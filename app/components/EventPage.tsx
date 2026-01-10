@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { EventData, EventDistance, events } from "@/app/data/events";
-import { getIconByName, ExternalLinkIcon, LocationIcon } from "./Icons";
+import { getIconByName, ExternalLinkIcon, LocationIcon, GravelBikeIcon } from "./Icons";
 import FAQ from "./FAQ";
 
 interface EventPageProps {
@@ -14,7 +14,7 @@ interface EventPageProps {
 
 export default function EventPage({ event, heroImage }: EventPageProps) {
   const allEvents = Object.values(events);
-  const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(0);
+  const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(event.distances.length - 1);
 
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const hasMultipleDistances = event.distances.length > 1;
@@ -34,19 +34,24 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
 
         {/* Navigation Buttons */}
         <nav className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-4 z-10">
-          {allEvents.map((e) => (
-            <Link
-              key={e.slug}
-              href={`/${e.slug}`}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                e.slug === event.slug
-                  ? "bg-white text-black"
-                  : "bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
-              }`}
-            >
-              {e.name}
-            </Link>
-          ))}
+          {allEvents.map((e) =>
+            e.slug === event.slug ? (
+              <span
+                key={e.slug}
+                className="px-6 py-3 rounded-lg font-semibold bg-white text-black cursor-default"
+              >
+                {e.name}
+              </span>
+            ) : (
+              <Link
+                key={e.slug}
+                href={`/${e.slug}`}
+                className="px-6 py-3 rounded-lg font-semibold transition-all bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
+              >
+                {e.name}
+              </Link>
+            )
+          )}
         </nav>
 
         {/* Event Title */}
@@ -62,6 +67,15 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
         {/* Facts Bar */}
         <div className="bg-gray-900 text-white py-8">
           <div className="max-w-5xl mx-auto px-4">
+            {/* Surface Type - Centered row */}
+            <div className="flex justify-center items-center gap-3 mb-6">
+              <GravelBikeIcon className="w-8 h-8 text-gray-400" />
+              <div>
+                <p className="text-sm text-gray-400">Segums</p>
+                <p className="text-xl font-semibold">{event.surfaceType}</p>
+              </div>
+            </div>
+            {/* Other facts */}
             <div className="flex justify-around items-center flex-wrap gap-6">
               {/* Location */}
               <div className="flex items-center gap-3">
@@ -124,7 +138,7 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
       {/* Route Section */}
       <section className="py-16 bg-gray-100">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">Maršruts</h2>
+          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">Maršruts</h2>
           {selectedDistance.komootEmbedUrl ? (
             <div className="w-full h-225">
               <iframe
@@ -144,7 +158,7 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
       {/* Registration Section */}
       <section className="py-16 bg-white">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Reģistrācija</h2>
+          <h2 className="text-3xl font-bold mb-4 text-gray-900">Reģistrācija</h2>
           <p className="text-gray-600 mb-8">
             Pievienojies {event.name} un izaicini sevi.
           </p>

@@ -20,6 +20,7 @@ export interface EventData {
   name: string;
   date: Date;
   location: EventLocation;
+  surfaceType: string;
   distances: EventDistance[];
   registrationUrl: string;
 }
@@ -33,11 +34,12 @@ export const events: Record<string, EventData> = {
       name: "Rēzekne",
       googleMapsUrl: "https://maps.google.com/?q=Rēzekne,Latvia",
     },
+    surfaceType: "Gravel",
     distances: [
       {
         name: "Piedzīvojums",
         facts: [
-          { icon: "calendar", label: "Datums", value: "6. jūnijs, 2026 09:00" },
+          { icon: "calendar", label: "Datums", value: "06/06 9AM" },
           { icon: "route", label: "Distance", value: "200 km" },
           { icon: "mountain", label: "Kāpums", value: "1200 m" },
           { icon: "clock", label: "Laika limits", value: "35h" },
@@ -48,7 +50,7 @@ export const events: Record<string, EventData> = {
       {
         name: "Izaicinājums",
         facts: [
-          { icon: "calendar", label: "Datums", value: "6. jūnijs, 2026 09:00" },
+          { icon: "calendar", label: "Datums", value: "06/06 9AM" },
           { icon: "route", label: "Distance", value: "370 km" },
           { icon: "mountain", label: "Kāpums", value: "3000 m" },
           { icon: "clock", label: "Laika limits", value: "35h" },
@@ -67,11 +69,12 @@ export const events: Record<string, EventData> = {
       name: "TBD",
       googleMapsUrl: "",
     },
+    surfaceType: "Gravel",
     distances: [
       {
         name: "Garā",
         facts: [
-          { icon: "calendar", label: "Datums", value: "29. augusts, 2026" },
+          { icon: "calendar", label: "Datums", value: "29/08" },
           { icon: "route", label: "Distance", value: "380 km" },
           { icon: "mountain", label: "Kāpums", value: "? m" },
           { icon: "clock", label: "Laika limits", value: "35h" },

@@ -103,6 +103,51 @@ export function LocationIcon({ className = "w-6 h-6" }: IconProps) {
   );
 }
 
+export function GravelBikeIcon({ className = "w-6 h-6" }: IconProps) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Wheels with gravel texture dots */}
+      <circle cx="5" cy="17" r="3" strokeWidth={1.5} />
+      <circle cx="19" cy="17" r="3" strokeWidth={1.5} />
+      {/* Frame */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M5 17l4-7h6l4 7M9 10l3 7M12 10v3M15 10l-1.5 4"
+      />
+      {/* Handlebars */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M15 10l1-2h2"
+      />
+      {/* Seat */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M9 10l-1-2h2"
+      />
+      {/* Gravel dots underneath */}
+      <circle cx="3" cy="21" r="0.5" fill="currentColor" />
+      <circle cx="6" cy="21.5" r="0.5" fill="currentColor" />
+      <circle cx="9" cy="21" r="0.5" fill="currentColor" />
+      <circle cx="12" cy="21.5" r="0.5" fill="currentColor" />
+      <circle cx="15" cy="21" r="0.5" fill="currentColor" />
+      <circle cx="18" cy="21.5" r="0.5" fill="currentColor" />
+      <circle cx="21" cy="21" r="0.5" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function ExternalLinkIcon({ className = "w-4 h-4" }: IconProps) {
   return (
     <svg
@@ -129,6 +174,7 @@ export function getIconByName(name: string) {
     mountain: MountainIcon,
     clock: ClockIcon,
     location: LocationIcon,
+    gravel: GravelBikeIcon,
   };
   return icons[name] || CalendarIcon;
 }

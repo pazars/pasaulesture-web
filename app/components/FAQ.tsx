@@ -71,7 +71,7 @@ export default function FAQ() {
   return (
     <section className="py-16 bg-gray-100">
       <div className="max-w-3xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8">
+        <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">
           Biežāk uzdotie jautājumi
         </h2>
         <div className="space-y-3">
