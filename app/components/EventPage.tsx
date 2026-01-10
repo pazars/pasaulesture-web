@@ -33,12 +33,12 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
         <div className="absolute inset-0 bg-black/30" />
 
         {/* Navigation Buttons */}
-        <nav className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-4 z-10">
+        <nav className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-wrap justify-center gap-2 sm:gap-4 z-10 max-w-[90vw]">
           {allEvents.map((e) =>
             e.slug === event.slug ? (
               <span
                 key={e.slug}
-                className="px-6 py-3 rounded-lg font-semibold bg-white text-black cursor-default"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold bg-white text-black cursor-default whitespace-nowrap"
               >
                 {e.name}
               </span>
@@ -46,7 +46,7 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
               <Link
                 key={e.slug}
                 href={`/${e.slug}`}
-                className="px-6 py-3 rounded-lg font-semibold transition-all bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm whitespace-nowrap"
               >
                 {e.name}
               </Link>
@@ -54,11 +54,14 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
           )}
         </nav>
 
-        {/* Event Title */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-6xl font-bold text-white drop-shadow-lg">
+        {/* Event Title + Quote */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+          <h1 className="text-4xl sm:text-6xl font-bold text-white drop-shadow-lg mb-6">
             {event.name}
           </h1>
+          <p className="text-lg sm:text-xl text-white/90 text-center max-w-2xl italic drop-shadow-md">
+            &ldquo;Ultra riteņbraukšanas pasākumi, kas sniedz iespēju apceļot pasaulē pazīstamas vietas tepat Latvijā.&rdquo;
+          </p>
         </div>
       </section>
 
@@ -115,21 +118,33 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
 
         {/* Distance Tabs - only show if multiple distances */}
         {hasMultipleDistances && (
-          <div className="bg-gray-100">
-            <div className="max-w-5xl mx-auto px-4 flex justify-center">
-              {event.distances.map((distance, index) => (
-                <button
-                  key={distance.name}
-                  onClick={() => setSelectedDistanceIndex(index)}
-                  className={`px-8 py-3 font-semibold transition-all rounded-b-lg ${
-                    index === selectedDistanceIndex
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-400 text-gray-700 hover:bg-gray-500"
-                  }`}
-                >
-                  {distance.name}
-                </button>
-              ))}
+          <div className="bg-gray-100 py-6">
+            <div className="max-w-5xl mx-auto px-4">
+              <h3 className="text-center text-lg font-semibold text-gray-700 mb-4">
+                Izvēlies distanci
+              </h3>
+              <div className="flex justify-center gap-4">
+                {event.distances.map((distance, index) => {
+                  const distanceFact = distance.facts.find(f => f.icon === "route");
+                  const distanceValue = distanceFact?.value || "";
+                  return (
+                    <button
+                      key={distance.name}
+                      onClick={() => setSelectedDistanceIndex(index)}
+                      className={`px-6 py-4 font-semibold transition-all rounded-lg border-2 ${
+                        index === selectedDistanceIndex
+                          ? "bg-gray-900 text-white border-gray-900"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:bg-gray-50"
+                      }`}
+                    >
+                      <span className="block text-lg">{distance.name}</span>
+                      <span className={`block text-sm ${index === selectedDistanceIndex ? "text-gray-300" : "text-gray-500"}`}>
+                        {distanceValue}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
