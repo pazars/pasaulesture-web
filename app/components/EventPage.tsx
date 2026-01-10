@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { EventData, events } from "@/app/data/events";
+import { useState } from "react";
+import { EventData, EventDistance, events } from "@/app/data/events";
 import { getIconByName, ExternalLinkIcon, LocationIcon } from "./Icons";
+import FAQ from "./FAQ";
 
 interface EventPageProps {
   event: EventData;
@@ -10,6 +14,10 @@ interface EventPageProps {
 
 export default function EventPage({ event, heroImage }: EventPageProps) {
   const allEvents = Object.values(events);
+  const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(0);
+
+  const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
+  const hasMultipleDistances = event.distances.length > 1;
 
   return (
     <div className="min-h-screen">
@@ -49,54 +57,78 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
         </div>
       </section>
 
-      {/* Facts Bar */}
-      <section className="bg-gray-900 text-white py-8">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex justify-around items-center flex-wrap gap-6">
-            {/* Location */}
-            <div className="flex items-center gap-3">
-              <LocationIcon className="w-8 h-8 text-gray-400" />
-              <div>
-                <p className="text-sm text-gray-400">Starts</p>
-                {event.location.googleMapsUrl ? (
-                  <a
-                    href={event.location.googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xl font-semibold hover:text-gray-300 transition-colors inline-flex items-center gap-1"
-                  >
-                    {event.location.name}
-                    <ExternalLinkIcon className="w-4 h-4" />
-                  </a>
-                ) : (
-                  <p className="text-xl font-semibold">{event.location.name}</p>
-                )}
-              </div>
-            </div>
-            {event.facts.map((fact, index) => {
-              const Icon = getIconByName(fact.icon);
-              return (
-                <div key={index} className="flex items-center gap-3">
-                  <Icon className="w-8 h-8 text-gray-400" />
-                  <div>
-                    <p className="text-sm text-gray-400">{fact.label}</p>
-                    <p className="text-xl font-semibold">{fact.value}</p>
-                  </div>
+      {/* Facts Bar + Distance Tabs */}
+      <section>
+        {/* Facts Bar */}
+        <div className="bg-gray-900 text-white py-8">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex justify-around items-center flex-wrap gap-6">
+              {/* Location */}
+              <div className="flex items-center gap-3">
+                <LocationIcon className="w-8 h-8 text-gray-400" />
+                <div>
+                  <p className="text-sm text-gray-400">Starts</p>
+                  {event.location.googleMapsUrl ? (
+                    <a
+                      href={event.location.googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xl font-semibold hover:text-gray-300 transition-colors inline-flex items-center gap-1"
+                    >
+                      {event.location.name}
+                      <ExternalLinkIcon className="w-4 h-4" />
+                    </a>
+                  ) : (
+                    <p className="text-xl font-semibold">{event.location.name}</p>
+                  )}
                 </div>
-              );
-            })}
+              </div>
+              {selectedDistance.facts.map((fact, index) => {
+                const Icon = getIconByName(fact.icon);
+                return (
+                  <div key={index} className="flex items-center gap-3">
+                    <Icon className="w-8 h-8 text-gray-400" />
+                    <div>
+                      <p className="text-sm text-gray-400">{fact.label}</p>
+                      <p className="text-xl font-semibold">{fact.value}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
+
+        {/* Distance Tabs - only show if multiple distances */}
+        {hasMultipleDistances && (
+          <div className="bg-gray-100">
+            <div className="max-w-5xl mx-auto px-4 flex justify-center">
+              {event.distances.map((distance, index) => (
+                <button
+                  key={distance.name}
+                  onClick={() => setSelectedDistanceIndex(index)}
+                  className={`px-8 py-3 font-semibold transition-all rounded-b-lg ${
+                    index === selectedDistanceIndex
+                      ? "bg-gray-900 text-white"
+                      : "bg-gray-400 text-gray-700 hover:bg-gray-500"
+                  }`}
+                >
+                  {distance.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Route Section */}
       <section className="py-16 bg-gray-100">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">Maršruts</h2>
-          {event.komootEmbedUrl ? (
+          {selectedDistance.komootEmbedUrl ? (
             <div className="w-full h-225">
               <iframe
-                src={event.komootEmbedUrl}
+                src={selectedDistance.komootEmbedUrl}
                 className="w-full h-full rounded-lg"
                 allowFullScreen
               />
@@ -133,6 +165,9 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
           )}
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FAQ />
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8">

@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation";
-import {
-  events,
-  getEventBySlug,
-  getRandomEventImage,
-} from "@/app/data/events";
+import { events, getEventBySlug } from "@/app/data/events";
+import { getRandomEventImage } from "@/app/data/events.server";
 import EventPage from "@/app/components/EventPage";
 
 interface PageProps {
@@ -20,7 +17,7 @@ export async function generateMetadata({ params }: PageProps) {
   if (!event) return {};
 
   return {
-    title: `${event.name} | Pasaules Tūre`,
+    title: `Pasaules Tūre`,
     description: `${event.name} - ultra riteņbraukšanas pasākums Latvijā`,
   };
 }
