@@ -54,13 +54,19 @@ export default function EventPage({ event, heroImage }: EventPageProps) {
           )}
         </nav>
 
-        {/* Event Title + Quote */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-          <h1 className="text-4xl sm:text-6xl font-bold text-white drop-shadow-lg mb-6">
+        {/* Event Title */}
+        <div className="absolute inset-0 flex items-center justify-center px-4">
+          <h1 className="text-4xl sm:text-6xl font-bold text-white text-center drop-shadow-lg">
             {event.name}
           </h1>
-          <p className="text-lg sm:text-xl text-white/90 text-center max-w-2xl italic drop-shadow-md">
-            &ldquo;Ultra riteņbraukšanas pasākumi, kas sniedz iespēju apceļot pasaulē pazīstamas vietas tepat Latvijā.&rdquo;
+        </div>
+      </section>
+
+      {/* Quote Section */}
+      <section className="bg-white py-8">
+        <div className="max-w-3xl mx-auto px-4">
+          <p className="text-lg sm:text-xl text-gray-700 text-center italic">
+            Ultra riteņbraukšanas pasākumi, kas sniedz iespēju apceļot pasaulē pazīstamas vietas tepat Latvijā.
           </p>
         </div>
       </section>
