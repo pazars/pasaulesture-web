@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { events, getEventBySlug } from "@/app/data/events";
-import { getRandomEventImage } from "@/app/data/events.server";
+import { getAllEventImages } from "@/app/data/events.server";
 import EventPage from "@/app/components/EventPage";
 
 interface PageProps {
@@ -32,7 +32,7 @@ export default async function Page({ params }: PageProps) {
     notFound();
   }
 
-  const heroImage = getRandomEventImage(slug);
+  const images = getAllEventImages(slug);
 
-  return <EventPage event={event} heroImage={heroImage} />;
+  return <EventPage event={event} images={images} />;
 }
