@@ -8,33 +8,70 @@ Pasaules Tūre website - a Next.js 16 application for ultra cycling events in La
 
 ## Commands
 
+### Development
 - `npm run dev` - Start development server
-- `npm run build` - Production build
+- `npm run build` - Production build (includes paraglide-js compilation)
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
+
+### Testing
+- `npm test` - Run unit tests (Vitest)
+- `npm run test:e2e` - Run E2E tests (Playwright, all browsers)
+- `npm run test:e2e:ui` - Run E2E tests with Playwright UI
+- `npm run test:e2e -- --project=chromium` - Run E2E tests in Chromium only
+
+### Internationalization
+- `npm run machine-translate` - Auto-translate missing keys using inlang
 
 ## Architecture
 
 - **Framework**: Next.js 16 with App Router
 - **Styling**: Tailwind CSS v4 (via PostCSS)
+- **i18n**: Paraglide-js with URL-based routing
+- **Testing**: Vitest (unit) + Playwright (E2E)
 - **Path alias**: `@/*` maps to project root
 
 ## Project Structure
 
 ```
 app/
-├── [slug]/page.tsx      # Dynamic event pages
-├── globals.css          # Design system (colors, animations, patterns)
-├── components/
-│   ├── EventPage.tsx    # Main event page component
-│   ├── Header.tsx       # Navigation header with event buttons
-│   ├── FAQ.tsx          # FAQ accordion component
-│   └── Icons.tsx        # SVG icon components
+├── layout.tsx           # Root layout (imports globals.css)
+├── [locale]/            # Locale-based routing
+│   ├── layout.tsx       # Locale layout (html/body tags, fonts, metadata)
+│   ├── page.tsx         # Home page (redirects to nearest event)
+│   ├── [slug]/page.tsx  # Dynamic event pages
+│   ├── privatuma-politika/  # Privacy policy page
+│   ├── noteikumi/       # Terms page
+│   └── components/
+│       ├── EventPage.tsx        # Main event page component
+│       ├── Header.tsx           # Navigation header with event buttons
+│       ├── FAQ.tsx              # FAQ accordion component
+│       ├── Icons.tsx            # SVG icon components
+│       ├── LanguageSwitcher.tsx # LV/EN language toggle
+│       └── LocaleProvider.tsx   # Client-side locale sync
 ├── data/
 │   ├── events.ts        # Event data and types
 │   └── events.server.ts # Server-side image utilities
-├── privatuma-politika/  # Privacy policy page
-└── noteikumi/           # Terms page
+└── globals.css          # Design system (colors, animations, patterns)
+
+messages/
+├── lv.json              # Latvian translations
+└── en.json              # English translations
+
+paraglide/
+└── runtime.ts           # Generated i18n runtime (auto-generated)
+
+proxy.ts                 # Locale detection and URL routing
+project.inlang/          # Inlang i18n configuration
+
+tests/
+├── unit/                # Vitest unit tests
+│   ├── proxy.test.ts
+│   └── translations.test.ts
+└── e2e/                 # Playwright E2E tests
+    ├── language-switching.spec.ts
+    ├── navigation.spec.ts
+    └── seo-metadata.spec.ts
 ```
 
 ## Design System
@@ -67,6 +104,41 @@ app/
 - Section spacing: `mt-6 mx-2`
 - Content constrained to `max-w-5xl` on desktop
 
+## Internationalization (i18n)
+
+### URL Structure
+- **Latvian (default)**: Clean URLs without locale prefix
+  - `/egipte-malta` (Latvian)
+  - `/privatuma-politika` (Latvian)
+- **English**: URLs with `/en/` prefix
+  - `/en/egipte-malta` (English)
+  - `/en/privatuma-politika` (English)
+- **Redirect behavior**: `/lv/...` always redirects to clean URL
+
+### Locale Detection Priority (proxy.ts)
+1. `PARAGLIDE_LOCALE` cookie
+2. `Accept-Language` header
+3. Default to Latvian (`lv`)
+
+### Translation Files
+- Located in `messages/lv.json` and `messages/en.json`
+- Keys must exist in both files (enforced by tests)
+- Use `m.key_name()` to access translations (imported from `@/paraglide/messages`)
+
+### Adding Translations
+1. Add key to both `messages/lv.json` and `messages/en.json`
+2. Import and use: `import * as m from "@/paraglide/messages";`
+3. Use in code: `m.your_key_name()`
+4. Run tests to verify: `npm test`
+
+### Components
+- **LanguageSwitcher**: Client component for LV/EN toggle
+  - Sets cookie before navigation to prevent redirects
+  - Uses `router.push()` for client-side navigation
+- **LocaleProvider**: Syncs locale between server and client
+  - Prevents hydration mismatches
+  - Required wrapper in `[locale]/layout.tsx`
+
 ## Key Patterns
 
 - Event images stored in `public/events/{slug}/`
@@ -74,3 +146,30 @@ app/
 - Distance selection defaults to full distance (last item)
 - Facts bar shows: Surface type (row 1), Location/Date/Time limit (row 2)
 - Distance buttons show: Name, Distance (km), Elevation (m)
+- HTML lang attribute set in `app/[locale]/layout.tsx` (not root layout)
+- Metadata (title, description) generated per-locale in `generateMetadata()`
+
+## Testing
+
+See [tests/CLAUDE.md](tests/CLAUDE.md) for comprehensive testing documentation.
+
+### Quick Start
+```bash
+# Run all unit tests
+npm test
+
+# Run all E2E tests (Chromium only, faster)
+npm run test:e2e -- --project=chromium
+
+# Run specific test file
+npm run test:e2e -- tests/e2e/language-switching.spec.ts
+```
+
+### Test Coverage
+- **77 total tests** (34 unit + 43 E2E)
+- Proxy routing logic
+- Translation completeness
+- Language switching functionality
+- SEO metadata (lang, title, description)
+- Navigation between pages
+- Cookie persistence
