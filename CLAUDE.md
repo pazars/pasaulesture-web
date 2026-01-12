@@ -10,7 +10,7 @@ Pasaules Tūre website - a Next.js 16 application for ultra cycling events in La
 
 ### Development
 - `npm run dev` - Start development server
-- `npm run build` - Production build (includes paraglide-js compilation)
+- `npm run build` - Production build
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
@@ -21,13 +21,14 @@ Pasaules Tūre website - a Next.js 16 application for ultra cycling events in La
 - `npm run test:e2e -- --project=chromium` - Run E2E tests in Chromium only
 
 ### Internationalization
+- `npm run build:i18n` - Compile translations (run after changing messages/*.json)
 - `npm run machine-translate` - Auto-translate missing keys using inlang
 
 ## Architecture
 
-- **Framework**: Next.js 16 with App Router
+- **Framework**: Next.js 16 with App Router (Turbopack)
 - **Styling**: Tailwind CSS v4 (via PostCSS)
-- **i18n**: Paraglide-js with URL-based routing
+- **i18n**: Paraglide-js with URL-based routing (compiled files committed)
 - **Testing**: Vitest (unit) + Playwright (E2E)
 - **Path alias**: `@/*` maps to project root
 
@@ -173,3 +174,22 @@ npm run test:e2e -- tests/e2e/language-switching.spec.ts
 - SEO metadata (lang, title, description)
 - Navigation between pages
 - Cookie persistence
+
+## Deployment
+
+### Committed Paraglide Files
+
+The `paraglide/` directory is **committed to git** (not gitignored) to avoid build-time compilation issues on Vercel.
+
+**Workflow:**
+1. Edit translations in `messages/lv.json` or `messages/en.json`
+2. Run `npm run build:i18n` to recompile paraglide files
+3. Commit both the message files and the regenerated paraglide files
+4. Push to deploy
+
+**Why this approach:**
+- ❌ Build-time compilation (`paraglide-js compile`) was hanging on Vercel
+- ❌ The inlang plugins need to be fetched from CDN during compilation, causing timeouts
+- ✅ Committing compiled files bypasses the compilation step entirely
+- ✅ Faster builds on Vercel
+- ✅ More reliable deployments

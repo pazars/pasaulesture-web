@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "paraglide-js compile --project ./project.inlang --outdir ./paraglide && next build",
+    "build": "next build",
+    "build:i18n": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
     "start": "next start",
     "lint": "eslint",
     "machine-translate": "inlang machine translate --project project.inlang",
