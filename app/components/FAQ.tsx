@@ -139,7 +139,7 @@ export default function FAQ() {
         <div className="mt-12 text-center">
           <p className="text-stone mb-4">{m.faq_contact_prompt()}</p>
           <a
-            href="mailto:info@pasaulestūre.lv"
+            href="mailto:pasaulesture@gmail.com"
             className="btn-secondary inline-flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
