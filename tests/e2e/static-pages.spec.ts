@@ -1,6 +1,100 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Static Pages Navigation", () => {
+  test.describe("Footer Links", () => {
+    test("should navigate to Latvian privacy policy from Latvian event page", async ({
+      page,
+      context,
+    }) => {
+      // Set Latvian locale cookie
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "lv",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+      await page.goto("/egipte-malta");
+
+      // Click privacy policy link in footer
+      const privacyLink = page.locator('a[href="/privatuma-politika"]');
+      await expect(privacyLink).toBeVisible();
+      await privacyLink.click();
+
+      // Should be on Latvian privacy policy page
+      await page.waitForURL("/privatuma-politika");
+      expect(page.url()).toMatch(/\/privatuma-politika$/);
+
+      // Check page title is in Latvian
+      await expect(page.locator("h1")).toContainText("Privātuma politika");
+    });
+
+    test("should navigate to English privacy policy from English event page", async ({
+      page,
+    }) => {
+      await page.goto("/en/egipte-malta");
+
+      // Click privacy policy link in footer
+      const privacyLink = page.locator('a[href="/en/privatuma-politika"]');
+      await expect(privacyLink).toBeVisible();
+      await privacyLink.click();
+
+      // Should be on English privacy policy page
+      await page.waitForURL("/en/privatuma-politika");
+      expect(page.url()).toMatch(/\/en\/privatuma-politika$/);
+
+      // Check page title is in English
+      await expect(page.locator("h1")).toContainText("Privacy Policy");
+    });
+
+    test("should navigate to Latvian terms from Latvian event page", async ({
+      page,
+      context,
+    }) => {
+      // Set Latvian locale cookie
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "lv",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+      await page.goto("/egipte-malta");
+
+      // Click terms link in footer
+      const termsLink = page.locator('a[href="/noteikumi"]');
+      await expect(termsLink).toBeVisible();
+      await termsLink.click();
+
+      // Should be on Latvian terms page
+      await page.waitForURL("/noteikumi");
+      expect(page.url()).toMatch(/\/noteikumi$/);
+
+      // Check page title is in Latvian
+      await expect(page.locator("h1")).toContainText("Noteikumi");
+    });
+
+    test("should navigate to English terms from English event page", async ({
+      page,
+    }) => {
+      await page.goto("/en/egipte-malta");
+
+      // Click terms link in footer
+      const termsLink = page.locator('a[href="/en/noteikumi"]');
+      await expect(termsLink).toBeVisible();
+      await termsLink.click();
+
+      // Should be on English terms page
+      await page.waitForURL("/en/noteikumi");
+      expect(page.url()).toMatch(/\/en\/noteikumi$/);
+
+      // Check page title is in English
+      await expect(page.locator("h1")).toContainText("Terms");
+    });
+  });
+
   test.describe("Privacy Policy Page", () => {
     test("should have back button that links to Latvian home from /privatuma-politika", async ({
       page,

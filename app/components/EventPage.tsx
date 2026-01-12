@@ -8,6 +8,7 @@ import { getIconByName, ExternalLinkIcon, LocationIcon, GravelBikeIcon } from ".
 import FAQ from "./FAQ";
 import Header from "./Header";
 import * as m from "@/paraglide/messages";
+import { getLocale } from "@/paraglide/runtime";
 
 interface EventPageProps {
   event: EventData;
@@ -479,13 +480,13 @@ export default function EventPage({ event, images }: EventPageProps) {
               {/* Links */}
               <nav className="flex gap-6">
                 <Link
-                  href="/privatuma-politika"
+                  href={getLocale() === "en" ? "/en/privatuma-politika" : "/privatuma-politika"}
                   className="text-sand/70 hover:text-amber-light transition-colors text-sm"
                 >
                   {m.footer_privacy()}
                 </Link>
                 <Link
-                  href="/noteikumi"
+                  href={getLocale() === "en" ? "/en/noteikumi" : "/noteikumi"}
                   className="text-sand/70 hover:text-amber-light transition-colors text-sm"
                 >
                   {m.footer_terms()}
