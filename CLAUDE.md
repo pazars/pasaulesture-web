@@ -140,6 +140,26 @@ tests/
   - Prevents hydration mismatches
   - Required wrapper in `[locale]/layout.tsx`
 
+### Long-Form Content Pages
+
+For pages with extensive content (like privacy policies or terms), use **locale-specific component files** instead of translation keys:
+
+**Structure:**
+```
+app/[locale]/page-name/
+├── page.tsx                    # Main page (imports locale-specific content)
+├── content/
+│   ├── Content.lv.tsx         # Latvian content
+│   └── Content.en.tsx         # English content
+```
+
+**Example:** Privacy Policy (`privatuma-politika`)
+- Title uses translation key: `m.page_privacy_title()`
+- Full content in separate components: `PrivacyContent.lv.tsx` / `PrivacyContent.en.tsx`
+- Benefits: Better formatting, type safety, no translation file bloat
+
+**Note:** Only `page_privacy_title` exists in `messages/*.json` - the full policy content is handled in component files.
+
 ## Key Patterns
 
 - Event images stored in `public/events/{slug}/`

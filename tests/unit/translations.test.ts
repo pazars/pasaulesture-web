@@ -90,7 +90,8 @@ describe('Translation coverage', () => {
     });
 
     it('should have all static page translations', () => {
-      const staticPageKeys = ['page_privacy_title', 'page_privacy_content', 'page_terms_title', 'page_terms_content'];
+      // Note: page_privacy_content is handled in separate component files (PrivacyContent.lv.tsx / PrivacyContent.en.tsx)
+      const staticPageKeys = ['page_privacy_title', 'page_terms_title', 'page_terms_content'];
 
       staticPageKeys.forEach(key => {
         expect(lvKeys).toContain(key);
