@@ -1,0 +1,70 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "site_title": "Pasaules Ture",
+  "site_description": "Ultra cycling events in Latvia",
+
+  "hero_quote": "Ultra cycling events that offer the opportunity to explore world-famous places right here in Latvia.",
+  "coming_soon": "Coming Soon",
+
+  "label_surface": "Surface",
+  "label_start": "Start",
+  "label_date": "Date",
+  "label_elevation": "Elevation",
+  "label_time_limit": "Time Limit",
+  "label_distance": "Distance",
+
+  "choose_route": "Choose your route",
+
+  "section_route": "Route",
+  "route_coming_soon": "Route coming soon...",
+
+  "register_badge": "Register now",
+  "register_heading": "Ready for the challenge?",
+  "register_button": "Register",
+  "registration_coming_soon": "Registration coming soon",
+
+  "faq_badge": "Help",
+  "faq_heading": "Frequently Asked Questions",
+  "faq_contact_prompt": "Didn't find the answer to your question?",
+  "faq_contact_button": "Contact us",
+
+  "faq_q1": "What is Pasaules Ture?",
+  "faq_a1": "Pasaules Ture is a series of ultra cycling events in Latvia that offers the opportunity to explore world-famous places right here in Latvia.",
+
+  "faq_q2": "Do I need a special bicycle?",
+  "faq_a2": "A Gravel or MTB type bicycle is recommended.",
+
+  "faq_q3": "How can I register?",
+  "faq_a3": "Registration takes place online by clicking the 'Register' button on the event page. After payment is received, you will receive a confirmation email.",
+
+  "faq_q4": "Is there a time limit?",
+  "faq_a4": "Yes, each distance has a set time limit. You can find precise information about the time limit in the event facts bar.",
+
+  "faq_q5": "What happens if I don't make the time limit?",
+  "faq_a5": "If you don't make the time limit, you can continue the route and will be counted among the finishers. However, you'll need to organize the finish badge separately after the event.",
+
+  "faq_q6": "Are there support points along the route?",
+  "faq_a6": "Yes, support points with water and snacks are placed along the route. Precise information will be sent to participants before the event.",
+
+  "back_to_home": "Back to home",
+
+  "footer_brand": "Pasaules Ture",
+  "footer_privacy": "Privacy Policy",
+  "footer_terms": "Terms",
+
+  "page_privacy_title": "Privacy Policy",
+  "page_terms_title": "Terms",
+  "page_terms_content": "Coming soon",
+
+  "aria_prev_image": "Previous image",
+  "aria_next_image": "Next image",
+  "aria_go_to_image": "Go to image {number}",
+
+  "event_egipte_malta": "Egypt-Malta",
+  "event_parize_dakara": "Paris-Dakar",
+
+  "distance_adventure": "Adventure",
+  "distance_challenge": "Challenge",
+  "distance_long": "Long"
+}
