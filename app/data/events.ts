@@ -13,6 +13,7 @@ export interface EventDistance {
   nameKey: string; // Translation key for distance name
   facts: EventFact[];
   komootEmbedUrl: string;
+  price: number; // Price in euros
 }
 
 export interface EventData {
@@ -46,6 +47,7 @@ export const events: Record<string, EventData> = {
         ],
         komootEmbedUrl:
           "https://www.komoot.com/tour/2745174862/embed?share_token=anNYG0j4XpOL98Qfekr2ycVKoKNDYV9l6lc43zZ3RAtjr810SB&profile=1",
+        price: 69,
       },
       {
         nameKey: "distance_challenge",
@@ -57,6 +59,7 @@ export const events: Record<string, EventData> = {
         ],
         komootEmbedUrl:
           "https://www.komoot.com/tour/2255436607/embed?share_token=adrib5Y0dhk2vnf6wz7UaepmHQEXDLqZh2gO94r4gck0d78ukL&profile=1",
+        price: 69,
       }
     ],
     registrationUrl: "",
@@ -80,6 +83,7 @@ export const events: Record<string, EventData> = {
           { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
         komootEmbedUrl: "",
+        price: 69,
       },
     ],
     registrationUrl: "",
