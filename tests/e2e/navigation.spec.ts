@@ -265,12 +265,12 @@ test.describe('Navigation', () => {
       await page.goto('/egipte-malta');
 
       // Find location link (if exists)
-      const locationLinks = page.getByRole('link').filter({ hasText: /Rēzekne|Riga/i });
+      const locationLinks = page.getByRole('link').filter({ hasText: /Sarkaņkalns|Rēzekne|Riga/i });
       const count = await locationLinks.count();
 
       if (count > 0) {
         const href = await locationLinks.first().getAttribute('href');
-        expect(href).toContain('maps.google.com');
+        expect(href).toMatch(/maps\.(google\.com|app\.goo\.gl)/);
       }
     });
   });

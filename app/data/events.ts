@@ -31,8 +31,8 @@ export const events: Record<string, EventData> = {
     nameKey: "event_egipte_malta",
     date: new Date("2026-06-06"),
     location: {
-      name: "Rēzekne",
-      googleMapsUrl: "https://maps.google.com/?q=Rēzekne,Latvia",
+      name: "Sarkaņkalns",
+      googleMapsUrl: "https://maps.app.goo.gl/ZT7SXvmoPGzpR8DM8",
     },
     surfaceType: "Gravel",
     distances: [
