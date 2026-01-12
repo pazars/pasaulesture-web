@@ -1,42 +1,37 @@
 "use client";
 
 import { useState } from "react";
+import * as m from "@/paraglide/messages";
 
 interface FAQItem {
-  question: string;
-  answer: string;
+  question: () => string;
+  answer: () => string;
 }
 
 const faqItems: FAQItem[] = [
   {
-    question: "Kas ir Pasaules Tūre?",
-    answer:
-      "Pasaules Tūre ir ultra riteņbraukšanas pasākumu sērija Latvijā, kas sniedz iespēju apceļot pasaulē pazīstamas vietas tepat Latvijā.",
+    question: m.faq_q1,
+    answer: m.faq_a1,
   },
   {
-    question: "Vai man ir nepieciešams speciāls velosipēds?",
-    answer:
-      "Ieteicams ir Gravel vai MTB tipa velosipēds.",
+    question: m.faq_q2,
+    answer: m.faq_a2,
   },
   {
-    question: "Kā es varu reģistrēties?",
-    answer:
-      "Reģistrācija notiek tiešsaistē, noklikšķinot uz 'Reģistrēties' pogas pasākuma lapā. Pēc maksājuma saņemšanas jūs saņemsiet apstiprinājuma e-pastu.",
+    question: m.faq_q3,
+    answer: m.faq_a3,
   },
   {
-    question: "Vai ir laika limits?",
-    answer:
-      "Jā, katrai distancei ir noteikts laika limits. Precīzu informāciju par laika limitu varat atrast pasākuma faktu joslā.",
+    question: m.faq_q4,
+    answer: m.faq_a4,
   },
   {
-    question: "Kas notiek, ja es nepaspēju laika limitā?",
-    answer:
-      "Ja neiekļaujaties laika limitā, jūs varat turpināt maršrutu un tiksiet ieskaitīts pie finišētājiem. Vienīgi finiša zīmodziņu būs jānoorganizē atsevišķi pēc sacensībām.",
+    question: m.faq_q5,
+    answer: m.faq_a5,
   },
   {
-    question: "Vai ir atbalsta punkti maršrutā?",
-    answer:
-      "Jā, maršrutā ir izvietoti atbalsta punkti ar ūdeni un uzkodām. Precīza informācija tiks nosūtīta dalībniekiem pirms pasākuma.",
+    question: m.faq_q6,
+    answer: m.faq_a6,
   },
 ];
 
@@ -89,10 +84,10 @@ export default function FAQ() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Palīdzība
+            {m.faq_badge()}
           </span>
           <h2 className="font-display text-4xl sm:text-5xl text-forest-deep mb-3">
-            Biežāk uzdotie jautājumi
+            {m.faq_heading()}
           </h2>
           <div className="section-divider w-24 mx-auto" />
         </div>
@@ -115,7 +110,7 @@ export default function FAQ() {
                   <div className="flex items-center">
                     <QuestionIcon />
                     <span className="font-bold text-earth-dark text-lg pr-4">
-                      {item.question}
+                      {item.question()}
                     </span>
                   </div>
                   <ChevronIcon isOpen={isOpen} />
@@ -130,7 +125,7 @@ export default function FAQ() {
                   <div className="overflow-hidden">
                     <div className="px-6 pb-6 pt-2">
                       <div className="pl-12 border-l-4 border-amber/40">
-                        <p className="text-stone leading-relaxed">{item.answer}</p>
+                        <p className="text-stone leading-relaxed">{item.answer()}</p>
                       </div>
                     </div>
                   </div>
@@ -142,15 +137,15 @@ export default function FAQ() {
 
         {/* Contact prompt */}
         <div className="mt-12 text-center">
-          <p className="text-stone mb-4">Neatradi atbildi uz savu jautājumu?</p>
+          <p className="text-stone mb-4">{m.faq_contact_prompt()}</p>
           <a
-            href="mailto:info@pasaulestūre.lv"
+            href="mailto:pasaulesture@gmail.com"
             className="btn-secondary inline-flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            Sazinies ar mums
+            {m.faq_contact_button()}
           </a>
         </div>
       </div>

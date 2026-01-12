@@ -1,6 +1,6 @@
 export interface EventFact {
   icon: string;
-  label: string;
+  labelKey: string; // Translation key for label
   value: string;
 }
 
@@ -10,14 +10,14 @@ export interface EventLocation {
 }
 
 export interface EventDistance {
-  name: string;
+  nameKey: string; // Translation key for distance name
   facts: EventFact[];
   komootEmbedUrl: string;
 }
 
 export interface EventData {
   slug: string;
-  name: string;
+  nameKey: string; // Translation key for event name
   date: Date;
   location: EventLocation;
   surfaceType: string;
@@ -28,32 +28,32 @@ export interface EventData {
 export const events: Record<string, EventData> = {
   "egipte-malta": {
     slug: "egipte-malta",
-    name: "Ēģipte-Malta",
+    nameKey: "event_egipte_malta",
     date: new Date("2026-06-06"),
     location: {
-      name: "Rēzekne",
-      googleMapsUrl: "https://maps.google.com/?q=Rēzekne,Latvia",
+      name: "Sarkaņkalns",
+      googleMapsUrl: "https://maps.app.goo.gl/ZT7SXvmoPGzpR8DM8",
     },
     surfaceType: "Gravel",
     distances: [
       {
-        name: "Piedzīvojums",
+        nameKey: "distance_adventure",
         facts: [
-          { icon: "calendar", label: "Datums", value: "06/06 9AM" },
-          { icon: "route", label: "Distance", value: "200 km" },
-          { icon: "mountain", label: "Kāpums", value: "1200 m" },
-          { icon: "clock", label: "Laika limits", value: "35h" },
+          { icon: "calendar", labelKey: "label_date", value: "06/06 9AM" },
+          { icon: "route", labelKey: "label_distance", value: "200 km" },
+          { icon: "mountain", labelKey: "label_elevation", value: "1200 m" },
+          { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
         komootEmbedUrl:
           "https://www.komoot.com/tour/2745174862/embed?share_token=anNYG0j4XpOL98Qfekr2ycVKoKNDYV9l6lc43zZ3RAtjr810SB&profile=1",
       },
       {
-        name: "Izaicinājums",
+        nameKey: "distance_challenge",
         facts: [
-          { icon: "calendar", label: "Datums", value: "06/06 9AM" },
-          { icon: "route", label: "Distance", value: "370 km" },
-          { icon: "mountain", label: "Kāpums", value: "3000 m" },
-          { icon: "clock", label: "Laika limits", value: "35h" },
+          { icon: "calendar", labelKey: "label_date", value: "06/06 9AM" },
+          { icon: "route", labelKey: "label_distance", value: "370 km" },
+          { icon: "mountain", labelKey: "label_elevation", value: "3000 m" },
+          { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
         komootEmbedUrl:
           "https://www.komoot.com/tour/2255436607/embed?share_token=adrib5Y0dhk2vnf6wz7UaepmHQEXDLqZh2gO94r4gck0d78ukL&profile=1",
@@ -63,7 +63,7 @@ export const events: Record<string, EventData> = {
   },
   "parize-dakara": {
     slug: "parize-dakara",
-    name: "Parīze-Dakāra",
+    nameKey: "event_parize_dakara",
     date: new Date("2026-08-29"),
     location: {
       name: "TBD",
@@ -72,12 +72,12 @@ export const events: Record<string, EventData> = {
     surfaceType: "Gravel",
     distances: [
       {
-        name: "Garā",
+        nameKey: "distance_long",
         facts: [
-          { icon: "calendar", label: "Datums", value: "29/08" },
-          { icon: "route", label: "Distance", value: "380 km" },
-          { icon: "mountain", label: "Kāpums", value: "? m" },
-          { icon: "clock", label: "Laika limits", value: "35h" },
+          { icon: "calendar", labelKey: "label_date", value: "29/08" },
+          { icon: "route", labelKey: "label_distance", value: "380 km" },
+          { icon: "mountain", labelKey: "label_elevation", value: "? m" },
+          { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
         komootEmbedUrl: "",
       },

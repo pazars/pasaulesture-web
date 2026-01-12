@@ -5,8 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:i18n": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "machine-translate": "inlang machine translate --project project.inlang",
+    "test": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "next": "16.1.1",
@@ -14,6 +19,11 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@inlang/cli": "^3.0.0",
+    "@inlang/paraglide-js": "^2.8.0",
+    "@inlang/plugin-m-function-matcher": "^2.1.2",
+    "@inlang/plugin-message-format": "^4.2.0",
+    "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -21,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }
