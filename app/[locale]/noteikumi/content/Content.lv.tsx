@@ -1,3 +1,5 @@
+import { CONTACT_INFO } from "@/app/data/contact";
+
 export default function TermsContentLV() {
     return (
         <div className="prose prose-lg max-w-none text-earth-dark">
@@ -6,9 +8,8 @@ export default function TermsContentLV() {
             </h2>
 
             <p>
-                Šajā interneta veikalā piedāvāto preču pārdevējs (Biedrība "Pasaules
-                Tūre" Reģ nr. 40008345302, Vestienas iela 43, Rīga LV-1035, Bankas
-                konts: LV50HABA0551060828205, epasts: pasaulesture@gmail.com) no vienas
+                Šajā interneta veikalā piedāvāto preču pārdevējs ({CONTACT_INFO.organizationName} Reģ nr. {CONTACT_INFO.registrationNumber}, {CONTACT_INFO.address}, Bankas
+                konts: {CONTACT_INFO.bankAccount}, epasts: {CONTACT_INFO.email}) no vienas
                 puses, turpmāk saukts Pārdevējs, un persona, kas veic pasūtījumu,
                 turpmāk saukta Pircējs, no otras puses, noslēdz šādu Līgumu: Pārdevējs
                 apņemas pārdot un piegādāt Pircējam pakalpojumus, atbilstoši Pircēja
@@ -74,7 +75,7 @@ export default function TermsContentLV() {
 
             <p>
                 Sūdzību par preču pieejamību vai kvalitāti lūdzam iesniegt elektroniski,
-                nosūtot uz elektronisko pasta adresi – pasaulesture@gmail.com Sūdzība
+                nosūtot uz elektronisko pasta adresi – {CONTACT_INFO.email} Sūdzība
                 tiks izskatīta 7 darba dienu laikā no sūdzības saņemšanas dienās,
                 atbildi nosūtot uz sūdzībā norādīto saziņas adresi.
             </p>

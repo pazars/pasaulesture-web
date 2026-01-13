@@ -1,3 +1,5 @@
+import { CONTACT_INFO } from "@/app/data/contact";
+
 export default function PrivacyContentLv() {
   return (
     <div className="prose prose-lg max-w-none text-gray-700">
@@ -6,8 +8,8 @@ export default function PrivacyContentLv() {
           1. Vispārīgie noteikumi
         </h2>
         <p className="mb-3">
-          <strong>1.1.</strong> Šī Privātuma politika apraksta, kā (Biedrība "Pasaules Tūre", Reģ nr. 40008345302,
-          Vestienas iela 43, Rīga LV-1035, Bankas konts: LV50HABA0551060828205) (turpmāk saukti arī – "Datu pārzinis")
+          <strong>1.1.</strong> Šī Privātuma politika apraksta, kā ({CONTACT_INFO.organizationName}, Reģ nr. {CONTACT_INFO.registrationNumber},
+          {CONTACT_INFO.address}, Bankas konts: {CONTACT_INFO.bankAccount}) (turpmāk saukti arī – "Datu pārzinis")
           iegūst, apstrādā un glabā personas datus, ko pasaulesture.lv iegūst no saviem klientiem un personām,
           kas apmeklē interneta mājaslapu (turpmāk saukti – "Datu subjekts" vai "Jūs").
         </p>
@@ -141,10 +143,10 @@ export default function PrivacyContentLv() {
           Pieprasījumu par savu tiesību īstenošanu varat iesniegt, iesūtot pieprasījumu elektroniski,
           rakstot uz{" "}
           <a
-            href="mailto:pasaulesture@gmail.com"
+            href={`mailto:${CONTACT_INFO.email}`}
             className="text-forest-deep hover:underline font-semibold"
           >
-            pasaulesture@gmail.com
+            {CONTACT_INFO.email}
           </a>
         </p>
       </section>
