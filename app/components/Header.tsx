@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { events } from "@/app/data/events";
 import LanguageSwitcher from "./LanguageSwitcher";
 import * as m from "@/paraglide/messages";
@@ -50,7 +51,9 @@ export default function Header({ currentSlug }: HeaderProps) {
           </nav>
 
           {/* Language switcher */}
-          <LanguageSwitcher />
+          <Suspense fallback={<div className="w-20 h-10" />}>
+            <LanguageSwitcher />
+          </Suspense>
         </div>
       </div>
     </header>

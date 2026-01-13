@@ -106,7 +106,20 @@ export default function EventPage({ event, images }: EventPageProps) {
 
   useEffect(() => {
     setIsLoaded(true);
-  }, []);
+    // Load persisted distance for this event
+    const savedDistance = localStorage.getItem(`last_distance_${event.slug}`);
+    if (savedDistance !== null) {
+      const index = parseInt(savedDistance, 10);
+      if (index >= 0 && index < event.distances.length) {
+        setSelectedDistanceIndex(index);
+      }
+    }
+  }, [event.slug, event.distances.length]);
+
+  const handleDistanceSelect = (index: number) => {
+    setSelectedDistanceIndex(index);
+    localStorage.setItem(`last_distance_${event.slug}`, index.toString());
+  };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -148,9 +161,8 @@ export default function EventPage({ event, images }: EventPageProps) {
               {/* Event Title & Tagline */}
               <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
                 <div
-                  className={`text-center transition-all duration-1000 ${
-                    isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                  }`}
+                  className={`text-center transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                    }`}
                 >
                   {/* Small decorative element */}
                   <div className="flex items-center justify-center gap-3 mb-4">
@@ -165,9 +177,8 @@ export default function EventPage({ event, images }: EventPageProps) {
 
                   {/* Event date badge */}
                   <div
-                    className={`mt-6 inline-flex items-center gap-2 glass-dark px-5 py-2.5 rounded-full transition-all duration-1000 delay-300 ${
-                      isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                    }`}
+                    className={`mt-6 inline-flex items-center gap-2 glass-dark px-5 py-2.5 rounded-full transition-all duration-1000 delay-300 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                      }`}
                   >
                     <svg className="w-5 h-5 text-amber-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -180,9 +191,8 @@ export default function EventPage({ event, images }: EventPageProps) {
 
                 {/* Scroll indicator */}
                 <div
-                  className={`absolute bottom-8 left-1/2 -translate-x-1/2 transition-all duration-1000 delay-700 ${
-                    isLoaded ? "opacity-100" : "opacity-0"
-                  }`}
+                  className={`absolute bottom-8 left-1/2 -translate-x-1/2 transition-all duration-1000 delay-700 ${isLoaded ? "opacity-100" : "opacity-0"
+                    }`}
                 >
                   <div className="animate-float">
                     <svg className="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,11 +230,10 @@ export default function EventPage({ event, images }: EventPageProps) {
                       <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          index === currentImageIndex
-                            ? "bg-amber-light w-8"
-                            : "bg-white/40 w-2 hover:bg-white/60"
-                        }`}
+                        className={`h-2 rounded-full transition-all duration-300 ${index === currentImageIndex
+                          ? "bg-amber-light w-8"
+                          : "bg-white/40 w-2 hover:bg-white/60"
+                          }`}
                         aria-label={m.aria_go_to_image({ number: String(index + 1) })}
                       />
                     ))}
@@ -339,12 +348,11 @@ export default function EventPage({ event, images }: EventPageProps) {
                   return (
                     <button
                       key={distance.nameKey}
-                      onClick={() => setSelectedDistanceIndex(index)}
-                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl border-2 overflow-hidden group ${
-                        isSelected
-                          ? "bg-forest-deep text-white border-forest-deep shadow-lg shadow-forest-deep/30"
-                          : "bg-white text-earth-dark border-sand hover:border-forest-medium hover:shadow-md"
-                      }`}
+                      onClick={() => handleDistanceSelect(index)}
+                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl border-2 overflow-hidden group ${isSelected
+                        ? "bg-forest-deep text-white border-forest-deep shadow-lg shadow-forest-deep/30"
+                        : "bg-white text-earth-dark border-sand hover:border-forest-medium hover:shadow-md"
+                        }`}
                     >
                       {/* Decorative corner */}
                       {isSelected && (
@@ -433,27 +441,15 @@ export default function EventPage({ event, images }: EventPageProps) {
               {m.register_heading()}
             </h2>
 
-            {event.registrationUrl ? (
-              <a
-                href={event.registrationUrl}
-                className="btn-primary inline-flex items-center gap-3 text-lg animate-pulse-glow"
-              >
-                <span>{m.register_button()}</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </a>
-            ) : (
-              <button
-                disabled
-                className="inline-flex items-center gap-3 bg-forest-light/50 text-sand/70 px-8 py-4 rounded-full font-bold cursor-not-allowed text-lg"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{m.registration_coming_soon()}</span>
-              </button>
-            )}
+            <Link
+              href={`/${getLocale() === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
+              className="btn-primary inline-flex items-center gap-3 text-lg animate-pulse-glow"
+            >
+              <span>{m.register_button()}</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </div>
         </section>
 
