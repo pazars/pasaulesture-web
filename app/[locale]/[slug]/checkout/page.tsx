@@ -6,6 +6,7 @@ import CheckoutHeader from "@/app/components/CheckoutHeader";
 import Link from "next/link";
 import * as m from "@/paraglide/messages";
 import { getLocale } from "@/paraglide/runtime";
+import { Suspense } from "react";
 
 interface CheckoutPageProps {
     params: Promise<{
@@ -66,9 +67,11 @@ export default async function CheckoutPage({
                             </h1>
                             <div className="section-divider w-24 mx-auto mb-8" />
 
-                            <CheckoutForm
-                                event={event}
-                            />
+                            <Suspense fallback={<div className="text-center py-8">Loading...</div>}>
+                                <CheckoutForm
+                                    event={event}
+                                />
+                            </Suspense>
                         </div>
                     </div>
                 </main>
