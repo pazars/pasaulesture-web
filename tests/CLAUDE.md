@@ -8,12 +8,15 @@ This directory contains all tests for the Pasaules Tūre website, covering both 
 tests/
 ├── unit/                    # Unit tests (Vitest)
 │   ├── proxy.test.ts       # Proxy middleware logic tests
-│   └── translations.test.ts # Translation coverage tests
+│   ├── translations.test.ts # Translation coverage tests
+│   └── contact.test.ts     # Contact info configuration tests
 └── e2e/                     # End-to-end tests (Playwright)
     ├── language-switching.spec.ts       # Language functionality tests
     ├── navigation.spec.ts               # Navigation and routing tests
     ├── seo-metadata.spec.ts             # SEO and metadata tests
     ├── static-pages.spec.ts             # Static page navigation tests
+    ├── contact-page.spec.ts             # Contact page functionality
+    ├── contact-info-consistency.spec.ts # Contact info consistency validation
     ├── checkout-page.spec.ts            # Checkout page loading & routing
     ├── checkout-form-interaction.spec.ts # Checkout form validation & interaction
     ├── checkout-selection.spec.ts       # Event & distance selection
