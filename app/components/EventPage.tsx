@@ -487,6 +487,12 @@ export default function EventPage({ event, images }: EventPageProps) {
                 >
                   {m.footer_terms()}
                 </Link>
+                <Link
+                  href={getLocale() === "en" ? "/en/kontakti" : "/kontakti"}
+                  className="text-sand/70 hover:text-amber-light transition-colors text-sm"
+                >
+                  {m.footer_contact()}
+                </Link>
               </nav>
             </div>
           </div>

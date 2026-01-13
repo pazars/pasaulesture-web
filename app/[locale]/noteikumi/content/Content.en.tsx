@@ -1,3 +1,5 @@
+import { CONTACT_INFO } from "@/app/data/contact";
+
 export default function TermsContentEN() {
     return (
         <div className="prose prose-lg max-w-none text-earth-dark">
@@ -13,9 +15,8 @@ export default function TermsContentEN() {
             </h2>
 
             <p>
-                The seller of goods offered in this online store (Association "Pasaules
-                Tūre" Reg. No. 40008345302, Vestienas Street 43, Riga LV-1035, Bank
-                account: LV50HABA0551060828205, email: pasaulesture@gmail.com) on one
+                The seller of goods offered in this online store ({CONTACT_INFO.organizationName} Reg. No. {CONTACT_INFO.registrationNumber}, {CONTACT_INFO.address}, Bank
+                account: {CONTACT_INFO.bankAccount}, email: {CONTACT_INFO.email}) on one
                 side, hereinafter referred to as the Seller, and the person placing the
                 order, hereinafter referred to as the Buyer, on the other side, enter
                 into the following Agreement: The Seller undertakes to sell and deliver
@@ -86,7 +87,7 @@ export default function TermsContentEN() {
             <p>
                 Please submit complaints about product availability or quality
                 electronically by sending them to the email address –
-                pasaulesture@gmail.com. The complaint will be reviewed within 7 business
+                {CONTACT_INFO.email}. The complaint will be reviewed within 7 business
                 days from the date of receipt, with a response sent to the contact
                 address specified in the complaint.
             </p>
