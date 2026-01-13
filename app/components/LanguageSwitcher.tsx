@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { locales } from "@/paraglide/runtime";
 import type { Locale } from "@/paraglide/runtime";
 
@@ -49,14 +49,20 @@ function getPathForLocale(currentPath: string, targetLocale: Locale): string {
 export default function LanguageSwitcher() {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const currentLocale = getLocaleFromPath(pathname);
 
   const handleLocaleChange = (targetLocale: Locale) => {
     if (targetLocale === currentLocale) return;
     const newPath = getPathForLocale(pathname, targetLocale);
+
+    // Preserve query parameters
+    const queryString = searchParams.toString();
+    const newPathWithQuery = queryString ? `${newPath}?${queryString}` : newPath;
+
     // Set cookie to target locale before navigating so proxy doesn't redirect back
     document.cookie = `PARAGLIDE_LOCALE=${targetLocale}; path=/; max-age=${60 * 60 * 24 * 365}`;
-    router.push(newPath);
+    router.push(newPathWithQuery);
   };
 
   return (

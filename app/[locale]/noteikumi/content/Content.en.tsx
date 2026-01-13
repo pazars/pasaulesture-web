@@ -1,6 +1,13 @@
 export default function TermsContentEN() {
     return (
         <div className="prose prose-lg max-w-none text-earth-dark">
+            <div className="bg-amber-light/20 border-l-4 border-amber px-4 py-3 mb-8 rounded">
+                <p className="text-sm text-gray-600 italic">
+                    <strong>Note:</strong> This is an AI-assisted translation from Latvian.
+                    In case of discrepancies, the Latvian version prevails.
+                </p>
+            </div>
+
             <h2 className="text-2xl font-display text-forest-deep mt-8 mb-4">
                 Distance Agreement
             </h2>
