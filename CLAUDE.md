@@ -43,6 +43,7 @@ app/
 │   ├── [slug]/page.tsx  # Dynamic event pages
 │   ├── privatuma-politika/  # Privacy policy page
 │   ├── noteikumi/       # Terms page
+│   ├── kontakti/        # Contact page
 │   └── components/
 │       ├── EventPage.tsx        # Main event page component
 │       ├── Header.tsx           # Navigation header with event buttons
@@ -52,7 +53,8 @@ app/
 │       └── LocaleProvider.tsx   # Client-side locale sync
 ├── data/
 │   ├── events.ts        # Event data and types
-│   └── events.server.ts # Server-side image utilities
+│   ├── events.server.ts # Server-side image utilities
+│   └── contact.ts       # Centralized contact information
 └── globals.css          # Design system (colors, animations, patterns)
 
 messages/
@@ -170,6 +172,47 @@ app/[locale]/page-name/
 - HTML lang attribute set in `app/[locale]/layout.tsx` (not root layout)
 - Metadata (title, description) generated per-locale in `generateMetadata()`
 
+## Contact Information
+
+**Centralized Configuration**: All contact information is stored in `app/data/contact.ts` as a single source of truth.
+
+### CONTACT_INFO Object
+```typescript
+{
+  email: "pasaulesture@gmail.com",
+  organizationName: "Biedrība \"Pasaules Tūre\"",
+  registrationNumber: "40008345302",
+  address: "Vestienas iela 43, Rīga LV-1035",
+  bankAccount: "LV50HABA0551060828205",
+}
+```
+
+### Usage
+Import and use the `CONTACT_INFO` object wherever contact details are needed:
+
+```typescript
+import { CONTACT_INFO } from "@/app/data/contact";
+
+// Email example
+<a href={`mailto:${CONTACT_INFO.email}`}>{CONTACT_INFO.email}</a>
+
+// Organization name example
+<p>{CONTACT_INFO.organizationName}</p>
+```
+
+### Where It's Used
+- **Contact Page** (`app/[locale]/kontakti/`) - Displays all contact info
+- **Privacy Policy** - Organization details and contact email
+- **Terms Page** - Seller information and complaint email
+- **FAQ Component** - "Contact us" mailto link
+- **Footer** - Contact page link
+
+### Updating Contact Info
+1. Edit values in `app/data/contact.ts`
+2. Changes automatically propagate to all pages
+3. Run `npm test` to verify consistency
+4. Tests will catch any missed hardcoded values
+
 ## Testing
 
 See [tests/CLAUDE.md](tests/CLAUDE.md) for comprehensive testing documentation.
@@ -187,13 +230,16 @@ npm run test:e2e -- tests/e2e/language-switching.spec.ts
 ```
 
 ### Test Coverage
-- **77 total tests** (34 unit + 43 E2E)
+- **250 total tests** (43 unit + 207 E2E)
 - Proxy routing logic
 - Translation completeness
 - Language switching functionality
 - SEO metadata (lang, title, description)
 - Navigation between pages
 - Cookie persistence
+- Contact page functionality
+- Contact information consistency across all pages
+- Centralized configuration validation
 
 ## Deployment
 

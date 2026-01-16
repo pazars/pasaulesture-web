@@ -1,70 +1,69 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-
   "site_title": "Pasaules Tūre",
   "site_description": "Ultra riteņbraukšanas pasākumi Latvijā",
-
   "hero_quote": "Ultra riteņbraukšanas pasākumi, kas sniedz iespēju apceļot pasaulē pazīstamas vietas tepat Latvijā.",
   "coming_soon": "Drīzumā",
-
   "label_surface": "Segums",
   "label_start": "Starts",
   "label_date": "Datums",
   "label_elevation": "Kāpums",
   "label_time_limit": "Laika limits",
   "label_distance": "Distance",
-
   "choose_route": "Izvēlies savu maršrutu",
-
   "section_route": "Maršruts",
   "route_coming_soon": "Maršruts drīzumā...",
-
   "register_badge": "Piesakies tagad",
   "register_heading": "Gatavs izaicinājumam?",
   "register_button": "Reģistrēties",
   "registration_coming_soon": "Reģistrācija drīzumā",
-
   "faq_badge": "Palīdzība",
   "faq_heading": "Biežāk uzdotie jautājumi",
   "faq_contact_prompt": "Neatradi atbildi uz savu jautājumu?",
   "faq_contact_button": "Sazinies ar mums",
-
   "faq_q1": "Kas ir Pasaules Tūre?",
   "faq_a1": "Pasaules Tūre ir ultra riteņbraukšanas pasākumu sērija Latvijā, kas sniedz iespēju apceļot pasaulē pazīstamas vietas tepat Latvijā.",
-
   "faq_q2": "Vai man ir nepieciešams speciāls velosipēds?",
   "faq_a2": "Ieteicams ir Gravel vai MTB tipa velosipēds.",
-
   "faq_q3": "Kā es varu reģistrēties?",
   "faq_a3": "Reģistrācija notiek tiešsaistē, noklikšķinot uz 'Reģistrēties' pogas pasākuma lapā. Pēc maksājuma saņemšanas jūs saņemsiet apstiprinājuma e-pastu.",
-
   "faq_q4": "Vai ir laika limits?",
   "faq_a4": "Jā, katrai distancei ir noteikts laika limits. Precīzu informāciju par laika limitu varat atrast pasākuma faktu joslā.",
-
   "faq_q5": "Kas notiek, ja es nepaspēju laika limitā?",
   "faq_a5": "Ja neiekļaujaties laika limitā, jūs varat turpināt maršrutu un tiksiet ieskaitīts pie finišētājiem. Vienīgi finiša zīmodziņu būs jānoorganizē atsevišķi pēc sacensībām.",
-
   "faq_q6": "Vai ir atbalsta punkti maršrutā?",
   "faq_a6": "Jā, maršrutā ir izvietoti atbalsta punkti ar ūdeni un uzkodām. Precīza informācija tiks nosūtīta dalībniekiem pirms pasākuma.",
-
   "back_to_home": "Atpakaļ uz sākumu",
-
   "footer_brand": "Pasaules Tūre",
   "footer_privacy": "Privātuma politika",
   "footer_terms": "Noteikumi",
-
+  "footer_contact": "Kontakti",
   "page_privacy_title": "Privātuma politika",
   "page_terms_title": "Noteikumi",
+  "page_contact_title": "Kontakti",
   "page_terms_content": "Tiks papildināts",
-
   "aria_prev_image": "Iepriekšējais attēls",
   "aria_next_image": "Nākamais attēls",
   "aria_go_to_image": "Iet uz attēlu {number}",
-
   "event_egipte_malta": "Ēģipte-Malta",
   "event_parize_dakara": "Parīze-Dakāra",
-
   "distance_adventure": "Piedzīvojums",
   "distance_challenge": "Izaicinājums",
-  "distance_long": "Garā"
+  "distance_long": "Garā",
+  "checkout_title": "Reģistrācija",
+  "checkout_notice": "Maksājumi vēl nav pieejami. Šī forma ir demonstrācijas nolūkiem.",
+  "checkout_event_label": "Pasākums",
+  "checkout_selection_label": "Izvēle",
+  "checkout_distance_label": "Distance",
+  "checkout_price_label": "Cena",
+  "checkout_name_label": "Vārds, uzvārds",
+  "checkout_email_label": "E-pasts",
+  "checkout_phone_label": "Telefons",
+  "checkout_emergency_label": "Ārkārtas kontakts",
+  "checkout_terms_label": "Es piekrītu",
+  "checkout_terms_link": "noteikumiem",
+  "checkout_submit": "Turpināt uz maksājumu",
+  "checkout_error_required": "Šis lauks ir obligāts",
+  "checkout_error_email": "Nederīga e-pasta adrese",
+  "checkout_error_terms": "Jums jāpiekrīt noteikumiem"
 }

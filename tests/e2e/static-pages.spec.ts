@@ -270,4 +270,204 @@ test.describe("Static Pages Navigation", () => {
       expect(page.url()).toMatch(/\/en\/(egipte-malta|parize-dakara)$/);
     });
   });
+
+  test.describe("AI Translation Notes", () => {
+    test("privacy policy should show AI translation note in English", async ({
+      page,
+      context,
+    }) => {
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "en",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+
+      await page.goto("/en/privatuma-politika");
+
+      // Should contain AI translation notice
+      const notice = page.locator("div.bg-amber-light\\/20");
+      await expect(notice).toBeVisible();
+
+      const noticeText = await notice.textContent();
+      expect(noticeText).toContain("AI-assisted translation");
+      expect(noticeText).toContain("Latvian version prevails");
+    });
+
+    test("privacy policy should not show AI translation note in Latvian", async ({
+      page,
+      context,
+    }) => {
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "lv",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+
+      await page.goto("/privatuma-politika");
+
+      // Should not contain AI translation notice
+      const pageText = await page.locator("body").textContent();
+      expect(pageText).not.toContain("AI-assisted translation");
+    });
+
+    test("terms should show AI translation note in English", async ({
+      page,
+      context,
+    }) => {
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "en",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+
+      await page.goto("/en/noteikumi");
+
+      // Should contain AI translation notice
+      const notice = page.locator("div.bg-amber-light\\/20");
+      await expect(notice).toBeVisible();
+
+      const noticeText = await notice.textContent();
+      expect(noticeText).toContain("AI-assisted translation");
+      expect(noticeText).toContain("Latvian version prevails");
+    });
+
+    test("terms should not show AI translation note in Latvian", async ({
+      page,
+      context,
+    }) => {
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "lv",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+
+      await page.goto("/noteikumi");
+
+      // Should not contain AI translation notice
+      const pageText = await page.locator("body").textContent();
+      expect(pageText).not.toContain("AI-assisted translation");
+    });
+  });
+
+  test.describe("Contact Information Validation", () => {
+    test("privacy policy LV should contain correct contact information", async ({
+      page,
+      context,
+    }) => {
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "lv",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+
+      await page.goto("/privatuma-politika");
+
+      const pageText = await page.locator("body").textContent();
+
+      // Check registration number
+      expect(pageText).toContain("40008345302");
+
+      // Check bank account
+      expect(pageText).toContain("LV50HABA0551060828205");
+
+      // Check email
+      expect(pageText).toContain("pasaulesture@gmail.com");
+    });
+
+    test("privacy policy EN should contain correct contact information", async ({
+      page,
+      context,
+    }) => {
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "en",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+
+      await page.goto("/en/privatuma-politika");
+
+      const pageText = await page.locator("body").textContent();
+
+      // Check registration number
+      expect(pageText).toContain("40008345302");
+
+      // Check bank account
+      expect(pageText).toContain("LV50HABA0551060828205");
+
+      // Check email
+      expect(pageText).toContain("pasaulesture@gmail.com");
+    });
+
+    test("terms LV should contain correct contact information", async ({
+      page,
+      context,
+    }) => {
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "lv",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+
+      await page.goto("/noteikumi");
+
+      const pageText = await page.locator("body").textContent();
+
+      // Check registration number
+      expect(pageText).toContain("40008345302");
+
+      // Check bank account
+      expect(pageText).toContain("LV50HABA0551060828205");
+
+      // Check email
+      expect(pageText).toContain("pasaulesture@gmail.com");
+    });
+
+    test("terms EN should contain correct contact information", async ({
+      page,
+      context,
+    }) => {
+      await context.addCookies([
+        {
+          name: "PARAGLIDE_LOCALE",
+          value: "en",
+          domain: "localhost",
+          path: "/",
+        },
+      ]);
+
+      await page.goto("/en/noteikumi");
+
+      const pageText = await page.locator("body").textContent();
+
+      // Check registration number
+      expect(pageText).toContain("40008345302");
+
+      // Check bank account
+      expect(pageText).toContain("LV50HABA0551060828205");
+
+      // Check email
+      expect(pageText).toContain("pasaulesture@gmail.com");
+    });
+  });
 });

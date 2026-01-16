@@ -90,13 +90,66 @@ describe('Translation coverage', () => {
     });
 
     it('should have all static page translations', () => {
-      // Note: page_privacy_content is handled in separate component files (PrivacyContent.lv.tsx / PrivacyContent.en.tsx)
-      const staticPageKeys = ['page_privacy_title', 'page_terms_title', 'page_terms_content'];
+      // Note: page_privacy_content and page_terms_content are handled in separate component files
+      const staticPageKeys = ['page_privacy_title', 'page_terms_title'];
 
       staticPageKeys.forEach(key => {
         expect(lvKeys).toContain(key);
         expect(enKeys).toContain(key);
       });
+    });
+
+    it('should have all checkout translations', () => {
+      const checkoutKeys = [
+        'checkout_title',
+        'checkout_notice',
+        'checkout_event_label',
+        'checkout_selection_label',
+        'checkout_distance_label',
+        'checkout_price_label',
+        'checkout_name_label',
+        'checkout_email_label',
+        'checkout_terms_label',
+        'checkout_terms_link',
+        'checkout_submit',
+        'checkout_error_required',
+        'checkout_error_email',
+        'checkout_error_terms',
+      ];
+
+      checkoutKeys.forEach(key => {
+        expect(lvKeys).toContain(key);
+        expect(enKeys).toContain(key);
+
+        // Verify they're not empty
+        const lvValue = lvMessages[key as keyof typeof lvMessages];
+        const enValue = enMessages[key as keyof typeof enMessages];
+
+        expect(typeof lvValue).toBe('string');
+        expect(typeof enValue).toBe('string');
+        expect((lvValue as string).trim()).not.toBe('');
+        expect((enValue as string).trim()).not.toBe('');
+      });
+    });
+
+    it('should have register button translations', () => {
+      const registerKeys = ['register_heading', 'register_button'];
+
+      registerKeys.forEach(key => {
+        expect(lvKeys).toContain(key);
+        expect(enKeys).toContain(key);
+      });
+    });
+
+    it('should have back_to_home translation', () => {
+      expect(lvKeys).toContain('back_to_home');
+      expect(enKeys).toContain('back_to_home');
+
+      const lvValue = lvMessages['back_to_home' as keyof typeof lvMessages];
+      const enValue = enMessages['back_to_home' as keyof typeof enMessages];
+
+      expect(typeof lvValue).toBe('string');
+      expect(typeof enValue).toBe('string');
     });
 
     it('should have all ARIA labels translated', () => {

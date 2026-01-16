@@ -2,8 +2,8 @@ import * as m from "@/paraglide/messages";
 import { locales, setLocale } from "@/paraglide/runtime";
 import type { Locale } from "@/paraglide/runtime";
 import Link from "next/link";
-import PrivacyContentLv from "./content/PrivacyContent.lv";
-import PrivacyContentEn from "./content/PrivacyContent.en";
+import ContactContentLv from "./content/ContactContent.lv";
+import ContactContentEn from "./content/ContactContent.en";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -13,13 +13,13 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-export default async function PrivacyPolicyPage({ params }: PageProps) {
+export default async function ContactPage({ params }: PageProps) {
   const { locale } = await params;
 
   // Set locale for translation functions
   setLocale(locale as Locale);
 
-  const Content = locale === "en" ? PrivacyContentEn : PrivacyContentLv;
+  const Content = locale === "en" ? ContactContentEn : ContactContentLv;
   const homeUrl = locale === "en" ? "/en" : "/";
 
   return (
@@ -46,7 +46,7 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
         </Link>
 
         <h1 className="text-4xl font-display text-forest-deep mb-12">
-          {m.page_privacy_title()}
+          {m.page_contact_title()}
         </h1>
         <Content />
       </div>

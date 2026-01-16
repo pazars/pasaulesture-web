@@ -1,3 +1,5 @@
+import { CONTACT_INFO } from "@/app/data/contact";
+
 export default function PrivacyContentEn() {
   return (
     <div className="prose prose-lg max-w-none text-gray-700">
@@ -13,8 +15,8 @@ export default function PrivacyContentEn() {
           1. General Provisions
         </h2>
         <p className="mb-3">
-          <strong>1.1.</strong> This Privacy Policy describes how (Association "Pasaules Tūre",
-          Reg. No. 40008345302, Vestienas Street 43, Riga LV-1035, Bank account: LV50HABA0551060828205)
+          <strong>1.1.</strong> This Privacy Policy describes how ({CONTACT_INFO.organizationName},
+          Reg. No. {CONTACT_INFO.registrationNumber}, {CONTACT_INFO.address}, Bank account: {CONTACT_INFO.bankAccount})
           (hereinafter also referred to as the "Data Controller") obtains, processes and stores
           personal data that pasaulesture.lv receives from its customers and persons who visit
           the website (hereinafter referred to as the "Data Subject" or "You").
@@ -156,10 +158,10 @@ export default function PrivacyContentEn() {
         <p className="mb-3">
           You can submit a request to exercise your rights by sending a request electronically to{" "}
           <a
-            href="mailto:pasaulesture@gmail.com"
+            href={`mailto:${CONTACT_INFO.email}`}
             className="text-forest-deep hover:underline font-semibold"
           >
-            pasaulesture@gmail.com
+            {CONTACT_INFO.email}
           </a>
         </p>
       </section>
