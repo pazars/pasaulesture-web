@@ -21,6 +21,20 @@ CREATE TABLE registrations (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Trigger to automatically update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_registrations_updated_at
+    BEFORE UPDATE ON registrations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
 CREATE INDEX idx_event_slug ON registrations(event_slug);
 CREATE INDEX idx_participant_email ON registrations(participant_email);
 CREATE INDEX idx_created_at ON registrations(created_at);
