@@ -8,19 +8,41 @@ beforeAll(() => {
 
 describe("Stripe Client", () => {
   it("should initialize Stripe client with secret key", async () => {
-    // Import the stripe client
-    const { stripe } = await import("@/app/lib/stripe");
+    const { getStripeClient } = await import("@/app/lib/stripe");
+
+    const stripe = getStripeClient();
 
     // Verify it's a Stripe instance
     expect(stripe).toBeInstanceOf(Stripe);
   });
 
   it("should use the same instance (singleton pattern)", async () => {
-    // Import stripe twice
-    const { stripe: stripe1 } = await import("@/app/lib/stripe");
-    const { stripe: stripe2 } = await import("@/app/lib/stripe");
+    const { getStripeClient } = await import("@/app/lib/stripe");
+
+    const stripe1 = getStripeClient();
+    const stripe2 = getStripeClient();
 
     // Verify they're the same instance
     expect(stripe1).toBe(stripe2);
+  });
+
+  it("should throw error if STRIPE_SECRET_KEY is not set", async () => {
+    // Save original env var
+    const originalKey = process.env.STRIPE_SECRET_KEY;
+
+    // Clear the env var
+    delete process.env.STRIPE_SECRET_KEY;
+
+    // Reset the module to clear the singleton
+    await vi.resetModules();
+
+    // Import fresh module
+    const { getStripeClient } = await import("@/app/lib/stripe");
+
+    // Verify it throws
+    expect(() => getStripeClient()).toThrow("STRIPE_SECRET_KEY is not set");
+
+    // Restore env var
+    process.env.STRIPE_SECRET_KEY = originalKey;
   });
 });
