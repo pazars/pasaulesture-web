@@ -11,6 +11,13 @@ interface CheckoutFormProps {
     event: EventData;
 }
 
+interface StripePrice {
+    priceId: string;
+    eventSlug: string;
+    distanceIndex: number;
+    amount: number;
+}
+
 // Helper to get translated distance name
 function getDistanceName(nameKey: string): string {
     const translations: Record<string, () => string> = {
@@ -53,13 +60,14 @@ export default function CheckoutForm({
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        phone: "",
-        emergencyContact: "",
         acceptTerms: false,
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [stripePrices, setStripePrices] = useState<StripePrice[]>([]);
+    const [priceLoading, setPriceLoading] = useState(true);
+    const [priceError, setPriceError] = useState<string | null>(null);
 
     // Load persisted form data on mount
     useEffect(() => {
@@ -83,6 +91,27 @@ export default function CheckoutForm({
         }
     }, []); // Run only on mount
 
+    // Fetch Stripe prices on mount
+    useEffect(() => {
+        async function fetchPrices() {
+            try {
+                const response = await fetch('/api/stripe/prices');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch prices');
+                }
+                const data = await response.json();
+                setStripePrices(data.prices || []);
+            } catch (error) {
+                console.error('Error fetching prices:', error);
+                setPriceError('Failed to load pricing information');
+            } finally {
+                setPriceLoading(false);
+            }
+        }
+
+        fetchPrices();
+    }, []);
+
     // Save selection and check for redirected persistence
     useEffect(() => {
         localStorage.setItem(`last_distance_${event.slug}`, selectedDistanceIndex.toString());
@@ -94,6 +123,11 @@ export default function CheckoutForm({
     const eventName = getEventName(event.nameKey);
     const distanceFact = selectedDistance.facts.find((f) => f.icon === "route");
     const elevationFact = selectedDistance.facts.find((f) => f.icon === "mountain");
+
+    // Find matching Stripe price
+    const matchingPrice = stripePrices.find(
+        p => p.eventSlug === event.slug && p.distanceIndex === selectedDistanceIndex
+    );
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
@@ -116,20 +150,52 @@ export default function CheckoutForm({
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         if (!validateForm()) {
             return;
         }
 
+        if (!matchingPrice) {
+            alert('Price information is not available. Please contact us.');
+            return;
+        }
+
         setIsSubmitting(true);
 
-        // Show "not yet functional" alert as per requirements
-        setTimeout(() => {
-            alert(m.checkout_notice());
+        try {
+            const response = await fetch('/api/checkout/create-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    eventSlug: event.slug,
+                    distanceIndex: selectedDistanceIndex,
+                    name: formData.name,
+                    email: formData.email,
+                    locale,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create checkout session');
+            }
+
+            const data = await response.json();
+
+            // Redirect to Stripe Checkout
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                throw new Error('No checkout URL returned');
+            }
+        } catch (error) {
+            console.error('Error creating checkout session:', error);
+            alert('Unable to start checkout. Please try again.');
             setIsSubmitting(false);
-        }, 500);
+        }
     };
 
     const handleInputChange = (field: string, value: string | boolean) => {
@@ -164,25 +230,32 @@ export default function CheckoutForm({
 
     const termsUrl = locale === "en" ? "/en/noteikumi" : "/noteikumi";
 
+    // Show error if price not found
+    const showPriceError = !priceLoading && !matchingPrice;
+
     return (
         <div>
             {/* Notice Banner */}
-            <div className="bg-amber/10 border-l-4 border-amber rounded-lg p-4 mb-8">
-                <div className="flex items-start gap-3">
-                    <svg
-                        className="w-6 h-6 text-amber flex-shrink-0 mt-0.5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
-                    <p className="text-sm text-earth-dark">{m.checkout_notice()}</p>
+            {showPriceError && (
+                <div className="bg-red-100 border-l-4 border-red-500 rounded-lg p-4 mb-8">
+                    <div className="flex items-start gap-3">
+                        <svg
+                            className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                        <p className="text-sm text-red-700">
+                            Registration is temporarily unavailable. Please contact us at pasaulesture@gmail.com
+                        </p>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Selected Event and Distance Info */}
             <div className="bg-forest-deep text-white rounded-2xl p-6 mb-8 shadow-xl">
@@ -194,7 +267,13 @@ export default function CheckoutForm({
                     </div>
                     <div className="text-right">
                         <p className="text-sand/60 text-xs uppercase tracking-widest mb-1">{m.checkout_price_label()}</p>
-                        <p className="text-3xl font-display text-amber-glow">€{selectedDistance.price}</p>
+                        {priceLoading ? (
+                            <p className="text-2xl font-display text-sand/50">Loading...</p>
+                        ) : matchingPrice ? (
+                            <p className="text-3xl font-display text-amber-glow">€{(matchingPrice.amount / 100).toFixed(0)}</p>
+                        ) : (
+                            <p className="text-xl font-display text-red-400">N/A</p>
+                        )}
                     </div>
                 </div>
 
@@ -379,7 +458,7 @@ export default function CheckoutForm({
                 {/* Submit Button */}
                 <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || priceLoading || showPriceError}
                     className="w-full btn-primary text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isSubmitting ? (
