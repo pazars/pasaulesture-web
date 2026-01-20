@@ -65,5 +65,15 @@
   "checkout_submit": "Turpināt uz maksājumu",
   "checkout_error_required": "Šis lauks ir obligāts",
   "checkout_error_email": "Nederīga e-pasta adrese",
-  "checkout_error_terms": "Jums jāpiekrīt noteikumiem"
+  "checkout_error_terms": "Jums jāpiekrīt noteikumiem",
+  "checkout_success_title": "Reģistrācija pabeigta!",
+  "checkout_success_message": "Paldies par reģistrāciju. Jūsu maksājums ir veiksmīgi apstrādāts.",
+  "checkout_error_title": "Kļūda",
+  "checkout_no_session": "Nav atrasta sesija.",
+  "checkout_invalid_session": "Neizdevās pārbaudīt maksājuma sesiju.",
+  "checkout_confirmation_email": "Apstiprinājuma e-pasts tiks nosūtīts uz jūsu norādīto e-pasta adresi.",
+  "label_participant": "Dalībnieks",
+  "label_event": "Pasākums",
+  "label_amount_paid": "Maksātā summa",
+  "button_back_to_event": "Atpakaļ uz pasākumu"
 }
