@@ -44,7 +44,92 @@ npm run dev
 
 All sections use `rounded-3xl` corners with `mt-6 mx-2` spacing for a friendly, card-based layout.
 
+## Testing Stripe Payments Locally
+
+### Prerequisites
+- Stripe account (free)
+- Stripe CLI installed: `brew install stripe/stripe-cli/stripe`
+
+### Setup Steps
+
+1. **Copy environment template:**
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. **Get Test API Keys:**
+   - Go to [Stripe Dashboard](https://dashboard.stripe.com)
+   - **Top left menu** → Switch to **Test Mode** (sandbox)
+   - Navigate to **Developers** → **API Keys**
+   - Copy both keys to `.env.local`:
+     ```bash
+     STRIPE_SECRET_KEY=sk_test_...
+     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+     ```
+
+3. **Create Test Products:**
+   - In Stripe Dashboard (Test Mode)
+   - Go to **Products** → **+ Add product**
+   - Create product with name and price
+   - **After creating**, click **Edit product**
+   - Scroll to **Metadata** section → **Add metadata**
+   - Add two keys (see `stripe-products.txt` for values):
+     - Key: `event_slug` → Value: `egipte-malta` or `parize-dakara`
+     - Key: `distance_index` → Value: `0`, `1`, etc.
+   - Click **Save**
+   - Repeat for all event distances
+
+   > **Tip:** Keep a `.gitignored` file (e.g., `stripe-products.txt`) with your product metadata mapping for reference.
+
+4. **Set up Webhook Listener:**
+   ```bash
+   stripe login
+   stripe listen --forward-to localhost:3000/api/webhooks/stripe
+   ```
+   Copy the `whsec_...` secret to `.env.local`:
+   ```bash
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   ```
+
+5. **Start Development Server:**
+   ```bash
+   npm run dev
+   ```
+
+6. **Test a Transaction:**
+   - Navigate to `http://localhost:3000/egipte-malta/checkout`
+   - Fill out the form
+   - Use test card: `4242 4242 4242 4242`
+   - Any future expiry date and CVC
+   - Complete payment
+
+7. **Verify:**
+   - Check Stripe CLI terminal for webhook event
+   - Check Stripe Dashboard → Payments for transaction
+   - Check your database for registration entry
+
+### Product Metadata Reference
+
+Create a file `stripe-products.txt` (gitignored) with this content:
+
+```
+Ēģipte-Malta - Piedzīvojums (200km):
+  event_slug: egipte-malta
+  distance_index: 0
+
+Ēģipte-Malta - Izaicinājums (370km):
+  event_slug: egipte-malta
+  distance_index: 1
+
+Parīze-Dakāra - Garā distance (380km):
+  event_slug: parize-dakara
+  distance_index: 0
+```
+
+For complete setup guide, see [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md).
+
 ## Adding Events
 
 1. Add event data in `app/data/events.ts`
 2. Add images to `public/events/{slug}/`
+3. Create corresponding Stripe products with metadata

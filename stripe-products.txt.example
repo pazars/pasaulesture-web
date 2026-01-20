@@ -1,0 +1,47 @@
+# Stripe Product Metadata Reference
+# Copy this to stripe-products.txt (gitignored) and update with your Stripe product IDs
+
+# Event: Ēģipte-Malta
+# Date: 2026-06-06
+
+Product 1: Ēģipte-Malta - Piedzīvojums (200km, 1200m elevation)
+  Stripe Product ID: prod_xxxxx
+  Price ID: price_xxxxx
+  Price: €69 (or your chosen price)
+  Metadata:
+    event_slug: egipte-malta
+    distance_index: 0
+
+Product 2: Ēģipte-Malta - Izaicinājums (370km, 3000m elevation)
+  Stripe Product ID: prod_xxxxx
+  Price ID: price_xxxxx
+  Price: €89 (or your chosen price)
+  Metadata:
+    event_slug: egipte-malta
+    distance_index: 1
+
+# Event: Parīze-Dakāra
+# Date: 2026-08-29
+
+Product 3: Parīze-Dakāra - Garā distance (380km)
+  Stripe Product ID: prod_xxxxx
+  Price ID: price_xxxxx
+  Price: €99 (or your chosen price)
+  Metadata:
+    event_slug: parize-dakara
+    distance_index: 0
+
+# How to create products:
+# 1. Go to Stripe Dashboard (Test Mode for testing)
+# 2. Products → + Add product
+# 3. Fill name, description, and price
+# 4. After creating, click "Edit product"
+# 5. Scroll to Metadata → Add metadata
+# 6. Add both event_slug and distance_index keys with exact values above
+# 7. Copy the product ID and price ID here for reference
+
+# Important:
+# - event_slug must match exactly from app/data/events.ts
+# - distance_index is zero-based (0, 1, 2, etc.)
+# - Create separate products in Test Mode and Live Mode
+# - Keep this file updated when adding new events/distances
