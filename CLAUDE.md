@@ -241,6 +241,67 @@ npm run test:e2e -- tests/e2e/language-switching.spec.ts
 - Contact information consistency across all pages
 - Centralized configuration validation
 
+## Stripe Payments
+
+### Architecture
+- **Payment Flow**: Stripe Checkout (hosted payment page)
+- **Database**: Vercel Postgres (`registrations` table)
+- **Price Management**: Stripe Dashboard (single source of truth)
+- **Webhooks**: `checkout.session.completed` → insert registration
+
+### API Routes
+- `GET /api/stripe/prices` - Fetch prices with event metadata
+- `POST /api/checkout/create-session` - Create checkout session
+- `POST /api/webhooks/stripe` - Handle Stripe webhooks
+
+### Environment Variables
+```bash
+STRIPE_SECRET_KEY=sk_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+POSTGRES_URL=postgres://...
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
+
+### Local Development
+See [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md) for complete setup guide.
+
+**Quick start:**
+1. Create Stripe products with metadata (`event_slug`, `distance_index`)
+2. Set up `.env.local` with API keys
+3. Run `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
+4. Test with card `4242 4242 4242 4242`
+
+### Testing
+- Unit tests: `npm test` (API routes, price matching, webhook handling)
+- E2E tests: `npm run test:e2e` (full checkout flow)
+- Manual: Use Stripe test cards (see docs)
+
+### Database Schema
+
+The `registrations` table stores completed registrations:
+
+```sql
+CREATE TABLE registrations (
+  id SERIAL PRIMARY KEY,
+  stripe_session_id VARCHAR(255) UNIQUE NOT NULL,
+  event_slug VARCHAR(255) NOT NULL,
+  distance_index INT NOT NULL,
+  participant_name VARCHAR(255) NOT NULL,
+  participant_email VARCHAR(255) NOT NULL,
+  amount_paid INT NOT NULL,
+  locale VARCHAR(10) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Product Metadata
+
+Each Stripe product must have these metadata fields:
+- `event_slug` - Maps to `events` object key (e.g., `egipte-malta`)
+- `distance_index` - Zero-based index in `event.distances` array (e.g., `0`, `1`)
+
 ## Deployment
 
 ### Committed Paraglide Files
