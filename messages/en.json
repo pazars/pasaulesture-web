@@ -65,5 +65,15 @@
   "checkout_submit": "Continue to payment",
   "checkout_error_required": "This field is required",
   "checkout_error_email": "Invalid email address",
-  "checkout_error_terms": "You must agree to the terms"
+  "checkout_error_terms": "You must agree to the terms",
+  "checkout_success_title": "Registration Complete!",
+  "checkout_success_message": "Thank you for registering. Your payment has been successfully processed.",
+  "checkout_error_title": "Error",
+  "checkout_no_session": "No session found.",
+  "checkout_invalid_session": "Unable to verify payment session.",
+  "checkout_confirmation_email": "A confirmation email will be sent to your provided email address.",
+  "label_participant": "Participant",
+  "label_event": "Event",
+  "label_amount_paid": "Amount Paid",
+  "button_back_to_event": "Back to Event"
 }
