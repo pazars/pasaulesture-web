@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "machine-translate": "inlang machine translate --project project.inlang",
+    "db:migrate": "node scripts/run-migrations.js",
     "test": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"

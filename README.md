@@ -81,7 +81,17 @@ All sections use `rounded-3xl` corners with `mt-6 mx-2` spacing for a friendly, 
 
    > **Tip:** Keep a `.gitignored` file (e.g., `stripe-products.txt`) with your product metadata mapping for reference.
 
-4. **Set up Webhook Listener:**
+4. **Run Database Migration:**
+   ```bash
+   npm run db:migrate
+   ```
+   This creates the `registrations` table in your Postgres database.
+
+   **Alternative methods:**
+   - **Vercel Console:** Copy contents of `app/db/migrations/001_create_registrations.sql` and run in Vercel Postgres query console
+   - **psql:** `psql "$POSTGRES_URL" < app/db/migrations/001_create_registrations.sql`
+
+5. **Set up Webhook Listener:**
    ```bash
    stripe login
    stripe listen --forward-to localhost:3000/api/webhooks/stripe
@@ -91,19 +101,19 @@ All sections use `rounded-3xl` corners with `mt-6 mx-2` spacing for a friendly, 
    STRIPE_WEBHOOK_SECRET=whsec_...
    ```
 
-5. **Start Development Server:**
+6. **Start Development Server:**
    ```bash
    npm run dev
    ```
 
-6. **Test a Transaction:**
+7. **Test a Transaction:**
    - Navigate to `http://localhost:3000/egipte-malta/checkout`
    - Fill out the form
    - Use test card: `4242 4242 4242 4242`
    - Any future expiry date and CVC
    - Complete payment
 
-7. **Verify:**
+8. **Verify:**
    - Check Stripe CLI terminal for webhook event
    - Check Stripe Dashboard → Payments for transaction
    - Check your database for registration entry
