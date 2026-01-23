@@ -17,7 +17,7 @@ const en_label_event = /** @type {(inputs: {}) => LocalizedString} */ () => {
 *
 * - If you want to change the translations, you can either edit the source files e.g. `en.json`, or
 * use another inlang app like [Fink](https://inlang.com/m/tdozzpar) or the [VSCode extension Sherlock](https://inlang.com/m/r7kp499g).
-*
+* 
 * @param {{}} inputs
 * @param {{ locale?: "lv" | "en" }} options
 * @returns {LocalizedString}
@@ -25,7 +25,7 @@ const en_label_event = /** @type {(inputs: {}) => LocalizedString} */ () => {
 /* @__NO_SIDE_EFFECTS__ */
 export const label_event = (inputs = {}, options = {}) => {
 	if (experimentalMiddlewareLocaleSplitting && isServer === false) {
-		return /** @type {any} */ (globalThis).__paraglide_ssr.label_event(inputs)
+		return /** @type {any} */ (globalThis).__paraglide_ssr.label_event(inputs) 
 	}
 	const locale = options.locale ?? getLocale()
 	trackMessageCall("label_event", locale)

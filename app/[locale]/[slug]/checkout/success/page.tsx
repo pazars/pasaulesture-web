@@ -99,12 +99,12 @@ export default async function CheckoutSuccessPage({
           </div>
           <div className="flex justify-between py-3 border-b border-stone/30">
             <span className="text-cream-light">{m.label_event()}:</span>
-            <span className="text-cream font-medium">{m[event.nameKey]()}</span>
+            <span className="text-cream font-medium">{(m as unknown as Record<string, () => string>)[event.nameKey]()}</span>
           </div>
           <div className="flex justify-between py-3 border-b border-stone/30">
             <span className="text-cream-light">{m.label_distance()}:</span>
             <span className="text-cream font-medium">
-              {m[distance.nameKey]()}
+              {(m as unknown as Record<string, () => string>)[distance.nameKey]()}
             </span>
           </div>
           <div className="flex justify-between py-3 border-b border-stone/30">

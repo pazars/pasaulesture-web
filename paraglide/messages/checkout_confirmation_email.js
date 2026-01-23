@@ -17,7 +17,7 @@ const en_checkout_confirmation_email = /** @type {(inputs: {}) => LocalizedStrin
 *
 * - If you want to change the translations, you can either edit the source files e.g. `en.json`, or
 * use another inlang app like [Fink](https://inlang.com/m/tdozzpar) or the [VSCode extension Sherlock](https://inlang.com/m/r7kp499g).
-*
+* 
 * @param {{}} inputs
 * @param {{ locale?: "lv" | "en" }} options
 * @returns {LocalizedString}
@@ -25,7 +25,7 @@ const en_checkout_confirmation_email = /** @type {(inputs: {}) => LocalizedStrin
 /* @__NO_SIDE_EFFECTS__ */
 export const checkout_confirmation_email = (inputs = {}, options = {}) => {
 	if (experimentalMiddlewareLocaleSplitting && isServer === false) {
-		return /** @type {any} */ (globalThis).__paraglide_ssr.checkout_confirmation_email(inputs)
+		return /** @type {any} */ (globalThis).__paraglide_ssr.checkout_confirmation_email(inputs) 
 	}
 	const locale = options.locale ?? getLocale()
 	trackMessageCall("checkout_confirmation_email", locale)
