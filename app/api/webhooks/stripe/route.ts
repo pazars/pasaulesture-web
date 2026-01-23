@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripeClient } from '@/app/lib/stripe';
-import { sql } from '@vercel/postgres';
+import { neon } from '@neondatabase/serverless';
 import Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -36,9 +36,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const sql = neon(process.env.DATABASE_URL!);
+
   // Handle the event
   switch (event.type) {
-    case 'checkout.session.completed':
+    case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
 
       try {
@@ -55,38 +57,77 @@ export async function POST(request: NextRequest) {
           break;
         }
 
-        // Insert registration into database
-        await sql`
-          INSERT INTO registrations (
-            stripe_session_id,
-            stripe_payment_intent_id,
-            amount_paid,
-            currency,
-            event_slug,
-            distance_index,
-            participant_name,
-            participant_email,
-            locale
-          ) VALUES (
-            ${session.id},
-            ${session.payment_intent as string},
-            ${session.amount_total},
-            ${session.currency},
-            ${event_slug},
-            ${parseInt(distance_index, 10)},
-            ${participant_name},
-            ${participant_email},
-            ${locale || 'lv'}
-          )
-          ON CONFLICT (stripe_session_id) DO NOTHING
+        // Try to update existing pending registration first
+        const updateResult = await sql`
+          UPDATE registrations
+          SET
+            payment_status = 'completed',
+            stripe_payment_intent_id = ${session.payment_intent as string},
+            amount_paid = ${session.amount_total},
+            currency = ${session.currency}
+          WHERE stripe_session_id = ${session.id}
+          RETURNING id
         `;
 
-        console.log('Registration created for session:', session.id);
+        if (updateResult.length === 0) {
+          // No pending registration found, insert new one (fallback for edge cases)
+          await sql`
+            INSERT INTO registrations (
+              stripe_session_id,
+              stripe_payment_intent_id,
+              amount_paid,
+              currency,
+              event_slug,
+              distance_index,
+              participant_name,
+              participant_email,
+              locale,
+              payment_status
+            ) VALUES (
+              ${session.id},
+              ${session.payment_intent as string},
+              ${session.amount_total},
+              ${session.currency},
+              ${event_slug},
+              ${parseInt(distance_index, 10)},
+              ${participant_name},
+              ${participant_email},
+              ${locale || 'lv'},
+              'completed'
+            )
+            ON CONFLICT (stripe_session_id) DO UPDATE SET
+              payment_status = 'completed',
+              stripe_payment_intent_id = ${session.payment_intent as string},
+              amount_paid = ${session.amount_total},
+              currency = ${session.currency}
+          `;
+          console.log('Registration created for session:', session.id);
+        } else {
+          console.log('Registration updated to completed for session:', session.id);
+        }
       } catch (error) {
-        console.error('Error processing webhook:', error);
+        console.error('Error processing checkout.session.completed:', error);
         // Still return 200 to prevent Stripe from retrying
       }
       break;
+    }
+
+    case 'checkout.session.expired': {
+      const session = event.data.object as Stripe.Checkout.Session;
+
+      try {
+        await sql`
+          UPDATE registrations
+          SET payment_status = 'expired'
+          WHERE stripe_session_id = ${session.id}
+            AND payment_status = 'pending'
+        `;
+        console.log('Registration marked as expired for session:', session.id);
+      } catch (error) {
+        console.error('Error processing checkout.session.expired:', error);
+      }
+      break;
+    }
 
     default:
       console.log('Unhandled event type:', event.type);

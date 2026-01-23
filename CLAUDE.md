@@ -245,7 +245,7 @@ npm run test:e2e -- tests/e2e/language-switching.spec.ts
 
 ### Architecture
 - **Payment Flow**: Stripe Checkout (hosted payment page)
-- **Database**: Vercel Postgres (`registrations` table)
+- **Database**: Neon Postgres (`registrations` table)
 - **Price Management**: Stripe Dashboard (single source of truth)
 - **Webhooks**: `checkout.session.completed` → insert registration
 
@@ -259,18 +259,23 @@ npm run test:e2e -- tests/e2e/language-switching.spec.ts
 STRIPE_SECRET_KEY=sk_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-POSTGRES_URL=postgres://...
+DATABASE_URL=postgres://...
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
+
+**Getting environment variables:**
+- Vercel integration: `vercel env pull --environment development`
+- Neon directly: Copy from Neon dashboard
 
 ### Local Development
 See [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md) for complete setup guide.
 
 **Quick start:**
 1. Create Stripe products with metadata (`event_slug`, `distance_index`)
-2. Set up `.env.local` with API keys
-3. Run `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
-4. Test with card `4242 4242 4242 4242`
+2. Set up `.env.local` with API keys (use `vercel env pull` for Neon)
+3. Run database migration: `npm run db:migrate`
+4. Start webhook listener: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
+5. Test with card `4242 4242 4242 4242`
 
 ### Testing
 - Unit tests: `npm test` (API routes, price matching, webhook handling)
@@ -279,22 +284,30 @@ See [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md) for complete setup guide.
 
 ### Database Schema
 
-The `registrations` table stores completed registrations:
+The `registrations` table tracks registration lifecycle:
 
 ```sql
 CREATE TABLE registrations (
   id SERIAL PRIMARY KEY,
   stripe_session_id VARCHAR(255) UNIQUE NOT NULL,
-  event_slug VARCHAR(255) NOT NULL,
+  stripe_payment_intent_id VARCHAR(255),
+  amount_paid INT,                           -- NULL until payment completes
+  currency VARCHAR(3) DEFAULT 'eur',
+  event_slug VARCHAR(100) NOT NULL,
   distance_index INT NOT NULL,
   participant_name VARCHAR(255) NOT NULL,
   participant_email VARCHAR(255) NOT NULL,
-  amount_paid INT NOT NULL,
-  locale VARCHAR(10) NOT NULL,
+  locale VARCHAR(5) DEFAULT 'lv',
+  payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- pending, completed, expired, failed
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
+
+**Payment Status Flow:**
+1. `pending` - Created when checkout session starts (before Stripe redirect)
+2. `completed` - Updated by webhook when `checkout.session.completed` fires
+3. `expired` - Updated by webhook when `checkout.session.expired` fires (user abandoned)
 
 ### Product Metadata
 

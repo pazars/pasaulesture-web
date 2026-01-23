@@ -4,6 +4,7 @@ import { NextRequest } from 'next/server';
 // Mock Stripe
 const mockPricesList = vi.fn();
 const mockCheckoutSessionsCreate = vi.fn();
+const mockSql = vi.fn();
 
 vi.mock('stripe', () => ({
   default: vi.fn().mockImplementation(() => ({
@@ -18,11 +19,18 @@ vi.mock('stripe', () => ({
   })),
 }));
 
+vi.mock('@neondatabase/serverless', () => ({
+  neon: vi.fn(() => mockSql),
+}));
+
 describe('POST /api/checkout/create-session', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.STRIPE_SECRET_KEY = 'sk_test_mock';
     process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+    process.env.DATABASE_URL = 'postgres://mock';
+    // Mock successful DB insert by default
+    mockSql.mockResolvedValue([] as any);
   });
 
   it('should create a checkout session successfully', async () => {
@@ -447,5 +455,91 @@ describe('POST /api/checkout/create-session', () => {
         },
       })
     );
+  });
+
+  it('should create pending registration in database', async () => {
+    mockPricesList.mockResolvedValue({
+      data: [
+        {
+          id: 'price_123',
+          active: true,
+          product: {
+            metadata: {
+              event_slug: 'egipte-malta',
+              distance_index: '0',
+            },
+          },
+        },
+      ],
+    });
+
+    mockCheckoutSessionsCreate.mockResolvedValue({
+      id: 'cs_test_pending',
+      url: 'https://checkout.stripe.com/pay/cs_test_pending',
+    });
+
+    const { POST } = await import('@/app/api/checkout/create-session/route');
+
+    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
+      method: 'POST',
+      body: JSON.stringify({
+        eventSlug: 'egipte-malta',
+        distanceIndex: 0,
+        name: 'Jānis Bērziņš',
+        email: 'janis@example.com',
+        locale: 'lv',
+      }),
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(200);
+    // Verify database insert was called with pending status
+    expect(mockSql).toHaveBeenCalled();
+  });
+
+  it('should still return success even if database insert fails', async () => {
+    mockPricesList.mockResolvedValue({
+      data: [
+        {
+          id: 'price_123',
+          active: true,
+          product: {
+            metadata: {
+              event_slug: 'egipte-malta',
+              distance_index: '0',
+            },
+          },
+        },
+      ],
+    });
+
+    mockCheckoutSessionsCreate.mockResolvedValue({
+      id: 'cs_test_db_fail',
+      url: 'https://checkout.stripe.com/pay/cs_test_db_fail',
+    });
+
+    // Simulate database error
+    mockSql.mockRejectedValue(new Error('Database connection failed'));
+
+    const { POST } = await import('@/app/api/checkout/create-session/route');
+
+    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
+      method: 'POST',
+      body: JSON.stringify({
+        eventSlug: 'egipte-malta',
+        distanceIndex: 0,
+        name: 'Jānis Bērziņš',
+        email: 'janis@example.com',
+        locale: 'lv',
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    // Should still succeed - webhook will create registration if this fails
+    expect(response.status).toBe(200);
+    expect(data.sessionId).toBe('cs_test_db_fail');
   });
 });

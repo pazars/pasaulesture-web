@@ -185,6 +185,45 @@ describe('Proxy middleware', () => {
     });
   });
 
+  describe('Query parameter preservation', () => {
+    it('should preserve query params when rewriting to /lv/', () => {
+      const request = createRequest('/egipte-malta/checkout/success?session_id=cs_test_123');
+      const response = proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get('x-middleware-rewrite')).toContain('/lv/egipte-malta/checkout/success');
+      expect(response.headers.get('x-middleware-rewrite')).toContain('session_id=cs_test_123');
+    });
+
+    it('should preserve query params when redirecting to /en/', () => {
+      const request = createRequest('/egipte-malta/checkout/success?session_id=cs_test_123', {
+        cookies: { PARAGLIDE_LOCALE: 'en' },
+      });
+      const response = proxy(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get('location')).toBe('http://localhost:3000/en/egipte-malta/checkout/success?session_id=cs_test_123');
+    });
+
+    it('should preserve query params when redirecting from /lv/ to clean URL', () => {
+      const request = createRequest('/lv/egipte-malta/checkout/success?session_id=cs_test_123');
+      const response = proxy(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get('location')).toBe('http://localhost:3000/egipte-malta/checkout/success?session_id=cs_test_123');
+    });
+
+    it('should preserve multiple query params', () => {
+      const request = createRequest('/egipte-malta/checkout?distance=1&promo=test');
+      const response = proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get('x-middleware-rewrite')).toContain('/lv/egipte-malta/checkout');
+      expect(response.headers.get('x-middleware-rewrite')).toContain('distance=1');
+      expect(response.headers.get('x-middleware-rewrite')).toContain('promo=test');
+    });
+  });
+
   describe('Edge cases', () => {
     it('should handle root path', () => {
       const request = createRequest('/');

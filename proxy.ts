@@ -59,9 +59,10 @@ export function proxy(request: NextRequest) {
     // /lv/egipte-malta → /egipte-malta
     if (pathnameLocale === defaultLocale) {
       const pathWithoutLocale = pathname.replace(/^\/lv/, "") || "/";
-      const response = NextResponse.redirect(
-        new URL(pathWithoutLocale, request.url)
-      );
+      const redirectUrl = new URL(pathWithoutLocale, request.url);
+      // Preserve query parameters during redirect
+      redirectUrl.search = request.nextUrl.search;
+      const response = NextResponse.redirect(redirectUrl);
       response.cookies.set("PARAGLIDE_LOCALE", defaultLocale, {
         maxAge: 60 * 60 * 24 * 365,
         path: "/",
@@ -85,9 +86,10 @@ export function proxy(request: NextRequest) {
   if (preferredLocale !== defaultLocale) {
     // User prefers non-default locale, redirect to prefixed URL
     // /egipte-malta → /en/egipte-malta
-    const response = NextResponse.redirect(
-      new URL(`/${preferredLocale}${pathname}`, request.url)
-    );
+    const redirectUrl = new URL(`/${preferredLocale}${pathname}`, request.url);
+    // Preserve query parameters during redirect
+    redirectUrl.search = request.nextUrl.search;
+    const response = NextResponse.redirect(redirectUrl);
     response.cookies.set("PARAGLIDE_LOCALE", preferredLocale, {
       maxAge: 60 * 60 * 24 * 365,
       path: "/",
@@ -97,9 +99,10 @@ export function proxy(request: NextRequest) {
 
   // Default locale - rewrite to /lv/... internally but keep clean URL
   // /egipte-malta → internally routes to /lv/egipte-malta
-  const response = NextResponse.rewrite(
-    new URL(`/${defaultLocale}${pathname}`, request.url)
-  );
+  const rewriteUrl = new URL(`/${defaultLocale}${pathname}`, request.url);
+  // Preserve query parameters during rewrite
+  rewriteUrl.search = request.nextUrl.search;
+  const response = NextResponse.rewrite(rewriteUrl);
   response.cookies.set("PARAGLIDE_LOCALE", defaultLocale, {
     maxAge: 60 * 60 * 24 * 365,
     path: "/",

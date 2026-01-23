@@ -32,6 +32,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
+  // Validate locale before using it
+  if (!locales.includes(locale as Locale)) {
+    return {
+      title: "Not Found",
+    };
+  }
+
   // Set locale for metadata generation
   setLocale(locale as Locale);
 

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { neon } from '@neondatabase/serverless';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-01-27.acacia',
 });
 
 export async function POST(request: NextRequest) {
+  const sql = neon(process.env.DATABASE_URL!);
   try {
     const body = await request.json();
     const { eventSlug, distanceIndex, name, email, locale } = body;
@@ -63,6 +65,32 @@ export async function POST(request: NextRequest) {
         locale: locale,
       },
     });
+
+    // Create pending registration in database
+    try {
+      await sql`
+        INSERT INTO registrations (
+          stripe_session_id,
+          event_slug,
+          distance_index,
+          participant_name,
+          participant_email,
+          locale,
+          payment_status
+        ) VALUES (
+          ${session.id},
+          ${eventSlug},
+          ${distanceIndex},
+          ${name},
+          ${email},
+          ${locale},
+          'pending'
+        )
+      `;
+    } catch (dbError) {
+      console.error('Error creating pending registration:', dbError);
+      // Continue anyway - webhook will create if this fails
+    }
 
     return NextResponse.json({
       sessionId: session.id,

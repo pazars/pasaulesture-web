@@ -5,7 +5,7 @@ This guide will help you set up and test Stripe payments locally.
 ## Prerequisites
 
 - Stripe account (free test mode)
-- Vercel Postgres database
+- Neon Postgres database
 - Stripe CLI installed
 
 ## Step 1: Create Stripe Account
@@ -52,9 +52,13 @@ Repeat for all events and distances (see `app/data/events.ts` for full list).
    STRIPE_SECRET_KEY=sk_test_...
    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
    STRIPE_WEBHOOK_SECRET=whsec_...  # Get this from Step 5
-   POSTGRES_URL=postgres://...  # From Vercel
+   DATABASE_URL=postgres://...  # From Neon
    NEXT_PUBLIC_BASE_URL=http://localhost:3000
    ```
+
+3. Get your Neon connection string:
+   - If using Vercel integration: `vercel env pull --environment development`
+   - If using Neon directly: Copy from Neon dashboard
 
 ## Step 5: Install and Configure Stripe CLI
 
@@ -86,14 +90,14 @@ Repeat for all events and distances (see `app/data/events.ts` for full list).
 
 ## Step 6: Run Database Migration
 
-1. Run the SQL migration in Vercel Postgres console:
-   ```sql
-   -- Copy contents from app/db/migrations/001_create_registrations.sql
-   ```
-
-Or use psql:
+Run the migration script:
 ```bash
-psql $POSTGRES_URL < app/db/migrations/001_create_registrations.sql
+npm run db:migrate
+```
+
+Or use psql directly:
+```bash
+psql $DATABASE_URL < app/db/migrations/001_create_registrations.sql
 ```
 
 ## Step 7: Start Development Server
@@ -131,7 +135,7 @@ psql $POSTGRES_URL < app/db/migrations/001_create_registrations.sql
 
 7. Check Stripe CLI terminal - you should see webhook event logged
 
-8. Verify database insert in Vercel Postgres console:
+8. Verify database insert in Neon console:
    ```sql
    SELECT * FROM registrations ORDER BY created_at DESC LIMIT 1;
    ```
@@ -172,9 +176,9 @@ This sends a test event to your local server.
 - Refresh `/api/stripe/prices` endpoint
 
 ### Database connection error
-- Verify `POSTGRES_URL` in `.env.local`
-- Check Vercel Postgres is running
-- Test connection: `psql $POSTGRES_URL -c "SELECT 1;"`
+- Verify `DATABASE_URL` in `.env.local`
+- Check Neon database is accessible
+- Test connection: `psql $DATABASE_URL -c "SELECT 1;"`
 
 ### Session expired on success page
 - Stripe sessions expire after 24 hours
