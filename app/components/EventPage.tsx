@@ -371,8 +371,14 @@ export default function EventPage({ event, images }: EventPageProps) {
                 <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden border border-sand/50">
                   <iframe
                     src={selectedDistance.komootEmbedUrl}
-                    className="w-full h-225"
-                    allowFullScreen
+                    title="Route Map"
+                    style={{
+                      width: '1px',
+                      minWidth: '100%',
+                      height: '700px',
+                      border: 'none',
+                      overflow: "hidden"
+                    }}
                   />
                 </div>
               </div>

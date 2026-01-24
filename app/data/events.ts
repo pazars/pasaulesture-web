@@ -46,7 +46,7 @@ export const events: Record<string, EventData> = {
           { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
         komootEmbedUrl:
-          "https://www.komoot.com/tour/2745174862/embed?share_token=anNYG0j4XpOL98Qfekr2ycVKoKNDYV9l6lc43zZ3RAtjr810SB&profile=1",
+          "https://ridewithgps.com/embeds?type=route&id=53804940&title=%C4%92%C4%A3ipte&metricUnits=true&sampleGraph=true",
       },
       {
         nameKey: "distance_challenge",
@@ -57,7 +57,7 @@ export const events: Record<string, EventData> = {
           { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
         komootEmbedUrl:
-          "https://www.komoot.com/tour/2255436607/embed?share_token=adrib5Y0dhk2vnf6wz7UaepmHQEXDLqZh2gO94r4gck0d78ukL&profile=1",
+          "https://ridewithgps.com/embeds?type=route&id=53804909&title=%C4%92%C4%A3ipte%20-%20Malta&metricUnits=true&sampleGraph=true",
       }
     ],
     registrationUrl: "",
