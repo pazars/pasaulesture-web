@@ -89,16 +89,35 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background-image:
-    /* Large vibrant pink bloom - top left */
-    radial-gradient(ellipse 70% 60% at 10% 30%, rgba(255, 135, 233, 0.45), transparent 50%),
-    /* Lime accent - top right */
-    radial-gradient(ellipse 50% 50% at 90% 20%, rgba(186, 253, 156, 0.35), transparent 45%),
-    /* Secondary pink - bottom right */
-    radial-gradient(ellipse 60% 50% at 85% 75%, rgba(255, 135, 233, 0.3), transparent 50%),
-    /* Beige warmth - center */
-    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(228, 218, 209, 0.15), transparent 50%),
-    /* Deep lime pool - bottom left */
-    radial-gradient(ellipse 45% 40% at 15% 80%, rgba(186, 253, 156, 0.25), transparent 45%);
+    /* Large vibrant pink bloom - top left (smooth multi-stop fade) */
+    radial-gradient(ellipse 80% 70% at 5% 25%,
+      rgba(255, 135, 233, 0.5) 0%,
+      rgba(255, 135, 233, 0.35) 20%,
+      rgba(255, 135, 233, 0.15) 40%,
+      transparent 70%),
+    /* Lime accent - top right (smooth multi-stop fade) */
+    radial-gradient(ellipse 60% 55% at 95% 15%,
+      rgba(186, 253, 156, 0.4) 0%,
+      rgba(186, 253, 156, 0.25) 25%,
+      rgba(186, 253, 156, 0.1) 50%,
+      transparent 75%),
+    /* Secondary pink - bottom right (smooth multi-stop fade) */
+    radial-gradient(ellipse 70% 60% at 90% 80%,
+      rgba(255, 135, 233, 0.35) 0%,
+      rgba(255, 135, 233, 0.2) 30%,
+      rgba(255, 135, 233, 0.08) 55%,
+      transparent 80%),
+    /* Beige warmth - center (very soft) */
+    radial-gradient(ellipse 100% 80% at 50% 45%,
+      rgba(228, 218, 209, 0.12) 0%,
+      rgba(228, 218, 209, 0.06) 40%,
+      transparent 70%),
+    /* Deep lime pool - bottom left (smooth multi-stop fade) */
+    radial-gradient(ellipse 55% 50% at 10% 85%,
+      rgba(186, 253, 156, 0.3) 0%,
+      rgba(186, 253, 156, 0.15) 30%,
+      rgba(186, 253, 156, 0.05) 55%,
+      transparent 80%);
 }
 
 /* Film grain texture - ABOVE gradients but BEHIND content (z-index: 1) */

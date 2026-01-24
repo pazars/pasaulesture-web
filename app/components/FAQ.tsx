@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { CONTACT_INFO } from "@/app/data/contact";
 
 interface FAQItem {
   questionKey: string;
@@ -74,36 +73,30 @@ export default function FAQ() {
   };
 
   return (
-    <section className="py-20 section-cream relative overflow-hidden rounded-3xl mt-6 mx-2">
+    <section className="py-20 relative overflow-hidden rounded-3xl mt-6 mx-2">
       <div className="max-w-3xl mx-auto px-6 relative z-10">
-        {/* Section header */}
+        {/* Section header - clean, no badge */}
         <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 bg-pink/20 text-pink px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {t("faq_badge")}
-          </span>
           <h2 className="font-display text-4xl sm:text-5xl text-beige mb-3">
             {t("faq_heading")}
           </h2>
           <div className="section-divider w-24 mx-auto" />
         </div>
 
-        {/* FAQ Items */}
+        {/* FAQ Items - opaque boxes for readability */}
         <div className="space-y-4">
           {faqItems.map((item, index) => {
             const isOpen = openIndex === index;
             return (
               <div
                 key={index}
-                className={`bg-white/8 backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-300 ${
+                className={`bg-blue/90 backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-300 shadow-lg ${
                   isOpen ? "ring-2 ring-pink/50" : ""
                 }`}
               >
                 <button
                   onClick={() => toggleItem(index)}
-                  className="group w-full px-6 py-5 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
+                  className="group w-full px-6 py-5 text-left flex items-center justify-between hover:bg-blue/95 transition-colors"
                 >
                   <div className="flex items-center">
                     <QuestionIcon />
@@ -123,7 +116,7 @@ export default function FAQ() {
                   <div className="overflow-hidden">
                     <div className="px-6 pb-6 pt-2">
                       <div className="pl-12 border-l-4 border-pink/40">
-                        <p className="text-beige/80 leading-relaxed">{t(item.answerKey as any)}</p>
+                        <p className="text-beige/90 leading-relaxed">{t(item.answerKey as any)}</p>
                       </div>
                     </div>
                   </div>
@@ -131,20 +124,6 @@ export default function FAQ() {
               </div>
             );
           })}
-        </div>
-
-        {/* Contact prompt */}
-        <div className="mt-12 text-center">
-          <p className="text-beige/70 mb-4">{t("faq_contact_prompt")}</p>
-          <a
-            href={`mailto:${CONTACT_INFO.email}`}
-            className="inline-flex items-center gap-2 bg-pink text-blue font-bold px-6 py-3 rounded-full hover:shadow-lg hover:shadow-pink/30 transition-all"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            {t("faq_contact_button")}
-          </a>
         </div>
       </div>
     </section>

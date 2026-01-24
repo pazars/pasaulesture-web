@@ -212,7 +212,7 @@ export default function EventPage({ event }: EventPageProps) {
         </section>
 
         {/* Quote Section - two paragraphs */}
-        <section className="relative section-cream py-16 overflow-hidden rounded-3xl mt-6 mx-2">
+        <section className="relative py-16 overflow-hidden rounded-3xl mt-6 mx-2">
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
             <p className="text-xl sm:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-6">
               &ldquo;{t("hero_quote")}&rdquo;
@@ -224,7 +224,7 @@ export default function EventPage({ event }: EventPageProps) {
         </section>
 
         {/* Combined Facts + Route Selection */}
-        <section className="relative mt-6 mx-2 rounded-3xl overflow-hidden section-cream py-8">
+        <section className="relative mt-6 mx-2 rounded-3xl overflow-hidden py-8">
           <div className="max-w-5xl mx-auto px-6">
             {/* Horizontal layout: Start | Route Buttons | Date */}
             <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
@@ -298,7 +298,7 @@ export default function EventPage({ event }: EventPageProps) {
         </section>
 
         {/* Route Section */}
-        <section className="py-20 section-cream relative overflow-hidden rounded-3xl mt-6 mx-2">
+        <section className="py-20 relative overflow-hidden rounded-3xl mt-6 mx-2">
           <div className="max-w-5xl mx-auto px-6 relative z-10">
             <div className="text-center mb-10">
               <h2 className="font-display text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
