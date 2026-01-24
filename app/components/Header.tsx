@@ -20,14 +20,14 @@ export default function Header({ currentSlug }: HeaderProps) {
       <div className="max-w-5xl mx-auto px-4">
         <div className="relative flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           {/* Event navigation - Center */}
-          <nav className="flex flex-wrap justify-center gap-2 sm:gap-3">
+          <nav className="flex flex-wrap justify-center gap-3">
             {allEvents.map((e) => {
               const isCurrent = e.slug === currentSlug;
               const eventName = t(e.nameKey as any);
               return isCurrent ? (
                 <span
                   key={e.slug}
-                  className="relative px-5 sm:px-7 py-2.5 sm:py-3 rounded-full font-accent font-bold bg-forest-deep text-white cursor-default whitespace-nowrap shadow-lg shadow-forest-deep/20"
+                  className="relative px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-bold text-lg bg-pink text-blue cursor-default whitespace-nowrap shadow-xl shadow-pink/40 scale-105"
                 >
                   {eventName}
                 </span>
@@ -35,7 +35,7 @@ export default function Header({ currentSlug }: HeaderProps) {
                 <Link
                   key={e.slug}
                   href={`/${e.slug}`}
-                  className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-full font-accent font-semibold transition-all whitespace-nowrap text-earth-dark bg-white/80 backdrop-blur-sm border border-sand hover:bg-white hover:border-forest-medium hover:shadow-md"
+                  className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-semibold text-lg transition-all whitespace-nowrap text-beige/70 hover:text-beige hover:bg-white/10"
                 >
                   {eventName}
                 </Link>
@@ -50,7 +50,7 @@ export default function Header({ currentSlug }: HeaderProps) {
               href="https://www.instagram.com/pasaulesture/?hl=en"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-forest-deep hover:text-amber transition-colors"
+              className="text-beige hover:text-pink transition-colors"
               aria-label="Instagram @pasaulesture"
             >
               <InstagramIcon className="w-6 h-6" />

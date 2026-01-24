@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { events, getEventBySlug } from "@/app/data/events";
-import { getAllEventImages } from "@/app/data/events.server";
 import EventPage from "@/app/components/EventPage";
 import { getTranslations } from "next-intl/server";
 import { locales } from "@/i18n/request";
@@ -68,7 +67,5 @@ export default async function Page({ params }: PageProps) {
     notFound();
   }
 
-  const images = getAllEventImages(slug);
-
-  return <EventPage event={event} images={images} />;
+  return <EventPage event={event} />;
 }

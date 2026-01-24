@@ -5,30 +5,39 @@
 
 /* ===== DESIGN TOKENS ===== */
 :root {
-  /* Forest Adventure Palette */
-  --forest-deep: #1a3a2f;
-  --forest-medium: #2d5a47;
-  --forest-light: #3d7a5f;
-  --moss: #4a8c6b;
+  /* Retro Pop Palette */
+  --beige: #E4DAD1;
+  --lime: #BAFD9C;
+  --pink: #FF87E9;
+  --bronze: #7F6A00;
+  /* Parīze - Dakāra specific */
+  --blue: #1F4C90;
+  /* Ēģipte - Malta specific */
 
-  --amber: #e07b39;
-  --amber-light: #f4a261;
-  --amber-glow: #ffb84d;
+  /* Legacy Mappings (formerly Forest/Amber) */
+  --forest-deep: var(--blue);
+  --forest-medium: color-mix(in srgb, var(--blue), white 20%);
+  --forest-light: var(--bronze);
+  --moss: var(--lime);
 
-  --earth-dark: #2c2416;
-  --earth-warm: #4a3f2f;
-  --stone: #8b7355;
-  --sand: #d4c4a8;
-  --cream: #f5f0e6;
-  --cream-light: #faf8f3;
+  --amber: var(--pink);
+  --amber-light: color-mix(in srgb, var(--pink), white 20%);
+  --amber-glow: var(--lime);
 
-  --charcoal: #1c1c1c;
-  --charcoal-warm: #2a2520;
+  --earth-dark: var(--blue);
+  --earth-warm: var(--bronze);
+  --stone: color-mix(in srgb, var(--bronze), white 20%);
+  --sand: var(--beige);
+  --cream: color-mix(in srgb, var(--beige), white 5%);
+  --cream-light: var(--beige);
+
+  --charcoal: var(--blue);
+  --charcoal-warm: var(--bronze);
 
   /* Semantic */
-  --background: var(--cream-light);
-  --foreground: var(--earth-dark);
-  --text-muted: var(--stone);
+  --background: var(--blue);
+  --foreground: var(--beige);
+  --text-muted: color-mix(in srgb, var(--beige), transparent 40%);
 }
 
 @theme inline {
@@ -46,18 +55,132 @@
   --color-earth-dark: var(--earth-dark);
   --color-earth-warm: var(--earth-warm);
   --color-stone: var(--stone);
-  --color-sand: var(--sand);
-  --color-cream: var(--cream);
-  --color-cream-light: var(--cream-light);
+  /* Translucent/Glassy definitions */
+  --color-sand: rgba(228, 218, 209, 0.2);
+  --color-cream: rgba(255, 255, 255, 0.03);
+  --color-cream-light: rgba(255, 255, 255, 0.05);
   --color-charcoal: var(--charcoal);
   --color-charcoal-warm: var(--charcoal-warm);
+
+  /* New named references */
+  --color-beige: var(--beige);
+  --color-lime: var(--lime);
+  --color-pink: var(--pink);
+  --color-bronze: var(--bronze);
+  --color-blue: var(--blue);
+  --color-dakara: var(--bronze);
+  --color-malta: var(--blue);
 }
 
 /* ===== BASE STYLES ===== */
 body {
-  background: var(--background);
+  background-color: #1F4C90;
   color: var(--foreground);
   font-family: 'Josefin Sans', system-ui, sans-serif;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Gradient layer - BEHIND content (z-index: 0) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    /* Large vibrant pink bloom - top left */
+    radial-gradient(ellipse 70% 60% at 10% 30%, rgba(255, 135, 233, 0.45), transparent 50%),
+    /* Lime accent - top right */
+    radial-gradient(ellipse 50% 50% at 90% 20%, rgba(186, 253, 156, 0.35), transparent 45%),
+    /* Secondary pink - bottom right */
+    radial-gradient(ellipse 60% 50% at 85% 75%, rgba(255, 135, 233, 0.3), transparent 50%),
+    /* Beige warmth - center */
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(228, 218, 209, 0.15), transparent 50%),
+    /* Deep lime pool - bottom left */
+    radial-gradient(ellipse 45% 40% at 15% 80%, rgba(186, 253, 156, 0.25), transparent 45%);
+}
+
+/* Film grain texture - ABOVE gradients but BEHIND content (z-index: 1) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("/insp/texture.png");
+  background-size: 300px 300px;
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+}
+
+/* Main content - sits ABOVE all background effects */
+.main-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== SECTION STYLES ===== */
+/* Borderless glass sections */
+.section-glass {
+  background: rgba(31, 76, 144, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Subtle blend sections - no borders */
+.section-cream {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Bold accent sections with vibrant colors */
+.section-accent {
+  background: linear-gradient(135deg,
+    var(--pink) 0%,
+    color-mix(in srgb, var(--pink), var(--lime) 30%) 100%);
+  color: var(--blue);
+}
+
+/* Deep blue blend sections - no borders */
+.section-deep {
+  background: rgba(31, 76, 144, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ===== CARD STYLES ===== */
+.card-elevated {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 10px 20px -5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card-elevated:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 12px -2px rgba(0, 0, 0, 0.15),
+    0 20px 40px -10px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== SECTION DIVIDERS ===== */
+.section-divider {
+  height: 4px;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      var(--lime) 20%,
+      var(--pink) 50%,
+      var(--lime) 80%,
+      transparent 100%);
+  border-radius: 2px;
 }
 
 /* ===== TYPOGRAPHY ===== */
@@ -77,6 +200,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -84,8 +208,13 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
@@ -93,6 +222,7 @@ body {
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -104,6 +234,7 @@ body {
     opacity: 0;
     transform: translateX(-40px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -115,6 +246,7 @@ body {
     opacity: 0;
     transform: translateX(40px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -122,22 +254,43 @@ body {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(224, 123, 57, 0.4); }
-  50% { box-shadow: 0 0 40px rgba(224, 123, 57, 0.7); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 135, 233, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(255, 135, 233, 0.7);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes dash {
-  to { stroke-dashoffset: 0; }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 /* Animation utilities */
@@ -170,14 +323,37 @@ body {
 }
 
 /* Stagger delays */
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
-.delay-500 { animation-delay: 500ms; }
-.delay-600 { animation-delay: 600ms; }
-.delay-700 { animation-delay: 700ms; }
-.delay-800 { animation-delay: 800ms; }
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
+}
+
+.delay-600 {
+  animation-delay: 600ms;
+}
+
+.delay-700 {
+  animation-delay: 700ms;
+}
+
+.delay-800 {
+  animation-delay: 800ms;
+}
 
 /* Initially hidden for animation */
 .animate-on-load {
@@ -186,12 +362,12 @@ body {
 
 /* ===== DECORATIVE PATTERNS ===== */
 .topo-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 50 Q 30 30, 50 50 T 90 50' fill='none' stroke='%232d5a47' stroke-width='0.5' opacity='0.15'/%3E%3Cpath d='M10 30 Q 30 10, 50 30 T 90 30' fill='none' stroke='%232d5a47' stroke-width='0.5' opacity='0.1'/%3E%3Cpath d='M10 70 Q 30 50, 50 70 T 90 70' fill='none' stroke='%232d5a47' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 50 Q 30 30, 50 50 T 90 50' fill='none' stroke='%23E4DAD1' stroke-width='0.5' opacity='0.15'/%3E%3Cpath d='M10 30 Q 30 10, 50 30 T 90 30' fill='none' stroke='%23E4DAD1' stroke-width='0.5' opacity='0.1'/%3E%3Cpath d='M10 70 Q 30 50, 50 70 T 90 70' fill='none' stroke='%23E4DAD1' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E");
   background-size: 200px 200px;
 }
 
 .topo-pattern-light {
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 50 Q 30 30, 50 50 T 90 50' fill='none' stroke='%23d4c4a8' stroke-width='0.5' opacity='0.3'/%3E%3Cpath d='M10 30 Q 30 10, 50 30 T 90 30' fill='none' stroke='%23d4c4a8' stroke-width='0.5' opacity='0.2'/%3E%3Cpath d='M10 70 Q 30 50, 50 70 T 90 70' fill='none' stroke='%23d4c4a8' stroke-width='0.5' opacity='0.2'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 50 Q 30 30, 50 50 T 90 50' fill='none' stroke='%23E4DAD1' stroke-width='0.5' opacity='0.1'/%3E%3Cpath d='M10 30 Q 30 10, 50 30 T 90 30' fill='none' stroke='%23E4DAD1' stroke-width='0.5' opacity='0.05'/%3E%3Cpath d='M10 70 Q 30 50, 50 70 T 90 70' fill='none' stroke='%23E4DAD1' stroke-width='0.5' opacity='0.05'/%3E%3C/svg%3E");
   background-size: 200px 200px;
 }
 
@@ -235,7 +411,7 @@ body {
   padding: 1rem 2.5rem;
   border-radius: 9999px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(224, 123, 57, 0.3);
+  box-shadow: 0 4px 20px rgba(255, 135, 233, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -251,7 +427,7 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(224, 123, 57, 0.5);
+  box-shadow: 0 8px 30px rgba(255, 135, 233, 0.5);
 }
 
 .btn-primary:hover::before {
@@ -278,54 +454,22 @@ body {
   transform: translateY(-1px);
 }
 
-/* ===== CARD STYLES ===== */
-.card-elevated {
-  background: white;
-  border-radius: 1rem;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 10px 20px -5px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-}
 
-.card-elevated:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 8px 12px -2px rgba(0, 0, 0, 0.08),
-    0 20px 40px -10px rgba(0, 0, 0, 0.12);
-}
-
-/* ===== SECTION DIVIDERS ===== */
-.section-divider {
-  height: 4px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--forest-light) 20%,
-    var(--amber) 50%,
-    var(--forest-light) 80%,
-    transparent 100%
-  );
-  border-radius: 2px;
-}
 
 /* ===== HERO GRADIENT OVERLAY ===== */
 /* Lighter overlay to let photos shine through */
 .hero-overlay {
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.2) 0%,
-    rgba(0, 0, 0, 0.35) 50%,
-    rgba(0, 0, 0, 0.5) 100%
-  );
+  background: linear-gradient(to bottom,
+      rgba(31, 76, 144, 0.15) 0%,
+      rgba(0, 0, 0, 0.25) 50%,
+      rgba(31, 76, 144, 0.4) 100%);
 }
 
 .hero-overlay-bottom {
-  background: linear-gradient(
-    to top,
-    rgba(26, 58, 47, 0.9) 0%,
-    rgba(26, 58, 47, 0.4) 40%,
-    transparent 100%
-  );
+  background: linear-gradient(to top,
+      rgba(31, 76, 144, 0.95) 0%,
+      rgba(31, 76, 144, 0.6) 30%,
+      transparent 100%);
 }
 
 /* ===== GLASS EFFECT ===== */
@@ -339,4 +483,24 @@ body {
   background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===== STAMP COLLAGE EFFECTS ===== */
+.stamp-hover {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stamp-hover:hover {
+  transform: scale(1.1) translateY(-8px);
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes stamp-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+.stamp-hover:hover img {
+  animation: stamp-wiggle 0.4s ease-in-out;
 }
