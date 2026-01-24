@@ -72,7 +72,7 @@ describe('Proxy middleware', () => {
 
       // Should set cookie to lv
       const setCookie = response.headers.get('set-cookie');
-      expect(setCookie).toContain('PARAGLIDE_LOCALE=lv');
+      expect(setCookie).toContain('language_preference=lv');
     });
 
     it('should keep /en/ prefix and set cookie', () => {
@@ -84,14 +84,14 @@ describe('Proxy middleware', () => {
 
       // Should set cookie to en
       const setCookie = response.headers.get('set-cookie');
-      expect(setCookie).toContain('PARAGLIDE_LOCALE=en');
+      expect(setCookie).toContain('language_preference=en');
     });
   });
 
   describe('Locale preference detection', () => {
     it('should respect cookie preference (LV)', () => {
       const request = createRequest('/egipte-malta', {
-        cookies: { PARAGLIDE_LOCALE: 'lv' },
+        cookies: { language_preference: 'lv' },
       });
       const response = proxy(request);
 
@@ -102,7 +102,7 @@ describe('Proxy middleware', () => {
 
     it('should respect cookie preference (EN)', () => {
       const request = createRequest('/egipte-malta', {
-        cookies: { PARAGLIDE_LOCALE: 'en' },
+        cookies: { language_preference: 'en' },
       });
       const response = proxy(request);
 
@@ -144,7 +144,7 @@ describe('Proxy middleware', () => {
 
     it('should prioritize cookie over Accept-Language', () => {
       const request = createRequest('/egipte-malta', {
-        cookies: { PARAGLIDE_LOCALE: 'en' },
+        cookies: { language_preference: 'en' },
         headers: { 'accept-language': 'lv,en;q=0.9' },
       });
       const response = proxy(request);
@@ -161,9 +161,9 @@ describe('Proxy middleware', () => {
       const response = proxy(request);
 
       const setCookie = response.headers.get('set-cookie');
-      expect(setCookie).toContain('PARAGLIDE_LOCALE=lv');
+      expect(setCookie).toContain('language_preference=lv');
       expect(setCookie).toContain('Path=/');
-      expect(setCookie).toContain('Max-Age=31536000'); // 1 year
+      expect(setCookie).toContain('Max-Age=2592000'); // 30 days
     });
 
     it('should set cookie on redirect', () => {
@@ -172,7 +172,7 @@ describe('Proxy middleware', () => {
 
       expect(response.status).toBe(307);
       const setCookie = response.headers.get('set-cookie');
-      expect(setCookie).toContain('PARAGLIDE_LOCALE=lv');
+      expect(setCookie).toContain('language_preference=lv');
     });
 
     it('should set cookie on rewrite', () => {
@@ -181,7 +181,7 @@ describe('Proxy middleware', () => {
 
       expect(response.status).toBe(200);
       const setCookie = response.headers.get('set-cookie');
-      expect(setCookie).toContain('PARAGLIDE_LOCALE=lv');
+      expect(setCookie).toContain('language_preference=lv');
     });
   });
 
@@ -197,7 +197,7 @@ describe('Proxy middleware', () => {
 
     it('should preserve query params when redirecting to /en/', () => {
       const request = createRequest('/egipte-malta/checkout/success?session_id=cs_test_123', {
-        cookies: { PARAGLIDE_LOCALE: 'en' },
+        cookies: { language_preference: 'en' },
       });
       const response = proxy(request);
 
@@ -236,7 +236,7 @@ describe('Proxy middleware', () => {
 
     it('should handle root path with EN cookie', () => {
       const request = createRequest('/', {
-        cookies: { PARAGLIDE_LOCALE: 'en' },
+        cookies: { language_preference: 'en' },
       });
       const response = proxy(request);
 
@@ -247,7 +247,7 @@ describe('Proxy middleware', () => {
 
     it('should ignore invalid locale in cookie', () => {
       const request = createRequest('/egipte-malta', {
-        cookies: { PARAGLIDE_LOCALE: 'fr' },
+        cookies: { language_preference: 'fr' },
       });
       const response = proxy(request);
 

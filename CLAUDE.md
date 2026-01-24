@@ -119,7 +119,7 @@ tests/
 - **Redirect behavior**: `/lv/...` always redirects to clean URL
 
 ### Locale Detection Priority (proxy.ts)
-1. `PARAGLIDE_LOCALE` cookie
+1. `language_preference` cookie (expires after 30 days)
 2. `Accept-Language` header
 3. Default to Latvian (`lv`)
 

@@ -16,7 +16,7 @@ function getLocaleFromPath(pathname: string): Locale | null {
 
 function getPreferredLocale(request: NextRequest): Locale {
   // 1. Check cookie
-  const cookieLocale = request.cookies.get("PARAGLIDE_LOCALE")?.value;
+  const cookieLocale = request.cookies.get("language_preference")?.value;
   if (cookieLocale && locales.includes(cookieLocale as Locale)) {
     return cookieLocale as Locale;
   }
@@ -63,8 +63,8 @@ export function proxy(request: NextRequest) {
       // Preserve query parameters during redirect
       redirectUrl.search = request.nextUrl.search;
       const response = NextResponse.redirect(redirectUrl);
-      response.cookies.set("PARAGLIDE_LOCALE", defaultLocale, {
-        maxAge: 60 * 60 * 24 * 365,
+      response.cookies.set("language_preference", defaultLocale, {
+        maxAge: 60 * 60 * 24 * 30, // 30 days
         path: "/",
       });
       return response;
@@ -73,8 +73,8 @@ export function proxy(request: NextRequest) {
     // Non-default locale with prefix - rewrite to [locale] route and set cookie
     // /en/egipte-malta stays as /en/egipte-malta
     const response = NextResponse.next();
-    response.cookies.set("PARAGLIDE_LOCALE", pathnameLocale, {
-      maxAge: 60 * 60 * 24 * 365,
+    response.cookies.set("language_preference", pathnameLocale, {
+      maxAge: 60 * 60 * 24 * 30, // 30 days
       path: "/",
     });
     return response;
@@ -90,8 +90,8 @@ export function proxy(request: NextRequest) {
     // Preserve query parameters during redirect
     redirectUrl.search = request.nextUrl.search;
     const response = NextResponse.redirect(redirectUrl);
-    response.cookies.set("PARAGLIDE_LOCALE", preferredLocale, {
-      maxAge: 60 * 60 * 24 * 365,
+    response.cookies.set("language_preference", preferredLocale, {
+      maxAge: 60 * 60 * 24 * 30, // 30 days
       path: "/",
     });
     return response;
@@ -103,8 +103,8 @@ export function proxy(request: NextRequest) {
   // Preserve query parameters during rewrite
   rewriteUrl.search = request.nextUrl.search;
   const response = NextResponse.rewrite(rewriteUrl);
-  response.cookies.set("PARAGLIDE_LOCALE", defaultLocale, {
-    maxAge: 60 * 60 * 24 * 365,
+  response.cookies.set("language_preference", defaultLocale, {
+    maxAge: 60 * 60 * 24 * 30, // 30 days
     path: "/",
   });
   return response;

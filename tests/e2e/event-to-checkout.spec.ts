@@ -6,7 +6,7 @@ test.describe("Event to Checkout Flow", () => {
     await context.clearCookies();
     await context.addCookies([
       {
-        name: "PARAGLIDE_LOCALE",
+        name: "language_preference",
         value: "lv",
         domain: "localhost",
         path: "/",
@@ -47,7 +47,7 @@ test.describe("Event to Checkout Flow", () => {
       await context.clearCookies();
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",

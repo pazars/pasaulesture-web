@@ -22,13 +22,13 @@ export const baseLocale = "lv";
  */
 export const locales = /** @type {const} */ (["lv", "en"]);
 /** @type {string} */
-export const cookieName = "PARAGLIDE_LOCALE";
+export const cookieName = "language_preference";
 /** @type {number} */
-export const cookieMaxAge = 34560000;
+export const cookieMaxAge = 2592000; // 30 days in seconds
 /** @type {string} */
 export const cookieDomain = "";
 /** @type {string} */
-export const localStorageKey = "PARAGLIDE_LOCALE";
+export const localStorageKey = "language_preference";
 /**
  * @type {Array<"cookie" | "baseLocale" | "globalVariable" | "url" | "preferredLanguage" | "localStorage" | `custom-${string}`>}
  */

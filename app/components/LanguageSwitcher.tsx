@@ -61,7 +61,7 @@ export default function LanguageSwitcher() {
     const newPathWithQuery = queryString ? `${newPath}?${queryString}` : newPath;
 
     // Set cookie to target locale before navigating so proxy doesn't redirect back
-    document.cookie = `PARAGLIDE_LOCALE=${targetLocale}; path=/; max-age=${60 * 60 * 24 * 365}`;
+    document.cookie = `language_preference=${targetLocale}; path=/; max-age=${60 * 60 * 24 * 30}`; // 30 days
     router.push(newPathWithQuery);
   };
 

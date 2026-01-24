@@ -13,7 +13,7 @@ test.describe("Checkout Success Page", () => {
     // Set English cookie and use English URL for consistent behavior
     await context.addCookies([
       {
-        name: "PARAGLIDE_LOCALE",
+        name: "language_preference",
         value: "en",
         domain: "localhost",
         path: "/",
@@ -37,7 +37,7 @@ test.describe("Checkout Success Page", () => {
     // Set English cookie and use English URL for consistent behavior
     await context.addCookies([
       {
-        name: "PARAGLIDE_LOCALE",
+        name: "language_preference",
         value: "en",
         domain: "localhost",
         path: "/",
@@ -55,7 +55,7 @@ test.describe("Checkout Success Page", () => {
     // This test verifies the error page has proper structure
     await context.addCookies([
       {
-        name: "PARAGLIDE_LOCALE",
+        name: "language_preference",
         value: "en",
         domain: "localhost",
         path: "/",

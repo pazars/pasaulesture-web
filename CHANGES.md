@@ -192,7 +192,7 @@ export const CONTACT_INFO = {
 ## 8. Locale Handling
 
 ### Cookie-Based Locale Preference
-**Tests**: Updated to use `PARAGLIDE_LOCALE` cookie
+**Tests**: Updated to use `language_preference` cookie
 - Ensures correct locale display in tests
 - Prevents redirect issues
 - Matches production behavior

@@ -5,7 +5,7 @@ test.describe('Language Switching', () => {
     test('Latvian locale shows Latvian content at clean URL', async ({ page, context }) => {
       // Set LV locale cookie to ensure Latvian content
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -26,7 +26,7 @@ test.describe('Language Switching', () => {
     test('English locale shows English content at /en/ URL', async ({ page, context }) => {
       // Set EN locale cookie
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -44,7 +44,7 @@ test.describe('Language Switching', () => {
     test('/lv/ prefix redirects to clean URL', async ({ page, context }) => {
       // Set LV locale cookie
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -63,7 +63,7 @@ test.describe('Language Switching', () => {
     test('visiting clean URL with EN cookie redirects to /en/', async ({ page, context }) => {
       // Set EN locale cookie
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -82,7 +82,7 @@ test.describe('Language Switching', () => {
     test('switching from LV to EN navigates to /en/ URL', async ({ page, context }) => {
       // Start with LV locale
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -106,7 +106,7 @@ test.describe('Language Switching', () => {
     test('switching from EN to LV navigates to clean URL', async ({ page, context }) => {
       // Start with EN locale
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -131,7 +131,7 @@ test.describe('Language Switching', () => {
     test('LV button is highlighted when on Latvian page', async ({ page, context }) => {
       // Start with LV locale
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -151,7 +151,7 @@ test.describe('Language Switching', () => {
     test('EN button is highlighted when on English page', async ({ page, context }) => {
       // Start with EN locale
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -173,7 +173,7 @@ test.describe('Language Switching', () => {
     test('locale preference persists via cookie after switching', async ({ page, context }) => {
       // Start with LV locale
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -187,14 +187,14 @@ test.describe('Language Switching', () => {
 
       // Check cookie was updated to EN
       const cookies = await context.cookies();
-      const localeCookie = cookies.find(c => c.name === 'PARAGLIDE_LOCALE');
+      const localeCookie = cookies.find(c => c.name === 'language_preference');
       expect(localeCookie?.value).toBe('en');
     });
 
     test('switching back to LV updates cookie', async ({ page, context }) => {
       // Start with EN locale
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -208,7 +208,7 @@ test.describe('Language Switching', () => {
 
       // Check cookie was updated to LV
       const cookies = await context.cookies();
-      const localeCookie = cookies.find(c => c.name === 'PARAGLIDE_LOCALE');
+      const localeCookie = cookies.find(c => c.name === 'language_preference');
       expect(localeCookie?.value).toBe('lv');
     });
   });
@@ -216,7 +216,7 @@ test.describe('Language Switching', () => {
   test.describe('No hydration errors', () => {
     test('LV page loads without hydration mismatch', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -237,7 +237,7 @@ test.describe('Language Switching', () => {
 
     test('EN page loads without hydration mismatch', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -260,7 +260,7 @@ test.describe('Language Switching', () => {
   test.describe('Static pages', () => {
     test('privacy policy page loads successfully', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -275,7 +275,7 @@ test.describe('Language Switching', () => {
 
     test('privacy policy page loads in English', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -290,7 +290,7 @@ test.describe('Language Switching', () => {
 
     test('terms page loads successfully', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -305,7 +305,7 @@ test.describe('Language Switching', () => {
 
     test('terms page loads in English', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'PARAGLIDE_LOCALE',
+        name: 'language_preference',
         value: 'en',
         domain: 'localhost',
         path: '/',

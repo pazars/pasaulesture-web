@@ -9,7 +9,7 @@ test.describe("Static Pages Navigation", () => {
       // Set Latvian locale cookie
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -55,7 +55,7 @@ test.describe("Static Pages Navigation", () => {
       // Set Latvian locale cookie
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -103,7 +103,7 @@ test.describe("Static Pages Navigation", () => {
       // Set Latvian locale cookie to ensure proper routing
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -145,7 +145,7 @@ test.describe("Static Pages Navigation", () => {
       // Set Latvian locale cookie
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -191,7 +191,7 @@ test.describe("Static Pages Navigation", () => {
       // Set Latvian locale cookie
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -233,7 +233,7 @@ test.describe("Static Pages Navigation", () => {
       // Set Latvian locale cookie
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -278,7 +278,7 @@ test.describe("Static Pages Navigation", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -302,7 +302,7 @@ test.describe("Static Pages Navigation", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -322,7 +322,7 @@ test.describe("Static Pages Navigation", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -346,7 +346,7 @@ test.describe("Static Pages Navigation", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -368,7 +368,7 @@ test.describe("Static Pages Navigation", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -395,7 +395,7 @@ test.describe("Static Pages Navigation", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -422,7 +422,7 @@ test.describe("Static Pages Navigation", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -449,7 +449,7 @@ test.describe("Static Pages Navigation", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
