@@ -63,6 +63,34 @@ function MountainDecoration({ className }: { className?: string }) {
   );
 }
 
+// Format event date with locale-specific spelled-out format
+function formatEventDate(date: Date, locale: string): string {
+  const day = date.getDate();
+  const year = date.getFullYear();
+
+  if (locale === "lv") {
+    // Latvian month names in genitive case (for dates)
+    const months = [
+      "janvāris", "februāris", "marts", "aprīlis", "maijs", "jūnijs",
+      "jūlijs", "augusts", "septembris", "oktobris", "novembris", "decembris"
+    ];
+    const month = months[date.getMonth()];
+    return `${day}. ${month}, ${year}`;
+  } else {
+    // English with ordinal suffix
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const month = months[date.getMonth()];
+    const suffix =
+      day === 1 || day === 21 || day === 31 ? "st" :
+      day === 2 || day === 22 ? "nd" :
+      day === 3 || day === 23 ? "rd" : "th";
+    return `${month} ${day}${suffix}, ${year}`;
+  }
+}
+
 export default function EventPage({ event, images }: EventPageProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -74,6 +102,7 @@ export default function EventPage({ event, images }: EventPageProps) {
   const hasMultipleDistances = event.distances.length > 1;
   const hasMultipleImages = images.length > 1;
   const eventName = t(event.nameKey as any);
+  const formattedDate = formatEventDate(event.date, locale);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -129,47 +158,29 @@ export default function EventPage({ event, images }: EventPageProps) {
               {/* Decorative Elements */}
               <MountainDecoration className="absolute bottom-0 left-0 right-0 h-24 text-forest-deep" />
 
-              {/* Event Title & Tagline */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+              {/* Elegant Spelled-Out Date */}
+              <div className="absolute inset-x-0 top-0 flex justify-center px-6 pt-8 sm:pt-12">
                 <div
-                  className={`text-center transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                    }`}
+                  className={`text-center transition-all duration-1200 ${
+                    isLoaded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8"
+                  }`}
                 >
-                  {/* Small decorative element */}
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    <span className="h-px w-12 bg-amber-light/60" />
-                    <GravelBikeIcon className="w-6 h-6 text-amber-light" />
-                    <span className="h-px w-12 bg-amber-light/60" />
-                  </div>
-
-                  <h1 className="font-display text-5xl sm:text-7xl md:text-8xl text-white tracking-tight drop-shadow-2xl">
-                    {eventName}
+                  <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-wide drop-shadow-[0_8px_32px_rgba(0,0,0,0.6)] leading-tight">
+                    {formattedDate}
                   </h1>
-
-                  {/* Event date badge */}
-                  <div
-                    className={`mt-6 inline-flex items-center gap-2 glass-dark px-5 py-2.5 rounded-full transition-all duration-1000 delay-300 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                      }`}
-                  >
-                    <svg className="w-5 h-5 text-amber-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-white font-semibold">
-                      {selectedDistance.facts.find(f => f.icon === "calendar")?.value || t("coming_soon")}
-                    </span>
-                  </div>
                 </div>
+              </div>
 
-                {/* Scroll indicator */}
-                <div
-                  className={`absolute bottom-8 left-1/2 -translate-x-1/2 transition-all duration-1000 delay-700 ${isLoaded ? "opacity-100" : "opacity-0"
-                    }`}
-                >
-                  <div className="animate-float">
-                    <svg className="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
+              {/* Scroll indicator */}
+              <div
+                className={`absolute bottom-8 left-1/2 -translate-x-1/2 transition-all duration-1000 delay-700 ${
+                  isLoaded ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                <div className="animate-float">
+                  <svg className="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
                 </div>
               </div>
 
@@ -214,7 +225,7 @@ export default function EventPage({ event, images }: EventPageProps) {
             </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-forest-deep to-forest-medium flex items-center justify-center">
-              <h1 className="font-display text-5xl sm:text-7xl text-white text-center">
+              <h1 className="font-accent text-5xl sm:text-7xl text-white text-center">
                 {eventName}
               </h1>
             </div>

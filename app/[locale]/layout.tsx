@@ -1,22 +1,11 @@
 import { notFound } from "next/navigation";
 import "../globals.css";
-import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { locales } from "@/i18n/request";
 import type { Locale } from "@/i18n/request";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -75,9 +64,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-WR2D5CTT');`}
         </Script>
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

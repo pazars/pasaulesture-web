@@ -27,7 +27,7 @@ export default function Header({ currentSlug }: HeaderProps) {
               return isCurrent ? (
                 <span
                   key={e.slug}
-                  className="relative px-5 sm:px-7 py-2.5 sm:py-3 rounded-full font-bold bg-forest-deep text-white cursor-default whitespace-nowrap shadow-lg shadow-forest-deep/20"
+                  className="relative px-5 sm:px-7 py-2.5 sm:py-3 rounded-full font-accent font-bold bg-forest-deep text-white cursor-default whitespace-nowrap shadow-lg shadow-forest-deep/20"
                 >
                   {eventName}
                 </span>
@@ -35,7 +35,7 @@ export default function Header({ currentSlug }: HeaderProps) {
                 <Link
                   key={e.slug}
                   href={`/${e.slug}`}
-                  className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-full font-semibold transition-all whitespace-nowrap text-earth-dark bg-white/80 backdrop-blur-sm border border-sand hover:bg-white hover:border-forest-medium hover:shadow-md"
+                  className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-full font-accent font-semibold transition-all whitespace-nowrap text-earth-dark bg-white/80 backdrop-blur-sm border border-sand hover:bg-white hover:border-forest-medium hover:shadow-md"
                 >
                   {eventName}
                 </Link>

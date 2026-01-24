@@ -50,16 +50,7 @@ export default function LanguageSwitcher() {
   const router = useRouter();
   const currentLocale = useLocale() as Locale;
 
-  console.log('[LanguageSwitcher] Component rendering', { currentLocale, pathname });
-
   const handleLocaleChange = (targetLocale: Locale) => {
-    console.log('[LanguageSwitcher] handleLocaleChange called', { targetLocale, currentLocale });
-
-    if (targetLocale === currentLocale) {
-      console.log('[LanguageSwitcher] Same locale, returning early');
-      return;
-    }
-
     // Use window.location to get the most current path and search params
     // This fixes a Safari bug where usePathname() and useSearchParams()
     // can cause issues inside Suspense boundaries after navigation
@@ -67,10 +58,7 @@ export default function LanguageSwitcher() {
       ? window.location.pathname
       : pathname;
 
-    console.log('[LanguageSwitcher] Current pathname:', currentPathname);
-
     const newPath = getPathForLocale(currentPathname, targetLocale);
-    console.log('[LanguageSwitcher] New path:', newPath);
 
     // Preserve query parameters using window.location.search
     const queryString = typeof window !== 'undefined'
@@ -78,15 +66,10 @@ export default function LanguageSwitcher() {
       : '';
     const newPathWithQuery = queryString ? `${newPath}${queryString}` : newPath;
 
-    console.log('[LanguageSwitcher] Query string:', queryString);
-    console.log('[LanguageSwitcher] Final path with query:', newPathWithQuery);
-
     // Set cookie to target locale before navigating so proxy doesn't redirect back
     document.cookie = `NEXT_LOCALE=${targetLocale}; path=/; max-age=${60 * 60 * 24 * 30}`; // 30 days
-    console.log('[LanguageSwitcher] Cookie set, calling router.push');
 
     router.push(newPathWithQuery);
-    console.log('[LanguageSwitcher] router.push called');
   };
 
   return (
@@ -98,7 +81,6 @@ export default function LanguageSwitcher() {
           <button
             key={locale}
             onClick={() => {
-              console.log('[LanguageSwitcher] Button clicked for locale:', locale);
               handleLocaleChange(locale);
             }}
             className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all ${isActive
