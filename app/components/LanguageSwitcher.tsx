@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { locales, defaultLocale } from "@/i18n/request";
 import type { Locale } from "@/i18n/request";
@@ -48,20 +48,45 @@ function getPathForLocale(currentPath: string, targetLocale: Locale): string {
 export default function LanguageSwitcher() {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const currentLocale = useLocale() as Locale;
 
-  const handleLocaleChange = (targetLocale: Locale) => {
-    if (targetLocale === currentLocale) return;
-    const newPath = getPathForLocale(pathname, targetLocale);
+  console.log('[LanguageSwitcher] Component rendering', { currentLocale, pathname });
 
-    // Preserve query parameters
-    const queryString = searchParams.toString();
-    const newPathWithQuery = queryString ? `${newPath}?${queryString}` : newPath;
+  const handleLocaleChange = (targetLocale: Locale) => {
+    console.log('[LanguageSwitcher] handleLocaleChange called', { targetLocale, currentLocale });
+
+    if (targetLocale === currentLocale) {
+      console.log('[LanguageSwitcher] Same locale, returning early');
+      return;
+    }
+
+    // Use window.location to get the most current path and search params
+    // This fixes a Safari bug where usePathname() and useSearchParams()
+    // can cause issues inside Suspense boundaries after navigation
+    const currentPathname = typeof window !== 'undefined'
+      ? window.location.pathname
+      : pathname;
+
+    console.log('[LanguageSwitcher] Current pathname:', currentPathname);
+
+    const newPath = getPathForLocale(currentPathname, targetLocale);
+    console.log('[LanguageSwitcher] New path:', newPath);
+
+    // Preserve query parameters using window.location.search
+    const queryString = typeof window !== 'undefined'
+      ? window.location.search
+      : '';
+    const newPathWithQuery = queryString ? `${newPath}${queryString}` : newPath;
+
+    console.log('[LanguageSwitcher] Query string:', queryString);
+    console.log('[LanguageSwitcher] Final path with query:', newPathWithQuery);
 
     // Set cookie to target locale before navigating so proxy doesn't redirect back
-    document.cookie = `language_preference=${targetLocale}; path=/; max-age=${60 * 60 * 24 * 30}`; // 30 days
+    document.cookie = `NEXT_LOCALE=${targetLocale}; path=/; max-age=${60 * 60 * 24 * 30}`; // 30 days
+    console.log('[LanguageSwitcher] Cookie set, calling router.push');
+
     router.push(newPathWithQuery);
+    console.log('[LanguageSwitcher] router.push called');
   };
 
   return (
@@ -72,12 +97,14 @@ export default function LanguageSwitcher() {
         return (
           <button
             key={locale}
-            onClick={() => handleLocaleChange(locale)}
-            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all ${
-              isActive
+            onClick={() => {
+              console.log('[LanguageSwitcher] Button clicked for locale:', locale);
+              handleLocaleChange(locale);
+            }}
+            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all ${isActive
                 ? "bg-forest-deep text-white"
                 : "text-earth-dark hover:bg-sand/50"
-            }`}
+              }`}
             aria-current={isActive ? "page" : undefined}
           >
             {localeNames[locale]}
