@@ -73,7 +73,7 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-1 py-1 border border-sand">
+    <div className="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full px-1 py-1">
       {locales.map((locale) => {
         const isActive = locale === currentLocale;
 
@@ -83,9 +83,9 @@ export default function LanguageSwitcher() {
             onClick={() => {
               handleLocaleChange(locale);
             }}
-            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all ${isActive
-                ? "bg-forest-deep text-white"
-                : "text-earth-dark hover:bg-sand/50"
+            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer ${isActive
+                ? "bg-pink text-blue"
+                : "text-beige/70 hover:text-beige hover:bg-white/15 hover:scale-105"
               }`}
             aria-current={isActive ? "page" : undefined}
           >

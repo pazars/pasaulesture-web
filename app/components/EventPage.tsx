@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { EventData, EventDistance } from "@/app/data/events";
-import { ExternalLinkIcon, LocationIcon, CalendarIcon } from "./Icons";
+import { ExternalLinkIcon, LocationIcon } from "./Icons";
 import FAQ from "./FAQ";
 import Header from "./Header";
 import { useTranslations, useLocale } from "next-intl";
@@ -39,18 +39,6 @@ function formatEventDate(date: Date, locale: string): string {
   }
 }
 
-// Format short date for fact box
-function formatShortDate(date: Date, locale: string): string {
-  const day = date.getDate();
-  if (locale === "lv") {
-    const months = ["jan", "feb", "mar", "apr", "mai", "jūn", "jūl", "aug", "sep", "okt", "nov", "dec"];
-    return `${day}. ${months[date.getMonth()]}`;
-  } else {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    return `${months[date.getMonth()]} ${day}`;
-  }
-}
-
 export default function EventPage({ event }: EventPageProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -59,7 +47,6 @@ export default function EventPage({ event }: EventPageProps) {
 
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
-  const shortDate = formatShortDate(event.date, locale);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -212,7 +199,7 @@ export default function EventPage({ event }: EventPageProps) {
         </section>
 
         {/* Quote Section - two paragraphs */}
-        <section className="relative py-16 overflow-hidden rounded-3xl mt-6 mx-2">
+        <section className="relative py-10 overflow-hidden rounded-3xl mt-6 mx-2">
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
             <p className="text-xl sm:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-6">
               &ldquo;{t("hero_quote")}&rdquo;
@@ -223,13 +210,13 @@ export default function EventPage({ event }: EventPageProps) {
           </div>
         </section>
 
-        {/* Combined Facts + Route Selection */}
-        <section className="relative mt-6 mx-2 rounded-3xl overflow-hidden py-8">
+        {/* Route Selection with Start Location */}
+        <section className="relative mt-4 mx-2 rounded-3xl overflow-hidden py-4">
           <div className="max-w-5xl mx-auto px-6">
-            {/* Horizontal layout: Start | Route Buttons | Date */}
-            <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
+            {/* Vertical layout: Start on top, Routes below */}
+            <div className="flex flex-col items-center gap-4">
 
-              {/* Start Location - Left */}
+              {/* Start Location - Top, centered */}
               <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all">
                 <div className="p-2 bg-pink/25 rounded-lg">
                   <LocationIcon className="w-5 h-5 text-pink" />
@@ -252,8 +239,8 @@ export default function EventPage({ event }: EventPageProps) {
                 </div>
               </div>
 
-              {/* Route Selection - Center */}
-              <div className="flex flex-wrap justify-center gap-3">
+              {/* Route Selection - Centered, larger buttons with clear hover states */}
+              <div className="flex flex-wrap justify-center gap-4">
                 {event.distances.map((distance, index) => {
                   const distanceFact = distance.facts.find(f => f.icon === "route");
                   const elevationFact = distance.facts.find(f => f.icon === "mountain");
@@ -265,16 +252,16 @@ export default function EventPage({ event }: EventPageProps) {
                     <button
                       key={distance.nameKey}
                       onClick={() => handleDistanceSelect(index)}
-                      className={`relative px-6 py-4 font-bold transition-all rounded-2xl overflow-hidden ${isSelected
-                        ? "bg-pink text-blue shadow-lg shadow-pink/40"
-                        : "bg-white/8 text-beige hover:bg-white/12"
+                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden min-w-40 cursor-pointer ${isSelected
+                        ? "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
+                        : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
                         }`}
                     >
                       {isSelected && (
                         <div className="absolute top-0 right-0 w-6 h-6 bg-lime transform rotate-45 translate-x-3 -translate-y-3" />
                       )}
-                      <span className="block text-base relative z-10 font-accent">{distanceName}</span>
-                      <div className={`flex items-center justify-center gap-1.5 mt-1 relative z-10 text-xs ${isSelected ? "text-blue/70" : "text-beige/60"}`}>
+                      <span className="block text-lg relative z-10 font-accent">{distanceName}</span>
+                      <div className={`flex items-center justify-center gap-2 mt-1.5 relative z-10 text-sm ${isSelected ? "text-blue/70" : "text-beige/60"}`}>
                         <span className="font-semibold">{distanceValue}</span>
                         {elevationValue && <span>· {elevationValue}</span>}
                       </div>
@@ -282,23 +269,12 @@ export default function EventPage({ event }: EventPageProps) {
                   );
                 })}
               </div>
-
-              {/* Date - Right */}
-              <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all">
-                <div className="p-2 bg-lime/25 rounded-lg">
-                  <CalendarIcon className="w-5 h-5 text-lime" />
-                </div>
-                <div>
-                  <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_date")}</p>
-                  <p className="font-bold text-beige">{shortDate}</p>
-                </div>
-              </div>
             </div>
           </div>
         </section>
 
         {/* Route Section */}
-        <section className="py-20 relative overflow-hidden rounded-3xl mt-6 mx-2">
+        <section className="py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">
           <div className="max-w-5xl mx-auto px-6 relative z-10">
             <div className="text-center mb-10">
               <h2 className="font-display text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
