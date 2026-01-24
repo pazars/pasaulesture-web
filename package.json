@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postinstall": "npm run build:i18n",
     "dev": "next dev",
     "build": "next build",
     "build:i18n": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
