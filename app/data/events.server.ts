@@ -15,11 +15,11 @@ export function getRandomEventImage(slug: string): string {
 }
 
 export function getAllEventImages(slug: string): string[] {
-  const imageDir = path.join(process.cwd(), "public", "events", slug);
+  const imageDir = path.join(process.cwd(), "public", "events", slug, "hero");
   try {
     const files = fs.readdirSync(imageDir);
     const images = files.filter((file) => /\.(jpg|jpeg|png|webp)$/i.test(file));
-    return images.map((img) => `/events/${slug}/${img}`);
+    return images.map((img) => `/events/${slug}/hero/${img}`);
   } catch {
     return [];
   }

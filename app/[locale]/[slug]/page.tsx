@@ -28,16 +28,51 @@ function getEventName(nameKey: string): string {
   return translations[nameKey]?.() ?? nameKey;
 }
 
+// Helper to get translated event description for metadata
+function getEventDescription(nameKey: string): string {
+  const translations: Record<string, () => string> = {
+    event_egipte_malta: m.event_egipte_malta_og_description,
+    event_parize_dakara: m.event_parize_dakara_og_description,
+  };
+  return translations[nameKey]?.() ?? "";
+}
+
 export async function generateMetadata({ params }: PageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const event = getEventBySlug(slug);
   if (!event) return {};
 
   const eventName = getEventName(event.nameKey);
+  const eventDescription = getEventDescription(event.nameKey);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://pasaulesture.lv";
+  const ogImageUrl = `${baseUrl}/events/${slug}/og/og-image-${locale}.jpg`;
+  const pageUrl = `${baseUrl}/${locale === "lv" ? "" : "en/"}${slug}`;
 
   return {
-    title: m.site_title(),
-    description: `${eventName} - ${m.site_description()}`,
+    title: `${eventName} - ${m.site_title()}`,
+    description: eventDescription,
+    openGraph: {
+      title: `${eventName} - ${m.site_title()}`,
+      description: eventDescription,
+      url: pageUrl,
+      siteName: m.site_title(),
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: eventName,
+        },
+      ],
+      locale: locale,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${eventName} - ${m.site_title()}`,
+      description: eventDescription,
+      images: [ogImageUrl],
+    },
   };
 }
 
