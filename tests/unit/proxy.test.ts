@@ -111,47 +111,13 @@ describe('Proxy middleware', () => {
       expect(response.headers.get('location')).toBe('http://localhost:3000/en/egipte-malta');
     });
 
-    it('should use Accept-Language header when no cookie (LV)', () => {
-      const request = createRequest('/egipte-malta', {
-        headers: { 'accept-language': 'lv,en;q=0.9' },
-      });
-      const response = proxy(request);
-
-      // Should rewrite to /lv/ internally
-      expect(response.status).toBe(200);
-      expect(response.headers.get('x-middleware-rewrite')).toContain('/lv/egipte-malta');
-    });
-
-    it('should use Accept-Language header when no cookie (EN)', () => {
-      const request = createRequest('/egipte-malta', {
-        headers: { 'accept-language': 'en-US,en;q=0.9' },
-      });
-      const response = proxy(request);
-
-      // Should redirect to /en/
-      expect(response.status).toBe(307);
-      expect(response.headers.get('location')).toBe('http://localhost:3000/en/egipte-malta');
-    });
-
-    it('should default to Latvian when no cookie or Accept-Language', () => {
+    it('should default to Latvian when no cookie', () => {
       const request = createRequest('/egipte-malta');
       const response = proxy(request);
 
       // Should rewrite to /lv/ internally (default locale)
       expect(response.status).toBe(200);
       expect(response.headers.get('x-middleware-rewrite')).toContain('/lv/egipte-malta');
-    });
-
-    it('should prioritize cookie over Accept-Language', () => {
-      const request = createRequest('/egipte-malta', {
-        cookies: { language_preference: 'en' },
-        headers: { 'accept-language': 'lv,en;q=0.9' },
-      });
-      const response = proxy(request);
-
-      // Should redirect to /en/ (cookie takes precedence)
-      expect(response.status).toBe(307);
-      expect(response.headers.get('location')).toBe('http://localhost:3000/en/egipte-malta');
     });
   });
 
@@ -254,17 +220,6 @@ describe('Proxy middleware', () => {
       // Should default to Latvian
       expect(response.status).toBe(200);
       expect(response.headers.get('x-middleware-rewrite')).toContain('/lv/egipte-malta');
-    });
-
-    it('should handle complex Accept-Language headers', () => {
-      const request = createRequest('/egipte-malta', {
-        headers: { 'accept-language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7' },
-      });
-      const response = proxy(request);
-
-      // Should detect 'en' from the list and redirect
-      expect(response.status).toBe(307);
-      expect(response.headers.get('location')).toBe('http://localhost:3000/en/egipte-malta');
     });
   });
 });

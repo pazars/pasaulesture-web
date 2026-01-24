@@ -120,8 +120,7 @@ tests/
 
 ### Locale Detection Priority (proxy.ts)
 1. `language_preference` cookie (expires after 30 days)
-2. `Accept-Language` header
-3. Default to Latvian (`lv`)
+2. Default to Latvian (`lv`)
 
 ### Translation Files
 - Located in `messages/lv.json` and `messages/en.json`

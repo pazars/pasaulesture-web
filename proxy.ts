@@ -21,21 +21,7 @@ function getPreferredLocale(request: NextRequest): Locale {
     return cookieLocale as Locale;
   }
 
-  // 2. Check Accept-Language header
-  const acceptLanguage = request.headers.get("Accept-Language");
-  if (acceptLanguage) {
-    const languages = acceptLanguage.split(",").map((lang) => {
-      const [code] = lang.trim().split(";");
-      return code.split("-")[0].toLowerCase();
-    });
-
-    for (const lang of languages) {
-      if (lang === "lv") return "lv";
-      if (lang === "en") return "en";
-    }
-  }
-
-  // 3. Default to Latvian (default locale)
+  // 2. Default to Latvian (default locale)
   return defaultLocale;
 }
 
