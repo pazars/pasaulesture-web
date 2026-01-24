@@ -44,15 +44,15 @@ export async function generateMetadata({ params }: PageProps) {
 
   const eventName = getEventName(event.nameKey);
   const eventDescription = getEventDescription(event.nameKey);
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://pasaulesture.lv";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const ogImageUrl = `${baseUrl}/events/${slug}/og/og-image-${locale}.jpg`;
   const pageUrl = `${baseUrl}/${locale === "lv" ? "" : "en/"}${slug}`;
 
   return {
-    title: `${eventName} - ${m.site_title()}`,
+    title: eventName,
     description: eventDescription,
     openGraph: {
-      title: `${eventName} - ${m.site_title()}`,
+      title: eventName,
       description: eventDescription,
       url: pageUrl,
       siteName: m.site_title(),
@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: PageProps) {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${eventName} - ${m.site_title()}`,
+      title: eventName,
       description: eventDescription,
       images: [ogImageUrl],
     },
