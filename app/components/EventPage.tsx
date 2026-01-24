@@ -7,42 +7,11 @@ import { EventData, EventDistance } from "@/app/data/events";
 import { getIconByName, ExternalLinkIcon, LocationIcon, GravelBikeIcon } from "./Icons";
 import FAQ from "./FAQ";
 import Header from "./Header";
-import * as m from "@/paraglide/messages";
-import { getLocale } from "@/paraglide/runtime";
+import { useTranslations, useLocale } from "next-intl";
 
 interface EventPageProps {
   event: EventData;
   images: string[];
-}
-
-// Helper to get translated event name
-function getEventName(nameKey: string): string {
-  const translations: Record<string, () => string> = {
-    event_egipte_malta: m.event_egipte_malta,
-    event_parize_dakara: m.event_parize_dakara,
-  };
-  return translations[nameKey]?.() ?? nameKey;
-}
-
-// Helper to get translated distance name
-function getDistanceName(nameKey: string): string {
-  const translations: Record<string, () => string> = {
-    distance_adventure: m.distance_adventure,
-    distance_challenge: m.distance_challenge,
-    distance_long: m.distance_long,
-  };
-  return translations[nameKey]?.() ?? nameKey;
-}
-
-// Helper to get translated fact label
-function getFactLabel(labelKey: string): string {
-  const translations: Record<string, () => string> = {
-    label_date: m.label_date,
-    label_distance: m.label_distance,
-    label_elevation: m.label_elevation,
-    label_time_limit: m.label_time_limit,
-  };
-  return translations[labelKey]?.() ?? labelKey;
 }
 
 // Decorative trail/path SVG component
@@ -95,6 +64,8 @@ function MountainDecoration({ className }: { className?: string }) {
 }
 
 export default function EventPage({ event, images }: EventPageProps) {
+  const t = useTranslations();
+  const locale = useLocale();
   const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(event.distances.length - 1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -102,7 +73,7 @@ export default function EventPage({ event, images }: EventPageProps) {
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const hasMultipleDistances = event.distances.length > 1;
   const hasMultipleImages = images.length > 1;
-  const eventName = getEventName(event.nameKey);
+  const eventName = t(event.nameKey as any);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -184,7 +155,7 @@ export default function EventPage({ event, images }: EventPageProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span className="text-white font-semibold">
-                      {selectedDistance.facts.find(f => f.icon === "calendar")?.value || m.coming_soon()}
+                      {selectedDistance.facts.find(f => f.icon === "calendar")?.value || t("coming_soon")}
                     </span>
                   </div>
                 </div>
@@ -208,7 +179,7 @@ export default function EventPage({ event, images }: EventPageProps) {
                   <button
                     onClick={prevImage}
                     className="absolute left-4 top-1/2 -translate-y-1/2 glass p-3 rounded-full transition-all hover:bg-white/20 hover:scale-110 group"
-                    aria-label={m.aria_prev_image()}
+                    aria-label={t("aria_prev_image")}
                   >
                     <svg className="w-6 h-6 text-white group-hover:text-amber-light transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -217,7 +188,7 @@ export default function EventPage({ event, images }: EventPageProps) {
                   <button
                     onClick={nextImage}
                     className="absolute right-4 top-1/2 -translate-y-1/2 glass p-3 rounded-full transition-all hover:bg-white/20 hover:scale-110 group"
-                    aria-label={m.aria_next_image()}
+                    aria-label={t("aria_next_image")}
                   >
                     <svg className="w-6 h-6 text-white group-hover:text-amber-light transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -234,7 +205,7 @@ export default function EventPage({ event, images }: EventPageProps) {
                           ? "bg-amber-light w-8"
                           : "bg-white/40 w-2 hover:bg-white/60"
                           }`}
-                        aria-label={m.aria_go_to_image({ number: String(index + 1) })}
+                        aria-label={t("aria_go_to_image", { number: String(index + 1) })}
                       />
                     ))}
                   </div>
@@ -255,7 +226,7 @@ export default function EventPage({ event, images }: EventPageProps) {
           <TrailDecoration className="absolute top-0 left-0 right-0 w-full h-16 text-forest-medium" />
           <div className="max-w-3xl mx-auto px-6 text-center relative">
             <p className="text-xl sm:text-2xl text-earth-warm font-medium italic leading-relaxed">
-              &ldquo;{m.hero_quote()}&rdquo;
+              &ldquo;{t("hero_quote")}&rdquo;
             </p>
           </div>
         </section>
@@ -270,7 +241,7 @@ export default function EventPage({ event, images }: EventPageProps) {
                 <div className="bg-forest-medium/50 backdrop-blur-sm px-8 py-4 rounded-full flex items-center gap-4 border border-forest-light/30">
                   <GravelBikeIcon className="w-8 h-8 text-amber-light" />
                   <div>
-                    <p className="text-xs text-sand/80 uppercase tracking-wider">{m.label_surface()}</p>
+                    <p className="text-xs text-sand/80 uppercase tracking-wider">{t("label_surface")}</p>
                     <p className="text-xl font-bold text-white">{event.surfaceType}</p>
                   </div>
                 </div>
@@ -285,7 +256,7 @@ export default function EventPage({ event, images }: EventPageProps) {
                       <LocationIcon className="w-6 h-6 text-amber-light" />
                     </div>
                     <div>
-                      <p className="text-xs text-sand/70 uppercase tracking-wider mb-1">{m.label_start()}</p>
+                      <p className="text-xs text-sand/70 uppercase tracking-wider mb-1">{t("label_start")}</p>
                       {event.location.googleMapsUrl ? (
                         <a
                           href={event.location.googleMapsUrl}
@@ -318,7 +289,7 @@ export default function EventPage({ event, images }: EventPageProps) {
                             <Icon className="w-6 h-6 text-amber-light" />
                           </div>
                           <div>
-                            <p className="text-xs text-sand/70 uppercase tracking-wider mb-1">{getFactLabel(fact.labelKey)}</p>
+                            <p className="text-xs text-sand/70 uppercase tracking-wider mb-1">{t(fact.labelKey as any)}</p>
                             <p className="font-bold text-white">{fact.value}</p>
                           </div>
                         </div>
@@ -334,7 +305,7 @@ export default function EventPage({ event, images }: EventPageProps) {
             <div className="max-w-5xl mx-auto px-6">
               {hasMultipleDistances && (
                 <h3 className="text-center text-sm font-bold text-stone uppercase tracking-widest mb-5">
-                  {m.choose_route()}
+                  {t("choose_route")}
                 </h3>
               )}
               <div className="flex flex-wrap justify-center gap-4">
@@ -344,7 +315,7 @@ export default function EventPage({ event, images }: EventPageProps) {
                   const distanceValue = distanceFact?.value || "";
                   const elevationValue = elevationFact?.value || "";
                   const isSelected = index === selectedDistanceIndex;
-                  const distanceName = getDistanceName(distance.nameKey);
+                  const distanceName = t(distance.nameKey as any);
                   return (
                     <button
                       key={distance.nameKey}
@@ -389,7 +360,7 @@ export default function EventPage({ event, images }: EventPageProps) {
         <section className="py-20 bg-cream topo-pattern relative overflow-hidden rounded-3xl mt-6 mx-2">
           <div className="max-w-5xl mx-auto px-6 relative z-10">
             <div className="text-center mb-10">
-              <h2 className="font-display text-4xl sm:text-5xl text-forest-deep mb-3">{m.section_route()}</h2>
+              <h2 className="font-display text-4xl sm:text-5xl text-forest-deep mb-3">{t("section_route")}</h2>
               <div className="section-divider w-24 mx-auto" />
             </div>
 
@@ -411,7 +382,7 @@ export default function EventPage({ event, images }: EventPageProps) {
                   <svg className="w-16 h-16 text-stone/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7" />
                   </svg>
-                  <p className="text-stone text-lg font-medium">{m.route_coming_soon()}</p>
+                  <p className="text-stone text-lg font-medium">{t("route_coming_soon")}</p>
                 </div>
               </div>
             )}
@@ -433,19 +404,19 @@ export default function EventPage({ event, images }: EventPageProps) {
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                 </svg>
-                {m.register_badge()}
+                {t("register_badge")}
               </span>
             </div>
 
             <h2 className="font-display text-4xl sm:text-5xl text-white mb-6">
-              {m.register_heading()}
+              {t("register_heading")}
             </h2>
 
             <Link
-              href={`/${getLocale() === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
+              href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
               className="btn-primary inline-flex items-center gap-3 text-lg animate-pulse-glow"
             >
-              <span>{m.register_button()}</span>
+              <span>{t("register_button")}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -465,33 +436,33 @@ export default function EventPage({ event, images }: EventPageProps) {
               {/* Logo/Brand */}
               <div className="flex items-center gap-3">
                 <GravelBikeIcon className="w-8 h-8 text-amber" />
-                <span className="font-display text-xl">{m.footer_brand()}</span>
+                <span className="font-display text-xl">{t("footer_brand")}</span>
               </div>
 
               {/* Copyright */}
               <p className="text-stone text-sm">
-                © {new Date().getFullYear()} {m.footer_brand()}.
+                © {new Date().getFullYear()} {t("footer_brand")}.
               </p>
 
               {/* Links */}
               <nav className="flex gap-6">
                 <Link
-                  href={getLocale() === "en" ? "/en/privatuma-politika" : "/privatuma-politika"}
+                  href={locale === "en" ? "/en/privatuma-politika" : "/privatuma-politika"}
                   className="text-sand/70 hover:text-amber-light transition-colors text-sm"
                 >
-                  {m.footer_privacy()}
+                  {t("footer_privacy")}
                 </Link>
                 <Link
-                  href={getLocale() === "en" ? "/en/noteikumi" : "/noteikumi"}
+                  href={locale === "en" ? "/en/noteikumi" : "/noteikumi"}
                   className="text-sand/70 hover:text-amber-light transition-colors text-sm"
                 >
-                  {m.footer_terms()}
+                  {t("footer_terms")}
                 </Link>
                 <Link
-                  href={getLocale() === "en" ? "/en/kontakti" : "/kontakti"}
+                  href={locale === "en" ? "/en/kontakti" : "/kontakti"}
                   className="text-sand/70 hover:text-amber-light transition-colors text-sm"
                 >
-                  {m.footer_contact()}
+                  {t("footer_contact")}
                 </Link>
               </nav>
             </div>

@@ -1,38 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import * as m from "@/paraglide/messages";
+import { useTranslations } from "next-intl";
 import { CONTACT_INFO } from "@/app/data/contact";
 
 interface FAQItem {
-  question: () => string;
-  answer: () => string;
+  questionKey: string;
+  answerKey: string;
 }
 
 const faqItems: FAQItem[] = [
   {
-    question: m.faq_q1,
-    answer: m.faq_a1,
+    questionKey: "faq_q1",
+    answerKey: "faq_a1",
   },
   {
-    question: m.faq_q2,
-    answer: m.faq_a2,
+    questionKey: "faq_q2",
+    answerKey: "faq_a2",
   },
   {
-    question: m.faq_q3,
-    answer: m.faq_a3,
+    questionKey: "faq_q3",
+    answerKey: "faq_a3",
   },
   {
-    question: m.faq_q4,
-    answer: m.faq_a4,
+    questionKey: "faq_q4",
+    answerKey: "faq_a4",
   },
   {
-    question: m.faq_q5,
-    answer: m.faq_a5,
+    questionKey: "faq_q5",
+    answerKey: "faq_a5",
   },
   {
-    question: m.faq_q6,
-    answer: m.faq_a6,
+    questionKey: "faq_q6",
+    answerKey: "faq_a6",
   },
 ];
 
@@ -66,6 +66,7 @@ function QuestionIcon() {
 }
 
 export default function FAQ() {
+  const t = useTranslations();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleItem = (index: number) => {
@@ -85,10 +86,10 @@ export default function FAQ() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            {m.faq_badge()}
+            {t("faq_badge")}
           </span>
           <h2 className="font-display text-4xl sm:text-5xl text-forest-deep mb-3">
-            {m.faq_heading()}
+            {t("faq_heading")}
           </h2>
           <div className="section-divider w-24 mx-auto" />
         </div>
@@ -111,7 +112,7 @@ export default function FAQ() {
                   <div className="flex items-center">
                     <QuestionIcon />
                     <span className="font-bold text-earth-dark text-lg pr-4">
-                      {item.question()}
+                      {t(item.questionKey as any)}
                     </span>
                   </div>
                   <ChevronIcon isOpen={isOpen} />
@@ -126,7 +127,7 @@ export default function FAQ() {
                   <div className="overflow-hidden">
                     <div className="px-6 pb-6 pt-2">
                       <div className="pl-12 border-l-4 border-amber/40">
-                        <p className="text-stone leading-relaxed">{item.answer()}</p>
+                        <p className="text-stone leading-relaxed">{t(item.answerKey as any)}</p>
                       </div>
                     </div>
                   </div>
@@ -138,7 +139,7 @@ export default function FAQ() {
 
         {/* Contact prompt */}
         <div className="mt-12 text-center">
-          <p className="text-stone mb-4">{m.faq_contact_prompt()}</p>
+          <p className="text-stone mb-4">{t("faq_contact_prompt")}</p>
           <a
             href={`mailto:${CONTACT_INFO.email}`}
             className="btn-secondary inline-flex items-center gap-2"
@@ -146,7 +147,7 @@ export default function FAQ() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            {m.faq_contact_button()}
+            {t("faq_contact_button")}
           </a>
         </div>
       </div>

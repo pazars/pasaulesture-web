@@ -12,5 +12,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './'),
     },
+    conditions: ['import', 'module', 'browser', 'default'],
+    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
   },
 });

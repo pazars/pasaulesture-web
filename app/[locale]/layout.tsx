@@ -1,11 +1,11 @@
-import { setLocale, locales } from "@/paraglide/runtime";
-import type { Locale } from "@/paraglide/runtime";
 import { notFound } from "next/navigation";
-import LocaleProvider from "@/app/components/LocaleProvider";
 import { Geist, Geist_Mono } from "next/font/google";
-import * as m from "@/paraglide/messages";
 import type { Metadata } from "next";
 import Script from "next/script";
+import { getTranslations } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { locales } from "@/i18n/request";
+import type { Locale } from "@/i18n/request";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,12 +40,11 @@ export async function generateMetadata({
     };
   }
 
-  // Set locale for metadata generation
-  setLocale(locale as Locale);
+  const t = await getTranslations({ locale });
 
   return {
-    title: m.site_title(),
-    description: m.site_description(),
+    title: t("site_title"),
+    description: t("site_description"),
   };
 }
 
@@ -60,8 +59,8 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  // Set the locale for paraglide on server
-  setLocale(locale as Locale);
+  // Load messages for the locale
+  const messages = (await import(`@/messages/${locale}.json`)).default;
 
   return (
     <html lang={locale}>
@@ -87,7 +86,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
-        <LocaleProvider locale={locale as Locale}>{children}</LocaleProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

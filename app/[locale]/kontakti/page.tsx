@@ -1,6 +1,5 @@
-import * as m from "@/paraglide/messages";
-import { locales, setLocale } from "@/paraglide/runtime";
-import type { Locale } from "@/paraglide/runtime";
+import { getTranslations } from "next-intl/server";
+import { locales } from "@/i18n/request";
 import Link from "next/link";
 import ContactContentLv from "./content/ContactContent.lv";
 import ContactContentEn from "./content/ContactContent.en";
@@ -15,9 +14,7 @@ export function generateStaticParams() {
 
 export default async function ContactPage({ params }: PageProps) {
   const { locale } = await params;
-
-  // Set locale for translation functions
-  setLocale(locale as Locale);
+  const t = await getTranslations();
 
   const Content = locale === "en" ? ContactContentEn : ContactContentLv;
   const homeUrl = locale === "en" ? "/en" : "/";
@@ -28,7 +25,7 @@ export default async function ContactPage({ params }: PageProps) {
         <Link
           href={homeUrl}
           className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-forest-deep/10 hover:bg-forest-deep hover:text-white text-forest-deep transition-all mb-8 group"
-          aria-label={m.back_to_home()}
+          aria-label={t("back_to_home")}
         >
           <svg
             className="w-6 h-6 transition-transform group-hover:scale-110"
@@ -46,7 +43,7 @@ export default async function ContactPage({ params }: PageProps) {
         </Link>
 
         <h1 className="text-4xl font-display text-forest-deep mb-12">
-          {m.page_contact_title()}
+          {t("page_contact_title")}
         </h1>
         <Content />
       </div>

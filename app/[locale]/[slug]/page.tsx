@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import { events, getEventBySlug } from "@/app/data/events";
 import { getAllEventImages } from "@/app/data/events.server";
 import EventPage from "@/app/components/EventPage";
-import * as m from "@/paraglide/messages";
-import { locales } from "@/paraglide/runtime";
+import { getTranslations } from "next-intl/server";
+import { locales } from "@/i18n/request";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -19,31 +19,15 @@ export function generateStaticParams() {
   return params;
 }
 
-// Helper to get translated event name for metadata
-function getEventName(nameKey: string): string {
-  const translations: Record<string, () => string> = {
-    event_egipte_malta: m.event_egipte_malta,
-    event_parize_dakara: m.event_parize_dakara,
-  };
-  return translations[nameKey]?.() ?? nameKey;
-}
-
-// Helper to get translated event description for metadata
-function getEventDescription(nameKey: string): string {
-  const translations: Record<string, () => string> = {
-    event_egipte_malta: m.event_egipte_malta_og_description,
-    event_parize_dakara: m.event_parize_dakara_og_description,
-  };
-  return translations[nameKey]?.() ?? "";
-}
-
 export async function generateMetadata({ params }: PageProps) {
   const { locale, slug } = await params;
   const event = getEventBySlug(slug);
   if (!event) return {};
 
-  const eventName = getEventName(event.nameKey);
-  const eventDescription = getEventDescription(event.nameKey);
+  const t = await getTranslations({ locale });
+
+  const eventName = t(event.nameKey as any);
+  const eventDescription = t(`${event.nameKey}_og_description` as any);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const ogImageUrl = `${baseUrl}/events/${slug}/og/og-image-${locale}.jpg`;
   const pageUrl = `${baseUrl}/${locale === "lv" ? "" : "en/"}${slug}`;
@@ -55,7 +39,7 @@ export async function generateMetadata({ params }: PageProps) {
       title: eventName,
       description: eventDescription,
       url: pageUrl,
-      siteName: m.site_title(),
+      siteName: t("site_title"),
       images: [
         {
           url: ogImageUrl,

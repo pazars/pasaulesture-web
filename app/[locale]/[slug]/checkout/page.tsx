@@ -4,8 +4,7 @@ import { getEventBySlug } from "@/app/data/events";
 import CheckoutForm from "@/app/components/CheckoutForm";
 import CheckoutHeader from "@/app/components/CheckoutHeader";
 import Link from "next/link";
-import * as m from "@/paraglide/messages";
-import { getLocale } from "@/paraglide/runtime";
+import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
 interface CheckoutPageProps {
@@ -26,6 +25,7 @@ export default async function CheckoutPage({
     const { distance } = await searchParams;
 
     const event = getEventBySlug(slug);
+    const t = await getTranslations();
 
     if (!event) {
         notFound();
@@ -45,7 +45,7 @@ export default async function CheckoutPage({
                             <Link
                                 href={homeUrl}
                                 className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-forest-deep/10 hover:bg-forest-deep hover:text-white text-forest-deep transition-all mb-8 group"
-                                aria-label={m.back_to_home()}
+                                aria-label={t("back_to_home")}
                             >
                                 <svg
                                     className="w-6 h-6 transition-transform group-hover:scale-110"
@@ -63,7 +63,7 @@ export default async function CheckoutPage({
                             </Link>
 
                             <h1 className="font-display text-4xl md:text-5xl text-forest-deep mb-3 text-center">
-                                {m.checkout_title()}
+                                {t("checkout_title")}
                             </h1>
                             <div className="section-divider w-24 mx-auto mb-8" />
 

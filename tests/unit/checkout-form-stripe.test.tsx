@@ -30,14 +30,11 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-// Mock paraglide runtime
-vi.mock("@/paraglide/runtime", async (importOriginal) => {
-  const actual = await importOriginal() as any;
-  return {
-    ...actual,
-    getLocale: () => "lv",
-  };
-});
+// Mock next-intl
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+  useLocale: () => "lv",
+}));
 
 describe("CheckoutForm Stripe Integration", () => {
   const mockEvent = events["egipte-malta"];
@@ -98,17 +95,17 @@ describe("CheckoutForm Stripe Integration", () => {
 
     // Wait for prices to load and button to become enabled
     await waitFor(() => {
-      const button = screen.getByRole("button", { name: /turpināt uz maksājumu/i });
+      const button = screen.getByRole("button", { name: /checkout_submit/i });
       expect(button).not.toBeDisabled();
     });
 
     // Fill form
-    await userEvent.type(screen.getByLabelText(/vārds/i), "John Doe");
-    await userEvent.type(screen.getByLabelText(/e-pasts/i), "john@example.com");
+    await userEvent.type(screen.getByLabelText(/checkout_name_label/i), "John Doe");
+    await userEvent.type(screen.getByLabelText(/checkout_email_label/i), "john@example.com");
     await userEvent.click(screen.getByRole("checkbox"));
 
     // Submit
-    await userEvent.click(screen.getByRole("button", { name: /turpināt uz maksājumu/i }));
+    await userEvent.click(screen.getByRole("button", { name: /checkout_submit/i }));
 
     // Check session creation request
     await waitFor(() => {

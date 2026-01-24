@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { getClosestEvent } from "@/app/data/events";
-import { locales } from "@/paraglide/runtime";
-
-const defaultLocale = "lv";
+import { locales, defaultLocale } from "@/i18n/request";
 
 interface PageProps {
   params: Promise<{ locale: string }>;

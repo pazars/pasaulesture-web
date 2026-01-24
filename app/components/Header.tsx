@@ -5,22 +5,14 @@ import { Suspense } from "react";
 import { events } from "@/app/data/events";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { InstagramIcon } from "./Icons";
-import * as m from "@/paraglide/messages";
+import { useTranslations } from "next-intl";
 
 interface HeaderProps {
   currentSlug: string;
 }
 
-// Helper to get translated event name
-function getEventName(nameKey: string): string {
-  const translations: Record<string, () => string> = {
-    event_egipte_malta: m.event_egipte_malta,
-    event_parize_dakara: m.event_parize_dakara,
-  };
-  return translations[nameKey]?.() ?? nameKey;
-}
-
 export default function Header({ currentSlug }: HeaderProps) {
+  const t = useTranslations();
   const allEvents = Object.values(events);
 
   return (
@@ -31,7 +23,7 @@ export default function Header({ currentSlug }: HeaderProps) {
           <nav className="flex flex-wrap justify-center gap-2 sm:gap-3">
             {allEvents.map((e) => {
               const isCurrent = e.slug === currentSlug;
-              const eventName = getEventName(e.nameKey);
+              const eventName = t(e.nameKey as any);
               return isCurrent ? (
                 <span
                   key={e.slug}

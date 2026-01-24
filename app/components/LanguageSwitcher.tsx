@@ -1,10 +1,9 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { locales } from "@/paraglide/runtime";
-import type { Locale } from "@/paraglide/runtime";
-
-const defaultLocale: Locale = "lv";
+import { useLocale } from "next-intl";
+import { locales, defaultLocale } from "@/i18n/request";
+import type { Locale } from "@/i18n/request";
 
 const localeNames: Record<Locale, string> = {
   lv: "LV",
@@ -50,7 +49,7 @@ export default function LanguageSwitcher() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentLocale = getLocaleFromPath(pathname);
+  const currentLocale = useLocale() as Locale;
 
   const handleLocaleChange = (targetLocale: Locale) => {
     if (targetLocale === currentLocale) return;

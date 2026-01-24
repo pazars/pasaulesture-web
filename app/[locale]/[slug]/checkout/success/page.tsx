@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getStripeClient } from "@/app/lib/stripe";
 import { getEventBySlug } from "@/app/data/events";
-import * as m from "@/paraglide/messages";
+import { getTranslations } from "next-intl/server";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -14,6 +14,7 @@ export default async function CheckoutSuccessPage({
 }: PageProps) {
   const { locale, slug } = await params;
   const { session_id } = await searchParams;
+  const t = await getTranslations();
 
   // Validate session ID exists
   if (!session_id) {
@@ -21,9 +22,9 @@ export default async function CheckoutSuccessPage({
       <div className="min-h-screen bg-gradient-to-b from-forest-deep to-forest-medium flex items-center justify-center p-4">
         <div className="max-w-md w-full glass p-8 rounded-3xl text-center">
           <h1 className="text-2xl font-display text-cream mb-4">
-            {m.checkout_error_title()}
+            {t("checkout_error_title")}
           </h1>
-          <p className="text-cream-light">{m.checkout_no_session()}</p>
+          <p className="text-cream-light">{t("checkout_no_session")}</p>
         </div>
       </div>
     );
@@ -45,9 +46,9 @@ export default async function CheckoutSuccessPage({
       <div className="min-h-screen bg-gradient-to-b from-forest-deep to-forest-medium flex items-center justify-center p-4">
         <div className="max-w-md w-full glass p-8 rounded-3xl text-center">
           <h1 className="text-2xl font-display text-cream mb-4">
-            {m.checkout_error_title()}
+            {t("checkout_error_title")}
           </h1>
-          <p className="text-cream-light">{m.checkout_invalid_session()}</p>
+          <p className="text-cream-light">{t("checkout_invalid_session")}</p>
         </div>
       </div>
     );
@@ -85,30 +86,30 @@ export default async function CheckoutSuccessPage({
 
         {/* Success Message */}
         <h1 className="text-3xl font-display text-cream text-center mb-4">
-          {m.checkout_success_title()}
+          {t("checkout_success_title")}
         </h1>
         <p className="text-cream-light text-center mb-8">
-          {m.checkout_success_message()}
+          {t("checkout_success_message")}
         </p>
 
         {/* Registration Details */}
         <div className="space-y-4 mb-8">
           <div className="flex justify-between py-3 border-b border-stone/30">
-            <span className="text-cream-light">{m.label_participant()}:</span>
+            <span className="text-cream-light">{t("label_participant")}:</span>
             <span className="text-cream font-medium">{participantName}</span>
           </div>
           <div className="flex justify-between py-3 border-b border-stone/30">
-            <span className="text-cream-light">{m.label_event()}:</span>
-            <span className="text-cream font-medium">{(m as unknown as Record<string, () => string>)[event.nameKey]()}</span>
+            <span className="text-cream-light">{t("label_event")}:</span>
+            <span className="text-cream font-medium">{t(event.nameKey as any)}</span>
           </div>
           <div className="flex justify-between py-3 border-b border-stone/30">
-            <span className="text-cream-light">{m.label_distance()}:</span>
+            <span className="text-cream-light">{t("label_distance")}:</span>
             <span className="text-cream font-medium">
-              {(m as unknown as Record<string, () => string>)[distance.nameKey]()}
+              {t(distance.nameKey as any)}
             </span>
           </div>
           <div className="flex justify-between py-3 border-b border-stone/30">
-            <span className="text-cream-light">{m.label_amount_paid()}:</span>
+            <span className="text-cream-light">{t("label_amount_paid")}:</span>
             <span className="text-cream font-medium">€{amountPaid}</span>
           </div>
         </div>
@@ -116,7 +117,7 @@ export default async function CheckoutSuccessPage({
         {/* Email Confirmation Notice */}
         <div className="bg-moss/20 border border-moss/30 rounded-xl p-4 mb-6">
           <p className="text-cream-light text-sm text-center">
-            {m.checkout_confirmation_email()}
+            {t("checkout_confirmation_email")}
           </p>
         </div>
 
@@ -126,7 +127,7 @@ export default async function CheckoutSuccessPage({
             href={`/${locale === "en" ? "en/" : ""}${slug}`}
             className="btn-secondary inline-block"
           >
-            {m.button_back_to_event()}
+            {t("button_back_to_event")}
           </a>
         </div>
       </div>

@@ -4,8 +4,7 @@ import { useState, FormEvent, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EventData, events } from "@/app/data/events";
-import * as m from "@/paraglide/messages";
-import { getLocale } from "@/paraglide/runtime";
+import { useTranslations, useLocale } from "next-intl";
 
 interface CheckoutFormProps {
     event: EventData;
@@ -18,31 +17,13 @@ interface StripePrice {
     amount: number;
 }
 
-// Helper to get translated distance name
-function getDistanceName(nameKey: string): string {
-    const translations: Record<string, () => string> = {
-        distance_adventure: m.distance_adventure,
-        distance_challenge: m.distance_challenge,
-        distance_long: m.distance_long,
-    };
-    return translations[nameKey]?.() ?? nameKey;
-}
-
-// Helper to get translated event name
-function getEventName(nameKey: string): string {
-    const translations: Record<string, () => string> = {
-        event_egipte_malta: m.event_egipte_malta,
-        event_parize_dakara: m.event_parize_dakara,
-    };
-    return translations[nameKey]?.() ?? nameKey;
-}
-
 export default function CheckoutForm({
     event,
 }: CheckoutFormProps) {
+    const t = useTranslations();
+    const locale = useLocale();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const locale = getLocale();
     const allEvents = Object.values(events);
 
     // Derive selected distance from URL params or default to last option
@@ -119,8 +100,8 @@ export default function CheckoutForm({
     }, [event.slug, selectedDistanceIndex]);
 
     const selectedDistance = event.distances[selectedDistanceIndex];
-    const distanceName = getDistanceName(selectedDistance.nameKey);
-    const eventName = getEventName(event.nameKey);
+    const distanceName = t(selectedDistance.nameKey as any);
+    const eventName = t(event.nameKey as any);
     const distanceFact = selectedDistance.facts.find((f) => f.icon === "route");
     const elevationFact = selectedDistance.facts.find((f) => f.icon === "mountain");
 
@@ -133,17 +114,17 @@ export default function CheckoutForm({
         const newErrors: Record<string, string> = {};
 
         if (!formData.name.trim()) {
-            newErrors.name = m.checkout_error_required();
+            newErrors.name = t("checkout_error_required");
         }
 
         if (!formData.email.trim()) {
-            newErrors.email = m.checkout_error_required();
+            newErrors.email = t("checkout_error_required");
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = m.checkout_error_email();
+            newErrors.email = t("checkout_error_email");
         }
 
         if (!formData.acceptTerms) {
-            newErrors.acceptTerms = m.checkout_error_terms();
+            newErrors.acceptTerms = t("checkout_error_terms");
         }
 
         setErrors(newErrors);
@@ -262,11 +243,11 @@ export default function CheckoutForm({
                 <div className="flex justify-between items-start mb-6">
                     <div className="space-y-1">
                         <p className="text-sand/70 text-sm uppercase tracking-wider">
-                            {m.checkout_selection_label()}
+                            {t("checkout_selection_label")}
                         </p>
                     </div>
                     <div className="text-right">
-                        <p className="text-sand/60 text-xs uppercase tracking-widest mb-1">{m.checkout_price_label()}</p>
+                        <p className="text-sand/60 text-xs uppercase tracking-widest mb-1">{t("checkout_price_label")}</p>
                         {priceLoading ? (
                             <p className="text-2xl font-display text-sand/50">Loading...</p>
                         ) : matchingPrice ? (
@@ -281,7 +262,7 @@ export default function CheckoutForm({
                     {/* Event Dropdown */}
                     <div>
                         <label className="text-sand/80 text-xs uppercase tracking-wide mb-2 block">
-                            {m.checkout_event_label()}
+                            {t("checkout_event_label")}
                         </label>
                         <div className="relative">
                             <select
@@ -291,7 +272,7 @@ export default function CheckoutForm({
                             >
                                 {allEvents.map((e) => (
                                     <option key={e.slug} value={e.slug} className="bg-forest-deep text-white">
-                                        {getEventName(e.nameKey)}
+                                        {t(e.nameKey as any)}
                                     </option>
                                 ))}
                             </select>
@@ -306,7 +287,7 @@ export default function CheckoutForm({
                     {/* Distance Dropdown */}
                     <div className="border-t border-sand/20 pt-4">
                         <label className="text-sand/80 text-xs uppercase tracking-wide mb-2 block">
-                            {m.checkout_distance_label()}
+                            {t("checkout_distance_label")}
                         </label>
                         <div className="relative">
                             <select
@@ -317,7 +298,7 @@ export default function CheckoutForm({
                             >
                                 {event.distances.map((d, idx) => (
                                     <option key={idx} value={idx.toString()} className="bg-forest-deep text-white">
-                                        {getDistanceName(d.nameKey)}
+                                        {t(d.nameKey as any)}
                                     </option>
                                 ))}
                             </select>
@@ -381,7 +362,7 @@ export default function CheckoutForm({
                         htmlFor="name"
                         className="block text-sm font-semibold text-earth-dark mb-2"
                     >
-                        {m.checkout_name_label()} <span className="text-amber">*</span>
+                        {t("checkout_name_label")} <span className="text-amber">*</span>
                     </label>
                     <input
                         type="text"
@@ -405,7 +386,7 @@ export default function CheckoutForm({
                         htmlFor="email"
                         className="block text-sm font-semibold text-earth-dark mb-2"
                     >
-                        {m.checkout_email_label()} <span className="text-amber">*</span>
+                        {t("checkout_email_label")} <span className="text-amber">*</span>
                     </label>
                     <input
                         type="email"
@@ -434,13 +415,13 @@ export default function CheckoutForm({
                             className="mt-1 w-5 h-5 rounded border-2 border-sand text-forest-deep focus:ring-2 focus:ring-forest-medium cursor-pointer"
                         />
                         <label htmlFor="terms" className="text-sm text-earth-dark flex-1">
-                            {m.checkout_terms_label()}{" "}
+                            {t("checkout_terms_label")}{" "}
                             <Link
                                 href={termsUrl}
                                 target="_blank"
                                 className="text-forest-medium hover:text-amber underline font-semibold inline-flex items-center gap-1"
                             >
-                                {m.checkout_terms_link()}
+                                {t("checkout_terms_link")}
                                 <svg className="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
@@ -482,11 +463,11 @@ export default function CheckoutForm({
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                 />
                             </svg>
-                            {m.checkout_submit()}
+                            {t("checkout_submit")}
                         </span>
                     ) : (
                         <span className="flex items-center justify-center gap-2">
-                            {m.checkout_submit()}
+                            {t("checkout_submit")}
                             <svg
                                 className="w-5 h-5"
                                 fill="none"
