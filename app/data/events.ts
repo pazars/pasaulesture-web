@@ -67,7 +67,7 @@ export const events: Record<string, EventData> = {
     nameKey: "event_parize_dakara",
     date: new Date("2026-08-29"),
     location: {
-      name: "TBD",
+      name: "Kurzeme",
       googleMapsUrl: "",
     },
     surfaceType: "Gravel",
@@ -77,7 +77,7 @@ export const events: Record<string, EventData> = {
         facts: [
           { icon: "calendar", labelKey: "label_date", value: "29/08" },
           { icon: "route", labelKey: "label_distance", value: "380 km" },
-          { icon: "mountain", labelKey: "label_elevation", value: "? m" },
+          { icon: "mountain", labelKey: "label_elevation", value: "<2000 m" },
           { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
         distanceEmbedUrl: "",

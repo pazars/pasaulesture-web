@@ -36,6 +36,20 @@ vi.mock("next-intl", () => ({
   useLocale: () => "lv",
 }));
 
+// Mock react-phone-number-input
+vi.mock("react-phone-number-input", () => ({
+  default: ({ value, onChange, className }: { value: string; onChange: (v: string) => void; className?: string }) => (
+    <input
+      type="tel"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={className}
+      data-testid="phone-input"
+    />
+  ),
+  isValidPhoneNumber: () => true,
+}));
+
 describe("CheckoutForm Stripe Integration", () => {
   const mockEvent = events["egipte-malta"];
 
@@ -56,14 +70,21 @@ describe("CheckoutForm Stripe Integration", () => {
   });
 
   it("fetches prices on mount", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        prices: [
-          { priceId: "price_123", eventSlug: "egipte-malta", distanceIndex: 0, amount: 6900 },
-        ],
-      }),
-    });
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          prices: [
+            { priceId: "price_123", eventSlug: "egipte-malta", distanceIndex: 0, amount: 6900 },
+          ],
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          dorm: { total: 15, remaining: 10, available: true },
+        }),
+      });
     global.fetch = mockFetch;
 
     render(<CheckoutForm event={mockEvent} />);
@@ -86,6 +107,12 @@ describe("CheckoutForm Stripe Integration", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
+          dorm: { total: 15, remaining: 10, available: true },
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
           url: "https://checkout.stripe.com/pay/cs_test_123",
         }),
       });
@@ -99,10 +126,19 @@ describe("CheckoutForm Stripe Integration", () => {
       expect(button).not.toBeDisabled();
     });
 
-    // Fill form
+    // Fill form - name, email, phone, emergency contact fields
     await userEvent.type(screen.getByLabelText(/checkout_name_label/i), "John Doe");
     await userEvent.type(screen.getByLabelText(/checkout_email_label/i), "john@example.com");
-    await userEvent.click(screen.getByRole("checkbox"));
+    // Fill phone inputs (there are multiple phone-input testids)
+    const phoneInputs = screen.getAllByTestId("phone-input");
+    await userEvent.type(phoneInputs[0], "+37120000000"); // participant phone
+    // Fill emergency contact fields
+    await userEvent.type(screen.getByLabelText(/checkout_emergency_name_label/i), "Jane Doe");
+    await userEvent.type(phoneInputs[1], "+37120000001"); // emergency phone
+    // Accept terms (first checkbox that isn't accommodation/tips)
+    const checkboxes = screen.getAllByRole("checkbox");
+    const termsCheckbox = checkboxes.find(cb => cb.id === "terms");
+    if (termsCheckbox) await userEvent.click(termsCheckbox);
 
     // Submit
     await userEvent.click(screen.getByRole("button", { name: /checkout_submit/i }));
@@ -124,12 +160,19 @@ describe("CheckoutForm Stripe Integration", () => {
   });
 
   it("shows error if price not found", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        prices: [], // No prices
-      }),
-    });
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          prices: [], // No prices
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          dorm: { total: 15, remaining: 10, available: true },
+        }),
+      });
     global.fetch = mockFetch;
 
     render(<CheckoutForm event={mockEvent} />);

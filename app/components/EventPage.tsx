@@ -7,6 +7,7 @@ import { EventData, EventDistance } from "@/app/data/events";
 import { ExternalLinkIcon, LocationIcon } from "./Icons";
 import FAQ from "./FAQ";
 import Header from "./Header";
+import Toast from "./Toast";
 import { useTranslations, useLocale } from "next-intl";
 
 interface EventPageProps {
@@ -45,6 +46,7 @@ export default function EventPage({ event }: EventPageProps) {
   const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(event.distances.length - 1);
   const [isLoaded, setIsLoaded] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [showToast, setShowToast] = useState(false);
 
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
@@ -116,6 +118,10 @@ export default function EventPage({ event }: EventPageProps) {
   const handleDistanceSelect = (index: number) => {
     setSelectedDistanceIndex(index);
     localStorage.setItem(`last_distance_${event.slug}`, index.toString());
+  };
+
+  const handleRegistrationClick = () => {
+    setShowToast(true);
   };
 
   return (
@@ -421,19 +427,27 @@ export default function EventPage({ event }: EventPageProps) {
               {t("register_heading")}
             </h2>
 
-            <Link
-              href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
-              className={`inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all ${
-                isDakar
-                  ? "bg-bronze text-beige shadow-bronze/40 hover:shadow-bronze/50"
-                  : "bg-blue text-white shadow-blue/40 hover:shadow-blue/50"
-              }`}
-            >
-              <span>{t("register_button")}</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
+{isDakar ? (
+              <button
+                onClick={handleRegistrationClick}
+                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-bronze text-beige shadow-bronze/40 hover:shadow-bronze/50"
+              >
+                <span>{t("register_button")}</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </button>
+            ) : (
+              <Link
+                href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
+                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-blue text-white shadow-blue/40 hover:shadow-blue/50"
+              >
+                <span>{t("register_button")}</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            )}
           </div>
         </section>
 
@@ -478,6 +492,15 @@ export default function EventPage({ event }: EventPageProps) {
           </div>
         </footer>
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <Toast
+          message={t("registration_coming_soon")}
+          onClose={() => setShowToast(false)}
+          isDakar={isDakar}
+        />
+      )}
     </div>
   );
 }

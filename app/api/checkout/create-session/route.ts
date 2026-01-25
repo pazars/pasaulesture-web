@@ -6,18 +6,65 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
 });
 
+const DORM_TOTAL_SPOTS = 15;
+
 export async function POST(request: NextRequest) {
   const sql = neon(process.env.DATABASE_URL!);
   try {
     const body = await request.json();
-    const { eventSlug, distanceIndex, name, email, locale } = body;
+    const {
+      eventSlug,
+      distanceIndex,
+      name,
+      email,
+      phone,
+      emergencyContactName,
+      emergencyContactPhone,
+      needsAccommodation,
+      accommodationType,
+      accommodationWaitlist,
+      wantsPreparationTips,
+      preparationTipsChannel,
+      locale,
+    } = body;
 
     // Validate ALL required fields
-    if (!eventSlug || distanceIndex === undefined || !name || !email || !locale) {
+    if (!eventSlug || distanceIndex === undefined || !name || !email || !phone || !emergencyContactName || !emergencyContactPhone || !locale) {
       return NextResponse.json(
-        { error: 'Missing required fields: eventSlug, distanceIndex, name, email, locale' },
+        { error: 'Missing required fields: eventSlug, distanceIndex, name, email, phone, emergencyContactName, emergencyContactPhone, locale' },
         { status: 400 }
       );
+    }
+
+    // Validate accommodation type if accommodation is needed
+    if (needsAccommodation && !accommodationType) {
+      return NextResponse.json(
+        { error: 'Accommodation type is required when accommodation is needed' },
+        { status: 400 }
+      );
+    }
+
+    // Check for dorm race condition: user selected dorm when spots were available,
+    // but spots are now full
+    if (needsAccommodation && accommodationType === 'dorm' && !accommodationWaitlist) {
+      const result = await sql`
+        SELECT COUNT(*) as dorm_count
+        FROM registrations
+        WHERE event_slug = ${eventSlug}
+          AND payment_status = 'completed'
+          AND accommodation_type = 'dorm'
+          AND accommodation_waitlist = FALSE
+      `;
+
+      const dormCount = parseInt(result[0]?.dorm_count || '0', 10);
+      const remaining = DORM_TOTAL_SPOTS - dormCount;
+
+      if (remaining <= 0) {
+        return NextResponse.json(
+          { error: 'DORM_FULL', message: 'Dorm spots filled while you were registering. Please refresh to update availability.' },
+          { status: 409 }
+        );
+      }
     }
 
     // Fetch prices using Stripe API with expanded product data
@@ -62,6 +109,14 @@ export async function POST(request: NextRequest) {
         distance_index: String(distanceIndex),
         participant_name: name,
         participant_email: email,
+        participant_phone: phone,
+        emergency_contact_name: emergencyContactName,
+        emergency_contact_phone: emergencyContactPhone,
+        needs_accommodation: String(needsAccommodation || false),
+        accommodation_type: accommodationType || '',
+        accommodation_waitlist: String(accommodationWaitlist || false),
+        wants_preparation_tips: String(wantsPreparationTips || false),
+        preparation_tips_channel: preparationTipsChannel || '',
         locale: locale,
       },
     });
@@ -75,6 +130,14 @@ export async function POST(request: NextRequest) {
           distance_index,
           participant_name,
           participant_email,
+          participant_phone,
+          emergency_contact_name,
+          emergency_contact_phone,
+          needs_accommodation,
+          accommodation_type,
+          accommodation_waitlist,
+          wants_preparation_tips,
+          preparation_tips_channel,
           locale,
           payment_status
         ) VALUES (
@@ -83,6 +146,14 @@ export async function POST(request: NextRequest) {
           ${distanceIndex},
           ${name},
           ${email},
+          ${phone},
+          ${emergencyContactName},
+          ${emergencyContactPhone},
+          ${needsAccommodation || false},
+          ${accommodationType || null},
+          ${accommodationWaitlist || false},
+          ${wantsPreparationTips || false},
+          ${preparationTipsChannel || null},
           ${locale},
           'pending'
         )

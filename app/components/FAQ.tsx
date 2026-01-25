@@ -33,6 +33,30 @@ const faqItems: FAQItem[] = [
     questionKey: "faq_q6",
     answerKey: "faq_a6",
   },
+  {
+    questionKey: "faq_q7",
+    answerKey: "faq_a7",
+  },
+  {
+    questionKey: "faq_q8",
+    answerKey: "faq_a8",
+  },
+  {
+    questionKey: "faq_q9",
+    answerKey: "faq_a9",
+  },
+  {
+    questionKey: "faq_q10",
+    answerKey: "faq_a10",
+  },
+  {
+    questionKey: "faq_q11",
+    answerKey: "faq_a11",
+  },
+  {
+    questionKey: "faq_q12",
+    answerKey: "faq_a12",
+  },
 ];
 
 function ChevronIcon({ isOpen, isDakar }: { isOpen: boolean; isDakar: boolean }) {

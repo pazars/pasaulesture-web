@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 import { getEventBySlug } from "@/app/data/events";
 import CheckoutForm from "@/app/components/CheckoutForm";
-import CheckoutHeader from "@/app/components/CheckoutHeader";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
@@ -12,17 +11,12 @@ interface CheckoutPageProps {
         locale: string;
         slug: string;
     }>;
-    searchParams: Promise<{
-        distance?: string;
-    }>;
 }
 
 export default async function CheckoutPage({
     params,
-    searchParams,
 }: CheckoutPageProps) {
     const { slug, locale } = await params;
-    const { distance } = await searchParams;
 
     const event = getEventBySlug(slug);
     const t = await getTranslations();
@@ -31,50 +25,48 @@ export default async function CheckoutPage({
         notFound();
     }
 
-    const homeUrl = locale === "en" ? "/en" : "/";
     const eventUrl = locale === "en" ? `/en/${slug}` : `/${slug}`;
 
     return (
-        <div className="min-h-screen bg-cream-light">
-            <div className="max-w-5xl mx-auto">
-                <CheckoutHeader />
+        <div
+            className="min-h-screen py-8 md:py-12"
+            style={{ background: 'linear-gradient(to bottom, #f5f0e6, #faf8f3)' }}
+        >
+            <div className="max-w-xl mx-auto px-4">
+                {/* Back button */}
+                <Link
+                    href={eventUrl}
+                    className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors mb-6 group"
+                    aria-label={t("back_to_home")}
+                >
+                    <svg
+                        className="w-4 h-4 transition-transform group-hover:-translate-x-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 19l-7-7 7-7"
+                        />
+                    </svg>
+                    <span>{t("button_back_to_event")}</span>
+                </Link>
 
-                <main className="mt-6 mx-2 mb-8">
-                    <div className="bg-cream rounded-3xl p-8 md:p-12">
-                        <div className="max-w-2xl mx-auto">
-                            <Link
-                                href={homeUrl}
-                                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-forest-deep/10 hover:bg-forest-deep hover:text-white text-forest-deep transition-all mb-8 group"
-                                aria-label={t("back_to_home")}
-                            >
-                                <svg
-                                    className="w-6 h-6 transition-transform group-hover:scale-110"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                                    />
-                                </svg>
-                            </Link>
+                {/* Title */}
+                <h1 className="font-display text-4xl md:text-5xl text-slate-800 mb-8">
+                    {t("checkout_title")}
+                </h1>
 
-                            <h1 className="font-display text-4xl md:text-5xl text-forest-deep mb-3 text-center">
-                                {t("checkout_title")}
-                            </h1>
-                            <div className="section-divider w-24 mx-auto mb-8" />
-
-                            <Suspense fallback={<div className="text-center py-8">Loading...</div>}>
-                                <CheckoutForm
-                                    event={event}
-                                />
-                            </Suspense>
-                        </div>
+                <Suspense fallback={
+                    <div className="flex items-center justify-center py-16">
+                        <div className="w-8 h-8 border-2 border-slate-200 border-t-slate-600 rounded-full animate-spin" />
                     </div>
-                </main>
+                }>
+                    <CheckoutForm event={event} />
+                </Suspense>
             </div>
         </div>
     );

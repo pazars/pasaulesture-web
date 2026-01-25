@@ -655,3 +655,92 @@ body::after {
 .theme-dakar body::after {
   animation: heat-shimmer 4s ease-in-out infinite;
 }
+
+/* ===== PHONE INPUT STYLES ===== */
+/* Override react-phone-number-input styles to match form design */
+.checkout-phone-input.PhoneInput {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkout-phone-input .PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.checkout-phone-input .PhoneInputCountry:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.checkout-phone-input .PhoneInputCountryIcon {
+  width: 1.5rem;
+  height: 1rem;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.checkout-phone-input .PhoneInputCountrySelectArrow {
+  margin-left: 0.25rem;
+  width: 0.4em;
+  height: 0.4em;
+  border-style: solid;
+  border-color: #64748b;
+  border-width: 0 1px 1px 0;
+  transform: rotate(45deg);
+}
+
+.checkout-phone-input .PhoneInputInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  color: #1e293b;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.checkout-phone-input .PhoneInputInput::placeholder {
+  color: #94a3b8;
+}
+
+.checkout-phone-input .PhoneInputInput:hover {
+  border-color: #cbd5e1;
+}
+
+.checkout-phone-input .PhoneInputInput:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #1e293b;
+}
+
+/* Error state */
+.checkout-phone-input.error .PhoneInputInput {
+  border-color: #fca5a5;
+}
+
+.checkout-phone-input.error .PhoneInputInput:focus {
+  box-shadow: 0 0 0 2px #ef4444;
+}
+
+/* Country dropdown */
+.PhoneInputCountrySelect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
