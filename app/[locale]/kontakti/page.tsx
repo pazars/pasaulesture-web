@@ -20,7 +20,7 @@ export default async function ContactPage({ params }: PageProps) {
   const homeUrl = locale === "en" ? "/en" : "/";
 
   return (
-    <div className="min-h-screen py-16">
+    <div className="min-h-screen py-16" style={{ background: 'linear-gradient(to bottom, #f5f0e6, #faf8f3)' }}>
       <div className="max-w-4xl mx-auto px-4">
         <Link
           href={homeUrl}

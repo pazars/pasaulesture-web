@@ -127,7 +127,6 @@ body::after {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background-image: url("/insp/texture.png");
   background-size: 300px 300px;
   opacity: 0.12;
   mix-blend-mode: overlay;

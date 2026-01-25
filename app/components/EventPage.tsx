@@ -282,21 +282,18 @@ export default function EventPage({ event }: EventPageProps) {
             </div>
 
             {selectedDistance.distanceEmbedUrl ? (
-              <div className="relative">
-                <div className="absolute -inset-3 bg-gradient-to-br from-pink via-lime to-pink rounded-2xl opacity-30 blur-xl" />
-                <div className="relative bg-white/90 rounded-xl shadow-2xl overflow-hidden">
-                  <iframe
-                    src={selectedDistance.distanceEmbedUrl}
-                    title="Route Map"
-                    style={{
-                      width: '1px',
-                      minWidth: '100%',
-                      height: '700px',
-                      border: 'none',
-                      overflow: "hidden"
-                    }}
-                  />
-                </div>
+              <div className="bg-white p-3 rounded-xl">
+                <iframe
+                  src={selectedDistance.distanceEmbedUrl}
+                  title="Route Map"
+                  style={{
+                    width: '1px',
+                    minWidth: '100%',
+                    height: '700px',
+                    border: 'none',
+                    overflow: "hidden"
+                  }}
+                />
               </div>
             ) : (
               <div className="w-full h-64 bg-white/5 rounded-xl flex items-center justify-center border-2 border-dashed border-white/20">
