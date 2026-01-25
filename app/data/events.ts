@@ -76,7 +76,6 @@ export const events: Record<string, EventData> = {
       "/events/egipte-malta/gallery/6.jpg",
       "/events/egipte-malta/gallery/7.jpg",
       "/events/egipte-malta/gallery/8.jpg",
-      "/events/egipte-malta/gallery/9.jpg",
     ],
   },
   "parize-dakara": {
