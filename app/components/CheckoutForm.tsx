@@ -540,44 +540,6 @@ export default function CheckoutForm({
                     )}
                 </div>
 
-                {/* Emergency Contact Section */}
-                <div className="space-y-6 !mt-8">
-                    {/* Emergency Name */}
-                    <div>
-                        <label htmlFor="emergencyName" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-                            {t("checkout_emergency_name_label")} <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="emergencyName"
-                            value={formData.emergencyName}
-                            onChange={(e) => handleInputChange("emergencyName", e.target.value)}
-                            className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.emergencyName ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
-                            placeholder="Anna Bērziņa"
-                        />
-                        {errors.emergencyName && (
-                            <p className="mt-1.5 text-sm text-red-600">{errors.emergencyName}</p>
-                        )}
-                    </div>
-
-                    {/* Emergency Phone */}
-                    <div>
-                        <label htmlFor="emergencyPhone" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-                            {t("checkout_emergency_phone_label")} <span className="text-red-500">*</span>
-                        </label>
-                        <PhoneInput
-                            international
-                            defaultCountry="LV"
-                            value={formData.emergencyPhone}
-                            onChange={(phone) => handleInputChange("emergencyPhone", phone || "")}
-                            className={`checkout-phone-input ${errors.emergencyPhone ? 'error' : ''}`}
-                        />
-                        {errors.emergencyPhone && (
-                            <p className="mt-1.5 text-sm text-red-600">{errors.emergencyPhone}</p>
-                        )}
-                    </div>
-                </div>
-
                 {/* Preparation Tips Checkbox */}
                 <div className="space-y-4">
                     <div className="flex items-start gap-3">
@@ -593,7 +555,7 @@ export default function CheckoutForm({
                             }}
                             className="w-5 h-5 mt-0.5 rounded border-slate-300 text-slate-800 focus:ring-slate-800 cursor-pointer"
                         />
-                        <label htmlFor="wantsPreparationTips" className="text-sm text-slate-600 flex-1 cursor-pointer leading-relaxed">
+                        <label htmlFor="wantsPreparationTips" className="text-sm text-slate-700 flex-1 cursor-pointer font-medium leading-relaxed">
                             {t("checkout_tips_label")}
                         </label>
                     </div>
@@ -637,6 +599,44 @@ export default function CheckoutForm({
                             </div>
                         </div>
                     )}
+                </div>
+
+                {/* Emergency Contact Section */}
+                <div className="space-y-6 !mt-8">
+                    {/* Emergency Name */}
+                    <div>
+                        <label htmlFor="emergencyName" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                            {t("checkout_emergency_name_label")} <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="emergencyName"
+                            value={formData.emergencyName}
+                            onChange={(e) => handleInputChange("emergencyName", e.target.value)}
+                            className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.emergencyName ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
+                            placeholder="Anna Bērziņa"
+                        />
+                        {errors.emergencyName && (
+                            <p className="mt-1.5 text-sm text-red-600">{errors.emergencyName}</p>
+                        )}
+                    </div>
+
+                    {/* Emergency Phone */}
+                    <div>
+                        <label htmlFor="emergencyPhone" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                            {t("checkout_emergency_phone_label")} <span className="text-red-500">*</span>
+                        </label>
+                        <PhoneInput
+                            international
+                            defaultCountry="LV"
+                            value={formData.emergencyPhone}
+                            onChange={(phone) => handleInputChange("emergencyPhone", phone || "")}
+                            className={`checkout-phone-input ${errors.emergencyPhone ? 'error' : ''}`}
+                        />
+                        {errors.emergencyPhone && (
+                            <p className="mt-1.5 text-sm text-red-600">{errors.emergencyPhone}</p>
+                        )}
+                    </div>
                 </div>
 
                 {/* Terms Acceptance */}
