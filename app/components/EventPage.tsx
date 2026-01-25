@@ -44,6 +44,7 @@ export default function EventPage({ event }: EventPageProps) {
   const locale = useLocale();
   const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(event.distances.length - 1);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
@@ -82,6 +83,35 @@ export default function EventPage({ event }: EventPageProps) {
       document.body.classList.remove('theme-dakar');
     };
   }, [event.slug, event.distances.length, isDakar]);
+
+  // Countdown timer for route reveal (Dakar: March 1st, 2026)
+  useEffect(() => {
+    if (!isDakar) return;
+
+    const routeRevealDate = new Date('2026-03-01T00:00:00');
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const diff = routeRevealDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setCountdown({ days, hours, minutes, seconds });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [isDakar]);
 
   const handleDistanceSelect = (index: number) => {
     setSelectedDistanceIndex(index);
@@ -337,12 +367,39 @@ export default function EventPage({ event }: EventPageProps) {
                 />
               </div>
             ) : (
-              <div className="w-full h-64 bg-white/5 rounded-xl flex items-center justify-center border-2 border-dashed border-white/20">
+              <div className="w-full bg-white/5 rounded-xl flex items-center justify-center border-2 border-dashed border-white/20 py-12 px-6">
                 <div className="text-center">
                   <svg className="w-16 h-16 text-beige/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7" />
                   </svg>
-                  <p className="text-beige/70 text-lg font-medium">{t("route_coming_soon")}</p>
+                  {isDakar ? (
+                    <>
+                      <p className="text-beige/70 text-lg font-medium mb-6">{t("route_reveal_countdown")}</p>
+                      <div className="flex justify-center gap-3 sm:gap-6">
+                        <div className="flex flex-col items-center">
+                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.days}</span>
+                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_days")}</span>
+                        </div>
+                        <span className="font-display text-3xl sm:text-5xl text-beige/30">:</span>
+                        <div className="flex flex-col items-center">
+                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.hours.toString().padStart(2, '0')}</span>
+                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_hours")}</span>
+                        </div>
+                        <span className="font-display text-3xl sm:text-5xl text-beige/30">:</span>
+                        <div className="flex flex-col items-center">
+                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.minutes.toString().padStart(2, '0')}</span>
+                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_minutes")}</span>
+                        </div>
+                        <span className="font-display text-3xl sm:text-5xl text-beige/30">:</span>
+                        <div className="flex flex-col items-center">
+                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.seconds.toString().padStart(2, '0')}</span>
+                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_seconds")}</span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-beige/70 text-lg font-medium">{t("route_coming_soon")}</p>
+                  )}
                 </div>
               </div>
             )}
