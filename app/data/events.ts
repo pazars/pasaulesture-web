@@ -12,7 +12,7 @@ export interface EventLocation {
 export interface EventDistance {
   nameKey: string; // Translation key for distance name
   facts: EventFact[];
-  komootEmbedUrl: string;
+  distanceEmbedUrl: string;
   // price field removed - managed in Stripe Dashboard
 }
 
@@ -45,7 +45,7 @@ export const events: Record<string, EventData> = {
           { icon: "mountain", labelKey: "label_elevation", value: "1200 m" },
           { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
-        komootEmbedUrl:
+        distanceEmbedUrl:
           "https://ridewithgps.com/embeds?type=route&id=53804940&title=%C4%92%C4%A3ipte&metricUnits=true&sampleGraph=true",
       },
       {
@@ -56,7 +56,7 @@ export const events: Record<string, EventData> = {
           { icon: "mountain", labelKey: "label_elevation", value: "3000 m" },
           { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
-        komootEmbedUrl:
+        distanceEmbedUrl:
           "https://ridewithgps.com/embeds?type=route&id=53804909&title=%C4%92%C4%A3ipte%20-%20Malta&metricUnits=true&sampleGraph=true",
       }
     ],
@@ -80,7 +80,7 @@ export const events: Record<string, EventData> = {
           { icon: "mountain", labelKey: "label_elevation", value: "? m" },
           { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
-        komootEmbedUrl: "",
+        distanceEmbedUrl: "",
       },
     ],
     registrationUrl: "",

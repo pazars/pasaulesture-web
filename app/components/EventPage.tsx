@@ -281,12 +281,12 @@ export default function EventPage({ event }: EventPageProps) {
               <div className="section-divider w-24 mx-auto" />
             </div>
 
-            {selectedDistance.komootEmbedUrl ? (
+            {selectedDistance.distanceEmbedUrl ? (
               <div className="relative">
                 <div className="absolute -inset-3 bg-gradient-to-br from-pink via-lime to-pink rounded-2xl opacity-30 blur-xl" />
                 <div className="relative bg-white/90 rounded-xl shadow-2xl overflow-hidden">
                   <iframe
-                    src={selectedDistance.komootEmbedUrl}
+                    src={selectedDistance.distanceEmbedUrl}
                     title="Route Map"
                     style={{
                       width: '1px',
