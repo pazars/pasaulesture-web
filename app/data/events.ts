@@ -24,6 +24,8 @@ export interface EventData {
   surfaceType: string;
   distances: EventDistance[];
   registrationUrl: string;
+  heroQuoteKey: string;
+  heroQuote2Key: string;
 }
 
 export const events: Record<string, EventData> = {
@@ -61,6 +63,8 @@ export const events: Record<string, EventData> = {
       }
     ],
     registrationUrl: "",
+    heroQuoteKey: "hero_quote_egipte_malta",
+    heroQuote2Key: "hero_quote_2_egipte_malta",
   },
   "parize-dakara": {
     slug: "parize-dakara",
@@ -84,6 +88,8 @@ export const events: Record<string, EventData> = {
       },
     ],
     registrationUrl: "",
+    heroQuoteKey: "hero_quote_parize_dakara",
+    heroQuote2Key: "hero_quote_2_parize_dakara",
   },
 };
 

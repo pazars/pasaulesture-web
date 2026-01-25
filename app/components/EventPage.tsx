@@ -57,13 +57,13 @@ export default function EventPage({ event }: EventPageProps) {
   // Dakar uses only the golden stamp, Malta uses blue + pink
   const stamps = isDakar
     ? [
-        { src: "/post/dakar/dakar-stamp.png", alt: "Dakar stamp" },
-        { src: "/post/dakar/dakar-stamp.png", alt: "Dakar stamp" }
-      ]
+      { src: "/post/dakar/dakar-stamp.png", alt: "Dakar stamp" },
+      { src: "/post/dakar/dakar-stamp.png", alt: "Dakar stamp" }
+    ]
     : [
-        { src: "/post/stamp1.png", alt: "Blue stamp" },
-        { src: "/post/stamp2.png", alt: "Pink stamp" }
-      ];
+      { src: "/post/stamp1.png", alt: "Blue stamp" },
+      { src: "/post/stamp2.png", alt: "Pink stamp" }
+    ];
 
   useEffect(() => {
     setIsLoaded(true);
@@ -262,10 +262,10 @@ export default function EventPage({ event }: EventPageProps) {
         <section className="relative py-10 overflow-hidden rounded-3xl mt-6 mx-2">
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
             <p className="text-xl sm:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-6">
-              &ldquo;{t("hero_quote")}&rdquo;
+              &ldquo;{t(event.heroQuoteKey as any)}&rdquo;
             </p>
             <p className="text-lg text-beige/70 leading-relaxed">
-              {t("hero_quote_2")}
+              {t(event.heroQuote2Key as any)}
             </p>
           </div>
         </section>
@@ -278,12 +278,10 @@ export default function EventPage({ event }: EventPageProps) {
 
               {/* Start Location - Top, centered */}
               <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all">
-                <div className={`p-2 rounded-lg ${
-                  isDakar ? "bg-beige/25" : "bg-pink/25"
-                }`}>
-                  <LocationIcon className={`w-5 h-5 ${
-                    isDakar ? "text-beige" : "text-pink"
-                  }`} />
+                <div className={`p-2 rounded-lg ${isDakar ? "bg-beige/25" : "bg-pink/25"
+                  }`}>
+                  <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
+                    }`} />
                 </div>
                 <div>
                   <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
@@ -292,9 +290,8 @@ export default function EventPage({ event }: EventPageProps) {
                       href={event.location.googleMapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${
-                        isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
-                      }`}
+                      className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                        }`}
                     >
                       {event.location.name}
                       <ExternalLinkIcon className="w-3 h-3" />
@@ -318,27 +315,24 @@ export default function EventPage({ event }: EventPageProps) {
                     <button
                       key={distance.nameKey}
                       onClick={() => handleDistanceSelect(index)}
-                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden min-w-40 cursor-pointer ${
-                        isSelected
+                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden min-w-40 cursor-pointer ${isSelected
                           ? isDakar
                             ? "bg-beige text-bronze shadow-lg shadow-beige/40 scale-105"
                             : "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
                           : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
-                      }`}
+                        }`}
                     >
                       {isSelected && (
-                        <div className={`absolute top-0 right-0 w-6 h-6 transform rotate-45 translate-x-3 -translate-y-3 ${
-                          isDakar ? "bg-[#FFD87F]" : "bg-lime"
-                        }`} />
+                        <div className={`absolute top-0 right-0 w-6 h-6 transform rotate-45 translate-x-3 -translate-y-3 ${isDakar ? "bg-[#FFD87F]" : "bg-lime"
+                          }`} />
                       )}
                       <span className="block text-lg relative z-10 font-accent">{distanceName}</span>
-                      <div className={`flex items-center justify-center gap-2 mt-1.5 relative z-10 text-sm ${
-                        isSelected
+                      <div className={`flex items-center justify-center gap-2 mt-1.5 relative z-10 text-sm ${isSelected
                           ? isDakar
                             ? "text-bronze/70"
                             : "text-blue/70"
                           : "text-beige/60"
-                      }`}>
+                        }`}>
                         <span className="font-semibold">{distanceValue}</span>
                         {elevationValue && <span>· {elevationValue}</span>}
                       </div>
@@ -414,20 +408,18 @@ export default function EventPage({ event }: EventPageProps) {
 
         {/* Registration Section - simplified, centered */}
         <section className="relative py-20 overflow-hidden rounded-3xl mt-6 mx-2">
-          <div className={`absolute inset-0 rounded-3xl ${
-            isDakar
+          <div className={`absolute inset-0 rounded-3xl ${isDakar
               ? "bg-linear-to-br from-beige via-[#FFD87F] to-[#E4DAD1]"
               : "bg-linear-to-br from-pink via-pink/80 to-lime"
-          }`} />
+            }`} />
 
           <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
-            <h2 className={`font-display text-4xl sm:text-5xl mb-8 ${
-              isDakar ? "text-bronze" : "text-blue"
-            }`}>
+            <h2 className={`font-display text-4xl sm:text-5xl mb-8 ${isDakar ? "text-bronze" : "text-blue"
+              }`}>
               {t("register_heading")}
             </h2>
 
-{isDakar ? (
+            {isDakar ? (
               <button
                 onClick={handleRegistrationClick}
                 className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-bronze text-beige shadow-bronze/40 hover:shadow-bronze/50"
@@ -466,25 +458,22 @@ export default function EventPage({ event }: EventPageProps) {
             <nav className="flex justify-center gap-8">
               <Link
                 href={locale === "en" ? "/en/privatuma-politika" : "/privatuma-politika"}
-                className={`text-beige/60 transition-colors text-sm ${
-                  isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
-                }`}
+                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                  }`}
               >
                 {t("footer_privacy")}
               </Link>
               <Link
                 href={locale === "en" ? "/en/noteikumi" : "/noteikumi"}
-                className={`text-beige/60 transition-colors text-sm ${
-                  isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
-                }`}
+                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                  }`}
               >
                 {t("footer_terms")}
               </Link>
               <Link
                 href={locale === "en" ? "/en/kontakti" : "/kontakti"}
-                className={`text-beige/60 transition-colors text-sm ${
-                  isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
-                }`}
+                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                  }`}
               >
                 {t("footer_contact")}
               </Link>
