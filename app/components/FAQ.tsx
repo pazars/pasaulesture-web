@@ -57,25 +57,27 @@ const faqItems: FAQItem[] = [
     questionKey: "faq_q12",
     answerKey: "faq_a12",
   },
+  {
+    questionKey: "faq_q13",
+    answerKey: "faq_a13",
+  },
 ];
 
 function ChevronIcon({ isOpen, isDakar }: { isOpen: boolean; isDakar: boolean }) {
   return (
-    <div className={`p-2 rounded-full transition-all duration-300 ${
-      isOpen
+    <div className={`p-2 rounded-full transition-all duration-300 ${isOpen
         ? isDakar
           ? "bg-beige rotate-180"
           : "bg-pink rotate-180"
         : "bg-white/10 group-hover:bg-white/20"
-    }`}>
+      }`}>
       <svg
-        className={`w-5 h-5 transition-colors duration-300 ${
-          isOpen
+        className={`w-5 h-5 transition-colors duration-300 ${isOpen
             ? isDakar
               ? "text-bronze"
               : "text-blue"
             : "text-beige"
-        }`}
+          }`}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -94,9 +96,8 @@ function ChevronIcon({ isOpen, isDakar }: { isOpen: boolean; isDakar: boolean })
 
 function QuestionIcon({ isDakar }: { isDakar: boolean }) {
   return (
-    <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mr-4 ${
-      isDakar ? "bg-beige" : "bg-pink"
-    }`}>
+    <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mr-4 ${isDakar ? "bg-beige" : "bg-pink"
+      }`}>
       <span className={`font-bold text-lg ${isDakar ? "text-bronze" : "text-blue"}`}>?</span>
     </div>
   );
@@ -132,17 +133,15 @@ export default function FAQ({ isDakar = false }: FAQProps) {
             return (
               <div
                 key={index}
-                className={`backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-300 shadow-lg ${
-                  isDakar
+                className={`backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-300 shadow-lg ${isDakar
                     ? `bg-bronze/80 ${isOpen ? "ring-2 ring-beige/50" : ""}`
                     : `bg-blue/90 ${isOpen ? "ring-2 ring-pink/50" : ""}`
-                }`}
+                  }`}
               >
                 <button
                   onClick={() => toggleItem(index)}
-                  className={`group w-full px-6 py-5 text-left flex items-center justify-between transition-colors ${
-                    isDakar ? "hover:bg-bronze/90" : "hover:bg-blue/95"
-                  }`}
+                  className={`group w-full px-6 py-5 text-left flex items-center justify-between transition-colors ${isDakar ? "hover:bg-bronze/90" : "hover:bg-blue/95"
+                    }`}
                 >
                   <div className="flex items-center">
                     <QuestionIcon isDakar={isDakar} />
@@ -155,15 +154,13 @@ export default function FAQ({ isDakar = false }: FAQProps) {
 
                 {/* Animated answer panel */}
                 <div
-                  className={`grid transition-all duration-300 ease-out ${
-                    isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                  }`}
+                  className={`grid transition-all duration-300 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                    }`}
                 >
                   <div className="overflow-hidden">
                     <div className="px-6 pb-6 pt-2">
-                      <div className={`pl-12 border-l-4 ${
-                        isDakar ? "border-beige/40" : "border-pink/40"
-                      }`}>
+                      <div className={`pl-12 border-l-4 ${isDakar ? "border-beige/40" : "border-pink/40"
+                        }`}>
                         <p className="text-beige/90 leading-relaxed">{t(item.answerKey as any)}</p>
                       </div>
                     </div>

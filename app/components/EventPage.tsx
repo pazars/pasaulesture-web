@@ -8,6 +8,7 @@ import { ExternalLinkIcon, LocationIcon } from "./Icons";
 import FAQ from "./FAQ";
 import Header from "./Header";
 import Toast from "./Toast";
+import Gallery from "./Gallery";
 import { useTranslations, useLocale } from "next-intl";
 
 interface EventPageProps {
@@ -316,10 +317,10 @@ export default function EventPage({ event }: EventPageProps) {
                       key={distance.nameKey}
                       onClick={() => handleDistanceSelect(index)}
                       className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden min-w-40 cursor-pointer ${isSelected
-                          ? isDakar
-                            ? "bg-beige text-bronze shadow-lg shadow-beige/40 scale-105"
-                            : "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
-                          : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
+                        ? isDakar
+                          ? "bg-beige text-bronze shadow-lg shadow-beige/40 scale-105"
+                          : "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
+                        : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
                         }`}
                     >
                       {isSelected && (
@@ -328,10 +329,10 @@ export default function EventPage({ event }: EventPageProps) {
                       )}
                       <span className="block text-lg relative z-10 font-accent">{distanceName}</span>
                       <div className={`flex items-center justify-center gap-2 mt-1.5 relative z-10 text-sm ${isSelected
-                          ? isDakar
-                            ? "text-bronze/70"
-                            : "text-blue/70"
-                          : "text-beige/60"
+                        ? isDakar
+                          ? "text-bronze/70"
+                          : "text-blue/70"
+                        : "text-beige/60"
                         }`}>
                         <span className="font-semibold">{distanceValue}</span>
                         {elevationValue && <span>· {elevationValue}</span>}
@@ -406,11 +407,19 @@ export default function EventPage({ event }: EventPageProps) {
           </div>
         </section>
 
+        {/* Photo Gallery Section */}
+        {event.gallery && event.gallery.length > 0 && (
+          <Gallery
+            images={event.gallery}
+            title={t("section_gallery")}
+          />
+        )}
+
         {/* Registration Section - simplified, centered */}
         <section className="relative py-20 overflow-hidden rounded-3xl mt-6 mx-2">
           <div className={`absolute inset-0 rounded-3xl ${isDakar
-              ? "bg-linear-to-br from-beige via-[#FFD87F] to-[#E4DAD1]"
-              : "bg-linear-to-br from-pink via-pink/80 to-lime"
+            ? "bg-linear-to-br from-beige via-[#FFD87F] to-[#E4DAD1]"
+            : "bg-linear-to-br from-pink via-pink/80 to-lime"
             }`} />
 
           <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">

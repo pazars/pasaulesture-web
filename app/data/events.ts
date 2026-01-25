@@ -26,6 +26,7 @@ export interface EventData {
   registrationUrl: string;
   heroQuoteKey: string;
   heroQuote2Key: string;
+  gallery?: string[];
 }
 
 export const events: Record<string, EventData> = {
@@ -65,6 +66,18 @@ export const events: Record<string, EventData> = {
     registrationUrl: "",
     heroQuoteKey: "hero_quote_egipte_malta",
     heroQuote2Key: "hero_quote_2_egipte_malta",
+    gallery: [
+      "/events/egipte-malta/gallery/0.jpg",
+      "/events/egipte-malta/gallery/1.jpeg",
+      "/events/egipte-malta/gallery/2.jpg",
+      "/events/egipte-malta/gallery/3.jpg",
+      "/events/egipte-malta/gallery/4.jpg",
+      "/events/egipte-malta/gallery/5.jpg",
+      "/events/egipte-malta/gallery/6.jpg",
+      "/events/egipte-malta/gallery/7.jpg",
+      "/events/egipte-malta/gallery/8.jpg",
+      "/events/egipte-malta/gallery/9.jpg",
+    ],
   },
   "parize-dakara": {
     slug: "parize-dakara",
