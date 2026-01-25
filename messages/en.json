@@ -90,6 +90,7 @@
   "checkout_terms_label": "I agree to the",
   "checkout_terms_link": "terms and conditions",
   "checkout_submit": "Continue to payment",
+  "checkout_submit_disabled": "Available soon",
   "checkout_error_required": "This field is required",
   "checkout_error_email": "Invalid email address",
   "checkout_error_terms": "You must agree to the terms",
