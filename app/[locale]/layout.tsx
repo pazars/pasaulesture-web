@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
-import "../globals.css";
+import { Geist, Geist_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getTranslations } from "next-intl/server";
+import { locales, type Locale } from "@/i18n/request";
 import type { Metadata } from "next";
 import Script from "next/script";
+import "../globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -82,7 +86,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
-        <LocaleProvider locale={locale as Locale}>{children}</LocaleProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );
