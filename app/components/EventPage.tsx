@@ -48,6 +48,20 @@ export default function EventPage({ event }: EventPageProps) {
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
 
+  // Event-specific theme configuration
+  const isDakar = event.slug === "parize-dakara";
+  const postcardSrc = isDakar ? "/post/dakar/dakar-card.png" : "/post/card.png";
+  // Dakar uses only the golden stamp, Malta uses blue + pink
+  const stamps = isDakar
+    ? [
+        { src: "/post/dakar/dakar-stamp.png", alt: "Dakar stamp" },
+        { src: "/post/dakar/dakar-stamp.png", alt: "Dakar stamp" }
+      ]
+    : [
+        { src: "/post/stamp1.png", alt: "Blue stamp" },
+        { src: "/post/stamp2.png", alt: "Pink stamp" }
+      ];
+
   useEffect(() => {
     setIsLoaded(true);
     const savedDistance = localStorage.getItem(`last_distance_${event.slug}`);
@@ -57,7 +71,17 @@ export default function EventPage({ event }: EventPageProps) {
         setSelectedDistanceIndex(index);
       }
     }
-  }, [event.slug, event.distances.length]);
+
+    // Apply event-specific theme to body
+    if (isDakar) {
+      document.body.classList.add('theme-dakar');
+    }
+
+    return () => {
+      // Clean up theme class on unmount
+      document.body.classList.remove('theme-dakar');
+    };
+  }, [event.slug, event.distances.length, isDakar]);
 
   const handleDistanceSelect = (index: number) => {
     setSelectedDistanceIndex(index);
@@ -94,7 +118,7 @@ export default function EventPage({ event }: EventPageProps) {
             >
               <div className="relative group">
                 <Image
-                  src="/post/card.png"
+                  src={postcardSrc}
                   alt="Pasaules Tūre Postcard"
                   width={520}
                   height={360}
@@ -104,7 +128,7 @@ export default function EventPage({ event }: EventPageProps) {
               </div>
             </div>
 
-            {/* Stamp 1 (Blue) - Top Left, tilted */}
+            {/* Stamp 1 - Top Left, tilted */}
             <div
               className={`absolute z-20 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8"}`}
               style={{
@@ -115,8 +139,8 @@ export default function EventPage({ event }: EventPageProps) {
             >
               <div className="stamp-hover">
                 <Image
-                  src="/post/stamp1.png"
-                  alt="Pasaules Tūre Stamp"
+                  src={stamps[0].src}
+                  alt={stamps[0].alt}
                   width={100}
                   height={130}
                   className="drop-shadow-xl rotate-[-15deg] hover:rotate-[-8deg] transition-transform duration-300 cursor-pointer"
@@ -124,7 +148,7 @@ export default function EventPage({ event }: EventPageProps) {
               </div>
             </div>
 
-            {/* Stamp 2 (Pink) - Bottom Right, tilted other way */}
+            {/* Stamp 2 - Bottom Right, tilted other way */}
             <div
               className={`absolute z-20 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{
@@ -135,8 +159,8 @@ export default function EventPage({ event }: EventPageProps) {
             >
               <div className="stamp-hover">
                 <Image
-                  src="/post/stamp2.png"
-                  alt="Pasaules Tūre Stamp"
+                  src={stamps[1].src}
+                  alt={stamps[1].alt}
                   width={110}
                   height={140}
                   className="drop-shadow-xl rotate-[12deg] hover:rotate-[5deg] transition-transform duration-300 cursor-pointer"
@@ -144,7 +168,7 @@ export default function EventPage({ event }: EventPageProps) {
               </div>
             </div>
 
-            {/* Extra Stamp 1 (Blue) - Top Right */}
+            {/* Extra Stamp 1 - Top Right */}
             <div
               className={`absolute z-15 transition-all duration-700 hidden sm:block ${isLoaded ? "opacity-100" : "opacity-0"}`}
               style={{
@@ -155,8 +179,8 @@ export default function EventPage({ event }: EventPageProps) {
             >
               <div className="stamp-hover">
                 <Image
-                  src="/post/stamp1.png"
-                  alt="Pasaules Tūre Stamp"
+                  src={stamps[0].src}
+                  alt={stamps[0].alt}
                   width={80}
                   height={104}
                   className="drop-shadow-lg rotate-[22deg] hover:rotate-[15deg] transition-transform duration-300 cursor-pointer opacity-80"
@@ -164,7 +188,7 @@ export default function EventPage({ event }: EventPageProps) {
               </div>
             </div>
 
-            {/* Extra Stamp 2 (Pink) - Bottom Left */}
+            {/* Extra Stamp 2 - Bottom Left */}
             <div
               className={`absolute z-15 transition-all duration-700 hidden sm:block ${isLoaded ? "opacity-100" : "opacity-0"}`}
               style={{
@@ -175,8 +199,8 @@ export default function EventPage({ event }: EventPageProps) {
             >
               <div className="stamp-hover">
                 <Image
-                  src="/post/stamp2.png"
-                  alt="Pasaules Tūre Stamp"
+                  src={stamps[1].src}
+                  alt={stamps[1].alt}
                   width={75}
                   height={98}
                   className="drop-shadow-lg rotate-[-8deg] hover:rotate-[-2deg] transition-transform duration-300 cursor-pointer opacity-70"
@@ -218,8 +242,12 @@ export default function EventPage({ event }: EventPageProps) {
 
               {/* Start Location - Top, centered */}
               <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all">
-                <div className="p-2 bg-pink/25 rounded-lg">
-                  <LocationIcon className="w-5 h-5 text-pink" />
+                <div className={`p-2 rounded-lg ${
+                  isDakar ? "bg-beige/25" : "bg-pink/25"
+                }`}>
+                  <LocationIcon className={`w-5 h-5 ${
+                    isDakar ? "text-beige" : "text-pink"
+                  }`} />
                 </div>
                 <div>
                   <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
@@ -228,7 +256,9 @@ export default function EventPage({ event }: EventPageProps) {
                       href={event.location.googleMapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-bold text-beige hover:text-pink transition-colors inline-flex items-center gap-1"
+                      className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${
+                        isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                      }`}
                     >
                       {event.location.name}
                       <ExternalLinkIcon className="w-3 h-3" />
@@ -252,16 +282,27 @@ export default function EventPage({ event }: EventPageProps) {
                     <button
                       key={distance.nameKey}
                       onClick={() => handleDistanceSelect(index)}
-                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden min-w-40 cursor-pointer ${isSelected
-                        ? "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
-                        : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
-                        }`}
+                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden min-w-40 cursor-pointer ${
+                        isSelected
+                          ? isDakar
+                            ? "bg-beige text-bronze shadow-lg shadow-beige/40 scale-105"
+                            : "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
+                          : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
+                      }`}
                     >
                       {isSelected && (
-                        <div className="absolute top-0 right-0 w-6 h-6 bg-lime transform rotate-45 translate-x-3 -translate-y-3" />
+                        <div className={`absolute top-0 right-0 w-6 h-6 transform rotate-45 translate-x-3 -translate-y-3 ${
+                          isDakar ? "bg-[#FFD87F]" : "bg-lime"
+                        }`} />
                       )}
                       <span className="block text-lg relative z-10 font-accent">{distanceName}</span>
-                      <div className={`flex items-center justify-center gap-2 mt-1.5 relative z-10 text-sm ${isSelected ? "text-blue/70" : "text-beige/60"}`}>
+                      <div className={`flex items-center justify-center gap-2 mt-1.5 relative z-10 text-sm ${
+                        isSelected
+                          ? isDakar
+                            ? "text-bronze/70"
+                            : "text-blue/70"
+                          : "text-beige/60"
+                      }`}>
                         <span className="font-semibold">{distanceValue}</span>
                         {elevationValue && <span>· {elevationValue}</span>}
                       </div>
@@ -310,16 +351,26 @@ export default function EventPage({ event }: EventPageProps) {
 
         {/* Registration Section - simplified, centered */}
         <section className="relative py-20 overflow-hidden rounded-3xl mt-6 mx-2">
-          <div className="absolute inset-0 bg-gradient-to-br from-pink via-pink/80 to-lime rounded-3xl" />
+          <div className={`absolute inset-0 rounded-3xl ${
+            isDakar
+              ? "bg-linear-to-br from-beige via-[#FFD87F] to-[#E4DAD1]"
+              : "bg-linear-to-br from-pink via-pink/80 to-lime"
+          }`} />
 
           <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
-            <h2 className="font-display text-4xl sm:text-5xl text-blue mb-8">
+            <h2 className={`font-display text-4xl sm:text-5xl mb-8 ${
+              isDakar ? "text-bronze" : "text-blue"
+            }`}>
               {t("register_heading")}
             </h2>
 
             <Link
               href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
-              className="inline-flex items-center gap-3 text-lg bg-blue text-white font-bold px-10 py-5 rounded-full shadow-lg shadow-blue/40 hover:shadow-xl hover:shadow-blue/50 hover:-translate-y-1 transition-all"
+              className={`inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all ${
+                isDakar
+                  ? "bg-bronze text-beige shadow-bronze/40 hover:shadow-bronze/50"
+                  : "bg-blue text-white shadow-blue/40 hover:shadow-blue/50"
+              }`}
             >
               <span>{t("register_button")}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,7 +381,7 @@ export default function EventPage({ event }: EventPageProps) {
         </section>
 
         {/* FAQ Section */}
-        <FAQ />
+        <FAQ isDakar={isDakar} />
 
         {/* Footer - simplified, centered brand */}
         <footer className="section-cream text-white py-10 relative overflow-hidden rounded-3xl mt-6 mx-2 mb-4">
@@ -344,19 +395,25 @@ export default function EventPage({ event }: EventPageProps) {
             <nav className="flex justify-center gap-8">
               <Link
                 href={locale === "en" ? "/en/privatuma-politika" : "/privatuma-politika"}
-                className="text-beige/60 hover:text-pink transition-colors text-sm"
+                className={`text-beige/60 transition-colors text-sm ${
+                  isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                }`}
               >
                 {t("footer_privacy")}
               </Link>
               <Link
                 href={locale === "en" ? "/en/noteikumi" : "/noteikumi"}
-                className="text-beige/60 hover:text-pink transition-colors text-sm"
+                className={`text-beige/60 transition-colors text-sm ${
+                  isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                }`}
               >
                 {t("footer_terms")}
               </Link>
               <Link
                 href={locale === "en" ? "/en/kontakti" : "/kontakti"}
-                className="text-beige/60 hover:text-pink transition-colors text-sm"
+                className={`text-beige/60 transition-colors text-sm ${
+                  isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                }`}
               >
                 {t("footer_contact")}
               </Link>

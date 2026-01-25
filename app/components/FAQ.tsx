@@ -35,11 +35,23 @@ const faqItems: FAQItem[] = [
   },
 ];
 
-function ChevronIcon({ isOpen }: { isOpen: boolean }) {
+function ChevronIcon({ isOpen, isDakar }: { isOpen: boolean; isDakar: boolean }) {
   return (
-    <div className={`p-2 rounded-full transition-all duration-300 ${isOpen ? "bg-pink rotate-180" : "bg-white/10 group-hover:bg-white/20"}`}>
+    <div className={`p-2 rounded-full transition-all duration-300 ${
+      isOpen
+        ? isDakar
+          ? "bg-beige rotate-180"
+          : "bg-pink rotate-180"
+        : "bg-white/10 group-hover:bg-white/20"
+    }`}>
       <svg
-        className={`w-5 h-5 transition-colors duration-300 ${isOpen ? "text-blue" : "text-beige"}`}
+        className={`w-5 h-5 transition-colors duration-300 ${
+          isOpen
+            ? isDakar
+              ? "text-bronze"
+              : "text-blue"
+            : "text-beige"
+        }`}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -56,15 +68,21 @@ function ChevronIcon({ isOpen }: { isOpen: boolean }) {
   );
 }
 
-function QuestionIcon() {
+function QuestionIcon({ isDakar }: { isDakar: boolean }) {
   return (
-    <div className="flex-shrink-0 w-8 h-8 bg-pink rounded-lg flex items-center justify-center mr-4">
-      <span className="text-blue font-bold text-lg">?</span>
+    <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mr-4 ${
+      isDakar ? "bg-beige" : "bg-pink"
+    }`}>
+      <span className={`font-bold text-lg ${isDakar ? "text-bronze" : "text-blue"}`}>?</span>
     </div>
   );
 }
 
-export default function FAQ() {
+interface FAQProps {
+  isDakar?: boolean;
+}
+
+export default function FAQ({ isDakar = false }: FAQProps) {
   const t = useTranslations();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -90,21 +108,25 @@ export default function FAQ() {
             return (
               <div
                 key={index}
-                className={`bg-blue/90 backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-300 shadow-lg ${
-                  isOpen ? "ring-2 ring-pink/50" : ""
+                className={`backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-300 shadow-lg ${
+                  isDakar
+                    ? `bg-bronze/80 ${isOpen ? "ring-2 ring-beige/50" : ""}`
+                    : `bg-blue/90 ${isOpen ? "ring-2 ring-pink/50" : ""}`
                 }`}
               >
                 <button
                   onClick={() => toggleItem(index)}
-                  className="group w-full px-6 py-5 text-left flex items-center justify-between hover:bg-blue/95 transition-colors"
+                  className={`group w-full px-6 py-5 text-left flex items-center justify-between transition-colors ${
+                    isDakar ? "hover:bg-bronze/90" : "hover:bg-blue/95"
+                  }`}
                 >
                   <div className="flex items-center">
-                    <QuestionIcon />
+                    <QuestionIcon isDakar={isDakar} />
                     <span className="font-bold text-beige text-lg pr-4">
                       {t(item.questionKey as any)}
                     </span>
                   </div>
-                  <ChevronIcon isOpen={isOpen} />
+                  <ChevronIcon isOpen={isOpen} isDakar={isDakar} />
                 </button>
 
                 {/* Animated answer panel */}
@@ -115,7 +137,9 @@ export default function FAQ() {
                 >
                   <div className="overflow-hidden">
                     <div className="px-6 pb-6 pt-2">
-                      <div className="pl-12 border-l-4 border-pink/40">
+                      <div className={`pl-12 border-l-4 ${
+                        isDakar ? "border-beige/40" : "border-pink/40"
+                      }`}>
                         <p className="text-beige/90 leading-relaxed">{t(item.answerKey as any)}</p>
                       </div>
                     </div>

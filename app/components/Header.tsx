@@ -14,6 +14,7 @@ interface HeaderProps {
 export default function Header({ currentSlug }: HeaderProps) {
   const t = useTranslations();
   const allEvents = Object.values(events);
+  const isDakar = currentSlug === "parize-dakara";
 
   return (
     <header className="bg-transparent py-5">
@@ -27,7 +28,11 @@ export default function Header({ currentSlug }: HeaderProps) {
               return isCurrent ? (
                 <span
                   key={e.slug}
-                  className="relative px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-bold text-lg bg-pink text-blue cursor-default whitespace-nowrap shadow-xl shadow-pink/40 scale-105"
+                  className={`relative px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-bold text-lg cursor-default whitespace-nowrap scale-105 ${
+                    isDakar
+                      ? "bg-beige text-bronze shadow-xl shadow-beige/40"
+                      : "bg-pink text-blue shadow-xl shadow-pink/40"
+                  }`}
                 >
                   {eventName}
                 </span>
@@ -35,7 +40,11 @@ export default function Header({ currentSlug }: HeaderProps) {
                 <Link
                   key={e.slug}
                   href={`/${e.slug}`}
-                  className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-semibold text-lg transition-all whitespace-nowrap text-beige/70 hover:text-beige hover:bg-white/10"
+                  className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-semibold text-lg transition-all whitespace-nowrap ${
+                    isDakar
+                      ? "text-beige/80 hover:text-beige hover:bg-beige/10"
+                      : "text-beige/70 hover:text-beige hover:bg-white/10"
+                  }`}
                 >
                   {eventName}
                 </Link>
@@ -50,7 +59,11 @@ export default function Header({ currentSlug }: HeaderProps) {
               href="https://www.instagram.com/pasaulesture/?hl=en"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-beige hover:text-pink transition-colors"
+              className={`transition-colors ${
+                isDakar
+                  ? "text-beige hover:text-[#FFD87F]"
+                  : "text-beige hover:text-pink"
+              }`}
               aria-label="Instagram @pasaulesture"
             >
               <InstagramIcon className="w-6 h-6" />
@@ -58,7 +71,7 @@ export default function Header({ currentSlug }: HeaderProps) {
 
             {/* Language switcher */}
             <Suspense fallback={<div className="w-20 h-10" />}>
-              <LanguageSwitcher />
+              <LanguageSwitcher isDakar={isDakar} />
             </Suspense>
           </div>
         </div>

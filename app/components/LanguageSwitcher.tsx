@@ -45,7 +45,11 @@ function getPathForLocale(currentPath: string, targetLocale: Locale): string {
   return `/${targetLocale}${pathWithoutLocale}`;
 }
 
-export default function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  isDakar?: boolean;
+}
+
+export default function LanguageSwitcher({ isDakar = false }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
   const currentLocale = useLocale() as Locale;
@@ -73,7 +77,9 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div className="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full px-1 py-1">
+    <div className={`flex items-center gap-1 backdrop-blur-sm rounded-full px-1 py-1 ${
+      isDakar ? "bg-beige/15" : "bg-white/10"
+    }`}>
       {locales.map((locale) => {
         const isActive = locale === currentLocale;
 
@@ -83,10 +89,15 @@ export default function LanguageSwitcher() {
             onClick={() => {
               handleLocaleChange(locale);
             }}
-            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer ${isActive
-                ? "bg-pink text-blue"
-                : "text-beige/70 hover:text-beige hover:bg-white/15 hover:scale-105"
-              }`}
+            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer ${
+              isActive
+                ? isDakar
+                  ? "bg-beige text-bronze"
+                  : "bg-pink text-blue"
+                : isDakar
+                  ? "text-beige/80 hover:text-beige hover:bg-beige/20 hover:scale-105"
+                  : "text-beige/70 hover:text-beige hover:bg-white/15 hover:scale-105"
+            }`}
             aria-current={isActive ? "page" : undefined}
           >
             {localeNames[locale]}
