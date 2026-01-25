@@ -20,15 +20,11 @@ Pasaules Tūre website - a Next.js 16 application for ultra cycling events in La
 - `npm run test:e2e:ui` - Run E2E tests with Playwright UI
 - `npm run test:e2e -- --project=chromium` - Run E2E tests in Chromium only
 
-### Internationalization
-- `npm run build:i18n` - Compile translations (run after changing messages/*.json)
-- `npm run machine-translate` - Auto-translate missing keys using inlang
-
 ## Architecture
 
 - **Framework**: Next.js 16 with App Router (Turbopack)
 - **Styling**: Tailwind CSS v4 (via PostCSS)
-- **i18n**: Paraglide-js with URL-based routing (compiled files committed)
+- **i18n**: next-intl with URL-based routing and middleware
 - **Testing**: Vitest (unit) + Playwright (E2E)
 - **Path alias**: `@/*` maps to project root
 
@@ -49,23 +45,21 @@ app/
 │       ├── Header.tsx           # Navigation header with event buttons
 │       ├── FAQ.tsx              # FAQ accordion component
 │       ├── Icons.tsx            # SVG icon components
-│       ├── LanguageSwitcher.tsx # LV/EN language toggle
-│       └── LocaleProvider.tsx   # Client-side locale sync
+│       └── LanguageSwitcher.tsx # LV/EN language toggle
 ├── data/
 │   ├── events.ts        # Event data and types
 │   ├── events.server.ts # Server-side image utilities
 │   └── contact.ts       # Centralized contact information
 └── globals.css          # Design system (colors, animations, patterns)
 
+i18n/
+└── request.ts           # next-intl configuration
+
 messages/
 ├── lv.json              # Latvian translations
 └── en.json              # English translations
 
-paraglide/
-└── runtime.ts           # Generated i18n runtime (auto-generated)
-
-proxy.ts                 # Locale detection and URL routing
-project.inlang/          # Inlang i18n configuration
+proxy.ts                 # Locale detection and URL routing (exports next-intl middleware)
 
 tests/
 ├── unit/                # Vitest unit tests
@@ -119,28 +113,39 @@ tests/
 - **Redirect behavior**: `/lv/...` always redirects to clean URL
 
 ### Locale Detection Priority (proxy.ts)
-1. `PARAGLIDE_LOCALE` cookie
-2. `Accept-Language` header
-3. Default to Latvian (`lv`)
+1. `language_preference` cookie (expires after 30 days)
+2. Default to Latvian (`lv`)
 
 ### Translation Files
 - Located in `messages/lv.json` and `messages/en.json`
 - Keys must exist in both files (enforced by tests)
-- Use `m.key_name()` to access translations (imported from `@/paraglide/messages`)
+- JSON format with simple key-value pairs
 
 ### Adding Translations
 1. Add key to both `messages/lv.json` and `messages/en.json`
-2. Import and use: `import * as m from "@/paraglide/messages";`
-3. Use in code: `m.your_key_name()`
+2. **Server components**:
+   ```tsx
+   import { getTranslations } from "next-intl/server";
+
+   const t = await getTranslations();
+   <h1>{t("your_key_name")}</h1>
+   ```
+3. **Client components**:
+   ```tsx
+   import { useTranslations } from "next-intl";
+
+   const t = useTranslations();
+   <button>{t("your_key_name")}</button>
+   ```
 4. Run tests to verify: `npm test`
 
-### Components
+### Utilities
 - **LanguageSwitcher**: Client component for LV/EN toggle
   - Sets cookie before navigation to prevent redirects
   - Uses `router.push()` for client-side navigation
-- **LocaleProvider**: Syncs locale between server and client
-  - Prevents hydration mismatches
-  - Required wrapper in `[locale]/layout.tsx`
+  - Uses `useLocale()` hook to get current locale
+- **useLocale()**: Hook to get current locale in client components
+- **getTranslations()**: Async function to get translations in server components
 
 ### Long-Form Content Pages
 
@@ -156,7 +161,7 @@ app/[locale]/page-name/
 ```
 
 **Example:** Privacy Policy (`privatuma-politika`)
-- Title uses translation key: `m.page_privacy_title()`
+- Title uses translation key: `t("page_privacy_title")`
 - Full content in separate components: `PrivacyContent.lv.tsx` / `PrivacyContent.en.tsx`
 - Benefits: Better formatting, type safety, no translation file bloat
 
@@ -241,21 +246,90 @@ npm run test:e2e -- tests/e2e/language-switching.spec.ts
 - Contact information consistency across all pages
 - Centralized configuration validation
 
+## Stripe Payments
+
+### Architecture
+- **Payment Flow**: Stripe Checkout (hosted payment page)
+- **Database**: Neon Postgres (`registrations` table)
+- **Price Management**: Stripe Dashboard (single source of truth)
+- **Webhooks**: `checkout.session.completed` → insert registration
+
+### API Routes
+- `GET /api/stripe/prices` - Fetch prices with event metadata
+- `POST /api/checkout/create-session` - Create checkout session
+- `POST /api/webhooks/stripe` - Handle Stripe webhooks
+
+### Environment Variables
+```bash
+STRIPE_SECRET_KEY=sk_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+DATABASE_URL=postgres://...
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
+
+**Getting environment variables:**
+- Vercel integration: `vercel env pull --environment development`
+- Neon directly: Copy from Neon dashboard
+
+### Local Development
+See [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md) for complete setup guide.
+
+**Quick start:**
+1. Create Stripe products with metadata (`event_slug`, `distance_index`)
+2. Set up `.env.local` with API keys (use `vercel env pull` for Neon)
+3. Run database migration: `npm run db:migrate`
+4. Start webhook listener: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
+5. Test with card `4242 4242 4242 4242`
+
+### Testing
+- Unit tests: `npm test` (API routes, price matching, webhook handling)
+- E2E tests: `npm run test:e2e` (full checkout flow)
+- Manual: Use Stripe test cards (see docs)
+
+### Database Schema
+
+The `registrations` table tracks registration lifecycle:
+
+```sql
+CREATE TABLE registrations (
+  id SERIAL PRIMARY KEY,
+  stripe_session_id VARCHAR(255) UNIQUE NOT NULL,
+  stripe_payment_intent_id VARCHAR(255),
+  amount_paid INT,                           -- NULL until payment completes
+  currency VARCHAR(3) DEFAULT 'eur',
+  event_slug VARCHAR(100) NOT NULL,
+  distance_index INT NOT NULL,
+  participant_name VARCHAR(255) NOT NULL,
+  participant_email VARCHAR(255) NOT NULL,
+  locale VARCHAR(5) DEFAULT 'lv',
+  payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- pending, completed, expired, failed
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**Payment Status Flow:**
+1. `pending` - Created when checkout session starts (before Stripe redirect)
+2. `completed` - Updated by webhook when `checkout.session.completed` fires
+3. `expired` - Updated by webhook when `checkout.session.expired` fires (user abandoned)
+
+### Product Metadata
+
+Each Stripe product must have these metadata fields:
+- `event_slug` - Maps to `events` object key (e.g., `egipte-malta`)
+- `distance_index` - Zero-based index in `event.distances` array (e.g., `0`, `1`)
+
 ## Deployment
 
-### Committed Paraglide Files
-
-The `paraglide/` directory is **committed to git** (not gitignored) to avoid build-time compilation issues on Vercel.
+### Translation Updates
 
 **Workflow:**
 1. Edit translations in `messages/lv.json` or `messages/en.json`
-2. Run `npm run build:i18n` to recompile paraglide files
-3. Commit both the message files and the regenerated paraglide files
-4. Push to deploy
+2. Commit the message files
+3. Push to deploy
 
-**Why this approach:**
-- ❌ Build-time compilation (`paraglide-js compile`) was hanging on Vercel
-- ❌ The inlang plugins need to be fetched from CDN during compilation, causing timeouts
-- ✅ Committing compiled files bypasses the compilation step entirely
-- ✅ Faster builds on Vercel
-- ✅ More reliable deployments
+**Notes:**
+- next-intl loads translations at runtime from JSON files - no compilation step needed
+- Translation files are automatically included in the build
+- Changes to translations take effect immediately after deployment

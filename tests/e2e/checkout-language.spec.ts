@@ -1,10 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Checkout - Language Switching", () => {
-  test.beforeEach(async ({ page }) => {
-    // Clear localStorage before each test
-    await page.goto("/egipte-malta/checkout");
-    await page.evaluate(() => localStorage.clear());
+  test.beforeEach(async ({ context }) => {
+    // Clear cookies before each test to ensure clean state
+    await context.clearCookies();
   });
 
   test.describe("Language Switching with URL Preservation", () => {
@@ -14,7 +13,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -39,7 +38,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -65,7 +64,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -91,7 +90,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -120,7 +119,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -149,7 +148,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -176,7 +175,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -202,7 +201,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -230,7 +229,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -253,34 +252,6 @@ test.describe("Checkout - Language Switching", () => {
       ).toBeVisible();
     });
 
-    test("should translate notice banner when switching languages", async ({
-      page,
-      context,
-    }) => {
-      await context.addCookies([
-        {
-          name: "PARAGLIDE_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
-
-      await page.goto("/egipte-malta/checkout");
-
-      // Should show Latvian notice
-      await expect(
-        page.getByText(/Maksājumi vēl nav pieejami/)
-      ).toBeVisible();
-
-      // Switch to English
-      await page.getByRole("button", { name: "EN", exact: true }).click();
-
-      // Should show English notice
-      await expect(
-        page.getByText(/Payments are not yet available/)
-      ).toBeVisible();
-    });
   });
 
   test.describe("Form State Preservation", () => {
@@ -290,7 +261,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -316,7 +287,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -342,7 +313,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -394,7 +365,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -413,7 +384,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -432,7 +403,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -457,7 +428,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -474,7 +445,7 @@ test.describe("Checkout - Language Switching", () => {
 
       // Check cookie was updated
       const cookies = await context.cookies();
-      const localeCookie = cookies.find((c) => c.name === "PARAGLIDE_LOCALE");
+      const localeCookie = cookies.find((c) => c.name === "language_preference");
       expect(localeCookie?.value).toBe("en");
     });
 
@@ -484,7 +455,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -501,7 +472,7 @@ test.describe("Checkout - Language Switching", () => {
 
       // Check cookie was updated
       const cookies = await context.cookies();
-      const localeCookie = cookies.find((c) => c.name === "PARAGLIDE_LOCALE");
+      const localeCookie = cookies.find((c) => c.name === "language_preference");
       expect(localeCookie?.value).toBe("lv");
     });
   });
@@ -513,7 +484,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -538,7 +509,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -565,7 +536,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -584,7 +555,7 @@ test.describe("Checkout - Language Switching", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",

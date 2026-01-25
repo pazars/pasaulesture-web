@@ -1,0 +1,137 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getStripeClient } from '@/app/lib/stripe';
+import { neon } from '@neondatabase/serverless';
+import Stripe from 'stripe';
+
+export async function POST(request: NextRequest) {
+  const body = await request.text();
+  const signature = request.headers.get('stripe-signature');
+
+  if (!signature) {
+    return NextResponse.json(
+      { error: 'Missing stripe-signature header' },
+      { status: 400 }
+    );
+  }
+
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    console.error('STRIPE_WEBHOOK_SECRET is not set');
+    return NextResponse.json(
+      { error: 'Webhook secret not configured' },
+      { status: 500 }
+    );
+  }
+
+  let event: Stripe.Event;
+
+  try {
+    const stripe = getStripeClient();
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (error) {
+    console.error('Webhook signature verification failed:', error);
+    return NextResponse.json(
+      { error: 'Invalid signature' },
+      { status: 400 }
+    );
+  }
+
+  const sql = neon(process.env.DATABASE_URL!);
+
+  // Handle the event
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session;
+
+      try {
+        const {
+          event_slug,
+          distance_index,
+          participant_name,
+          participant_email,
+          locale,
+        } = session.metadata || {};
+
+        if (!event_slug || !distance_index || !participant_name || !participant_email) {
+          console.error('Missing required metadata in session:', session.id);
+          break;
+        }
+
+        // Try to update existing pending registration first
+        const updateResult = await sql`
+          UPDATE registrations
+          SET
+            payment_status = 'completed',
+            stripe_payment_intent_id = ${session.payment_intent as string},
+            amount_paid = ${session.amount_total},
+            currency = ${session.currency}
+          WHERE stripe_session_id = ${session.id}
+          RETURNING id
+        `;
+
+        if (updateResult.length === 0) {
+          // No pending registration found, insert new one (fallback for edge cases)
+          await sql`
+            INSERT INTO registrations (
+              stripe_session_id,
+              stripe_payment_intent_id,
+              amount_paid,
+              currency,
+              event_slug,
+              distance_index,
+              participant_name,
+              participant_email,
+              locale,
+              payment_status
+            ) VALUES (
+              ${session.id},
+              ${session.payment_intent as string},
+              ${session.amount_total},
+              ${session.currency},
+              ${event_slug},
+              ${parseInt(distance_index, 10)},
+              ${participant_name},
+              ${participant_email},
+              ${locale || 'lv'},
+              'completed'
+            )
+            ON CONFLICT (stripe_session_id) DO UPDATE SET
+              payment_status = 'completed',
+              stripe_payment_intent_id = ${session.payment_intent as string},
+              amount_paid = ${session.amount_total},
+              currency = ${session.currency}
+          `;
+          console.log('Registration created for session:', session.id);
+        } else {
+          console.log('Registration updated to completed for session:', session.id);
+        }
+      } catch (error) {
+        console.error('Error processing checkout.session.completed:', error);
+        // Still return 200 to prevent Stripe from retrying
+      }
+      break;
+    }
+
+    case 'checkout.session.expired': {
+      const session = event.data.object as Stripe.Checkout.Session;
+
+      try {
+        await sql`
+          UPDATE registrations
+          SET payment_status = 'expired'
+          WHERE stripe_session_id = ${session.id}
+            AND payment_status = 'pending'
+        `;
+        console.log('Registration marked as expired for session:', session.id);
+      } catch (error) {
+        console.error('Error processing checkout.session.expired:', error);
+      }
+      break;
+    }
+
+    default:
+      console.log('Unhandled event type:', event.type);
+  }
+
+  return NextResponse.json({ received: true });
+}

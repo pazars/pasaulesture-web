@@ -8,7 +8,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -34,7 +34,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -60,7 +60,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -81,7 +81,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -103,7 +103,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -124,7 +124,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -148,7 +148,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -168,7 +168,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -188,7 +188,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -210,7 +210,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -236,7 +236,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -272,7 +272,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -296,7 +296,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "PARAGLIDE_LOCALE",
+          name: "language_preference",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -314,25 +314,5 @@ test.describe("Checkout Page - Loading & Routing", () => {
       await expect(homeButton).toHaveAttribute("href", "/en");
     });
 
-    test("should show notice banner with warning", async ({
-      page,
-      context,
-    }) => {
-      await context.addCookies([
-        {
-          name: "PARAGLIDE_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
-
-      await page.goto("/egipte-malta/checkout");
-
-      // Notice banner should be visible
-      await expect(
-        page.getByText(/Maksājumi vēl nav pieejami/)
-      ).toBeVisible();
-    });
   });
 });

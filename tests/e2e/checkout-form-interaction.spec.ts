@@ -5,7 +5,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
     // Set Latvian locale for consistent testing
     await context.addCookies([
       {
-        name: "PARAGLIDE_LOCALE",
+        name: "language_preference",
         value: "lv",
         domain: "localhost",
         path: "/",
@@ -213,7 +213,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
   });
 
   test.describe("Form Submission", () => {
-    test("should show placeholder alert on valid submission", async ({
+    test("should redirect to Stripe checkout on valid submission", async ({
       page,
     }) => {
       await page.goto("/egipte-malta/checkout");
@@ -223,31 +223,21 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       await page.locator('input[id="email"]').fill("janis@example.com");
       await page.locator('input[id="terms"]').check();
 
-      // Listen for alert dialog
-      page.on("dialog", async (dialog) => {
-        expect(dialog.type()).toBe("alert");
-        expect(dialog.message()).toContain(
-          "Maksājumi vēl nav pieejami"
-        );
-        await dialog.accept();
-      });
-
       // Submit form
       await page.getByRole("button", { name: /Turpināt uz maksājumu/ }).click();
+
+      // Should redirect to Stripe checkout
+      await page.waitForURL(/checkout\.stripe\.com/, { timeout: 10000 });
+      expect(page.url()).toContain("checkout.stripe.com");
     });
 
-    test("should show loading state during submission", async ({ page }) => {
+    test("should disable button during submission", async ({ page }) => {
       await page.goto("/egipte-malta/checkout");
 
       // Fill valid form data
       await page.locator('input[id="name"]').fill("Jānis Bērziņš");
       await page.locator('input[id="email"]').fill("janis@example.com");
       await page.locator('input[id="terms"]').check();
-
-      // Handle the alert so it doesn't block the test
-      page.on("dialog", async (dialog) => {
-        await dialog.accept();
-      });
 
       // Click submit
       const submitButton = page.getByRole("button", {
@@ -255,39 +245,8 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       });
       await submitButton.click();
 
-      // Button should be disabled during submission
-      // Note: This happens very quickly, might be hard to catch
+      // Button should be disabled during submission (before redirect)
       await expect(submitButton).toBeDisabled();
-    });
-
-    test("should not submit form when clicking disabled button", async ({
-      page,
-    }) => {
-      await page.goto("/egipte-malta/checkout");
-
-      // Fill valid form
-      await page.locator('input[id="name"]').fill("Jānis Bērziņš");
-      await page.locator('input[id="email"]').fill("janis@example.com");
-      await page.locator('input[id="terms"]').check();
-
-      let alertShown = false;
-      page.on("dialog", async (dialog) => {
-        alertShown = true;
-        await dialog.accept();
-      });
-
-      // Click submit rapidly twice
-      const submitButton = page.getByRole("button", {
-        name: /Turpināt uz maksājumu/,
-      });
-      await submitButton.click();
-      await submitButton.click(); // Second click should be ignored
-
-      // Wait a bit
-      await page.waitForTimeout(600);
-
-      // Alert should only be shown once
-      expect(alertShown).toBe(true);
     });
   });
 

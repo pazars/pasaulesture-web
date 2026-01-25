@@ -6,7 +6,7 @@ test.describe("Contact Page", () => {
     test("should display all contact information", async ({ page, context }) => {
       // Set Latvian locale preference
       await context.addCookies([{
-        name: "PARAGLIDE_LOCALE",
+        name: "language_preference",
         value: "lv",
         domain: "localhost",
         path: "/"
@@ -40,7 +40,7 @@ test.describe("Contact Page", () => {
     test("should have back to home button", async ({ page, context }) => {
       // Set Latvian locale preference
       await context.addCookies([{
-        name: "PARAGLIDE_LOCALE",
+        name: "language_preference",
         value: "lv",
         domain: "localhost",
         path: "/"
@@ -56,7 +56,7 @@ test.describe("Contact Page", () => {
     test("email link should be clickable", async ({ page, context }) => {
       // Set Latvian locale preference
       await context.addCookies([{
-        name: "PARAGLIDE_LOCALE",
+        name: "language_preference",
         value: "lv",
         domain: "localhost",
         path: "/"
@@ -124,7 +124,7 @@ test.describe("Contact Page", () => {
     test("should be accessible from footer (Latvian)", async ({ page, context }) => {
       // Set Latvian locale preference
       await context.addCookies([{
-        name: "PARAGLIDE_LOCALE",
+        name: "language_preference",
         value: "lv",
         domain: "localhost",
         path: "/"

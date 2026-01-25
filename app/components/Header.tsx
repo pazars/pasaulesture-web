@@ -4,37 +4,35 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { events } from "@/app/data/events";
 import LanguageSwitcher from "./LanguageSwitcher";
-import * as m from "@/paraglide/messages";
+import { InstagramIcon } from "./Icons";
+import { useTranslations } from "next-intl";
 
 interface HeaderProps {
   currentSlug: string;
 }
 
-// Helper to get translated event name
-function getEventName(nameKey: string): string {
-  const translations: Record<string, () => string> = {
-    event_egipte_malta: m.event_egipte_malta,
-    event_parize_dakara: m.event_parize_dakara,
-  };
-  return translations[nameKey]?.() ?? nameKey;
-}
-
 export default function Header({ currentSlug }: HeaderProps) {
+  const t = useTranslations();
   const allEvents = Object.values(events);
+  const isDakar = currentSlug === "parize-dakara";
 
   return (
     <header className="bg-transparent py-5">
       <div className="max-w-5xl mx-auto px-4">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-          {/* Event navigation */}
-          <nav className="flex flex-wrap justify-center gap-2 sm:gap-3">
+        <div className="relative flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+          {/* Event navigation - Center */}
+          <nav className="flex flex-wrap justify-center gap-3">
             {allEvents.map((e) => {
               const isCurrent = e.slug === currentSlug;
-              const eventName = getEventName(e.nameKey);
+              const eventName = t(e.nameKey as any);
               return isCurrent ? (
                 <span
                   key={e.slug}
-                  className="relative px-5 sm:px-7 py-2.5 sm:py-3 rounded-full font-bold bg-forest-deep text-white cursor-default whitespace-nowrap shadow-lg shadow-forest-deep/20"
+                  className={`relative px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-bold text-lg cursor-default whitespace-nowrap scale-105 ${
+                    isDakar
+                      ? "bg-beige text-bronze shadow-xl shadow-beige/40"
+                      : "bg-pink text-blue shadow-xl shadow-pink/40"
+                  }`}
                 >
                   {eventName}
                 </span>
@@ -42,7 +40,11 @@ export default function Header({ currentSlug }: HeaderProps) {
                 <Link
                   key={e.slug}
                   href={`/${e.slug}`}
-                  className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-full font-semibold transition-all whitespace-nowrap text-earth-dark bg-white/80 backdrop-blur-sm border border-sand hover:bg-white hover:border-forest-medium hover:shadow-md"
+                  className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-semibold text-lg transition-all whitespace-nowrap ${
+                    isDakar
+                      ? "text-beige/80 hover:text-beige hover:bg-beige/10"
+                      : "text-beige/70 hover:text-beige hover:bg-white/10"
+                  }`}
                 >
                   {eventName}
                 </Link>
@@ -50,10 +52,28 @@ export default function Header({ currentSlug }: HeaderProps) {
             })}
           </nav>
 
-          {/* Language switcher */}
-          <Suspense fallback={<div className="w-20 h-10" />}>
-            <LanguageSwitcher />
-          </Suspense>
+          {/* Social & Language - Right */}
+          <div className="sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2 flex items-center gap-3 sm:gap-4">
+            {/* Instagram icon */}
+            <a
+              href="https://www.instagram.com/pasaulesture/?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`transition-colors ${
+                isDakar
+                  ? "text-beige hover:text-[#FFD87F]"
+                  : "text-beige hover:text-pink"
+              }`}
+              aria-label="Instagram @pasaulesture"
+            >
+              <InstagramIcon className="w-6 h-6" />
+            </a>
+
+            {/* Language switcher */}
+            <Suspense fallback={<div className="w-20 h-10" />}>
+              <LanguageSwitcher isDakar={isDakar} />
+            </Suspense>
+          </div>
         </div>
       </div>
     </header>

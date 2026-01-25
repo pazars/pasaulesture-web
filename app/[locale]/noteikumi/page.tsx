@@ -1,6 +1,5 @@
-import * as m from "@/paraglide/messages";
-import { locales, setLocale } from "@/paraglide/runtime";
-import type { Locale } from "@/paraglide/runtime";
+import { getTranslations } from "next-intl/server";
+import { locales } from "@/i18n/request";
 import Link from "next/link";
 import TermsContentLV from "./content/Content.lv";
 import TermsContentEN from "./content/Content.en";
@@ -15,19 +14,17 @@ export function generateStaticParams() {
 
 export default async function TermsPage({ params }: PageProps) {
   const { locale } = await params;
-
-  // Set locale for translation functions
-  setLocale(locale as Locale);
+  const t = await getTranslations();
 
   const homeUrl = locale === "en" ? "/en" : "/";
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-cream to-cream-light py-16">
+    <div className="min-h-screen py-16" style={{ background: 'linear-gradient(to bottom, #f5f0e6, #faf8f3)' }}>
       <div className="max-w-4xl mx-auto px-4">
         <Link
           href={homeUrl}
           className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-forest-deep/10 hover:bg-forest-deep hover:text-white text-forest-deep transition-all mb-8 group"
-          aria-label={m.back_to_home()}
+          aria-label={t("back_to_home")}
         >
           <svg
             className="w-6 h-6 transition-transform group-hover:scale-110"
@@ -45,7 +42,7 @@ export default async function TermsPage({ params }: PageProps) {
         </Link>
 
         <h1 className="text-4xl font-display text-forest-deep mb-12">
-          {m.page_terms_title()}
+          {t("page_terms_title")}
         </h1>
 
         {locale === "en" ? <TermsContentEN /> : <TermsContentLV />}

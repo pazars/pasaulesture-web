@@ -1,10 +1,9 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { locales } from "@/paraglide/runtime";
-import type { Locale } from "@/paraglide/runtime";
-
-const defaultLocale: Locale = "lv";
+import { usePathname, useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { locales, defaultLocale } from "@/i18n/request";
+import type { Locale } from "@/i18n/request";
 
 const localeNames: Record<Locale, string> = {
   lv: "LV",
@@ -46,38 +45,58 @@ function getPathForLocale(currentPath: string, targetLocale: Locale): string {
   return `/${targetLocale}${pathWithoutLocale}`;
 }
 
-export default function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  isDakar?: boolean;
+}
+
+export default function LanguageSwitcher({ isDakar = false }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentLocale = getLocaleFromPath(pathname);
+  const currentLocale = useLocale() as Locale;
 
   const handleLocaleChange = (targetLocale: Locale) => {
-    if (targetLocale === currentLocale) return;
-    const newPath = getPathForLocale(pathname, targetLocale);
+    // Use window.location to get the most current path and search params
+    // This fixes a Safari bug where usePathname() and useSearchParams()
+    // can cause issues inside Suspense boundaries after navigation
+    const currentPathname = typeof window !== 'undefined'
+      ? window.location.pathname
+      : pathname;
 
-    // Preserve query parameters
-    const queryString = searchParams.toString();
-    const newPathWithQuery = queryString ? `${newPath}?${queryString}` : newPath;
+    const newPath = getPathForLocale(currentPathname, targetLocale);
+
+    // Preserve query parameters using window.location.search
+    const queryString = typeof window !== 'undefined'
+      ? window.location.search
+      : '';
+    const newPathWithQuery = queryString ? `${newPath}${queryString}` : newPath;
 
     // Set cookie to target locale before navigating so proxy doesn't redirect back
-    document.cookie = `PARAGLIDE_LOCALE=${targetLocale}; path=/; max-age=${60 * 60 * 24 * 365}`;
+    document.cookie = `NEXT_LOCALE=${targetLocale}; path=/; max-age=${60 * 60 * 24 * 30}`; // 30 days
+
     router.push(newPathWithQuery);
   };
 
   return (
-    <div className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-1 py-1 border border-sand">
+    <div className={`flex items-center gap-1 backdrop-blur-sm rounded-full px-1 py-1 ${
+      isDakar ? "bg-beige/15" : "bg-white/10"
+    }`}>
       {locales.map((locale) => {
         const isActive = locale === currentLocale;
 
         return (
           <button
             key={locale}
-            onClick={() => handleLocaleChange(locale)}
-            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all ${
+            onClick={() => {
+              handleLocaleChange(locale);
+            }}
+            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer ${
               isActive
-                ? "bg-forest-deep text-white"
-                : "text-earth-dark hover:bg-sand/50"
+                ? isDakar
+                  ? "bg-beige text-bronze"
+                  : "bg-pink text-blue"
+                : isDakar
+                  ? "text-beige/80 hover:text-beige hover:bg-beige/20 hover:scale-105"
+                  : "text-beige/70 hover:text-beige hover:bg-white/15 hover:scale-105"
             }`}
             aria-current={isActive ? "page" : undefined}
           >
