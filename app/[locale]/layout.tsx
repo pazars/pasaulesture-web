@@ -6,6 +6,32 @@ import { getTranslations } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { locales } from "@/i18n/request";
 import type { Locale } from "@/i18n/request";
+import { Caveat_Brush, BioRhyme, Josefin_Sans } from "next/font/google";
+
+// Display font - for headers and titles
+const caveatBrush = Caveat_Brush({
+  weight: "400",
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+// Accent font - for emphasis and buttons
+const bioRhyme = BioRhyme({
+  weight: ["400", "700", "800"],
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-accent",
+  display: "swap",
+});
+
+// Body font - for general text
+const josefinSans = Josefin_Sans({
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -53,7 +79,7 @@ export default async function LocaleLayout({
   const messages = (await import(`@/messages/${locale}.json`)).default;
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={`${caveatBrush.variable} ${bioRhyme.variable} ${josefinSans.variable}`}>
       <head>
         {/* Google Tag Manager */}
         <Script id="gtm-script" strategy="afterInteractive">
