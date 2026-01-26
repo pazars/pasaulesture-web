@@ -41,10 +41,25 @@ export async function POST(request: NextRequest) {
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed': {
-      // Fetch full session from API (thin events only include minimal data)
-      const session = await stripe.checkout.sessions.retrieve(
-        (event.data.object as Stripe.Checkout.Session).id
-      );
+      let session: Stripe.Checkout.Session;
+      try {
+        // Fetch full session from API (thin events only include minimal data)
+        session = await stripe.checkout.sessions.retrieve(
+          (event.data.object as Stripe.Checkout.Session).id
+        );
+      } catch (fetchError) {
+        console.error('Failed to fetch session from Stripe:', fetchError);
+        break;
+      }
+
+      // Debug logging
+      console.log('Session retrieved:', {
+        id: session.id,
+        payment_intent: session.payment_intent,
+        amount_total: session.amount_total,
+        currency: session.currency,
+        metadata: session.metadata,
+      });
 
       try {
         const {
