@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const stripe = getStripeClient();
   let event: Stripe.Event;
 
   try {
-    const stripe = getStripeClient();
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
     console.error('Webhook signature verification failed:', error);
@@ -41,7 +41,10 @@ export async function POST(request: NextRequest) {
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session;
+      // Fetch full session from API (thin events only include minimal data)
+      const session = await stripe.checkout.sessions.retrieve(
+        (event.data.object as Stripe.Checkout.Session).id
+      );
 
       try {
         const {
@@ -62,7 +65,7 @@ export async function POST(request: NextRequest) {
           UPDATE registrations
           SET
             payment_status = 'completed',
-            stripe_payment_intent_id = ${session.payment_intent as string},
+            stripe_payment_intent_id = ${typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id},
             amount_paid = ${session.amount_total},
             currency = ${session.currency}
           WHERE stripe_session_id = ${session.id}
@@ -85,7 +88,7 @@ export async function POST(request: NextRequest) {
               payment_status
             ) VALUES (
               ${session.id},
-              ${session.payment_intent as string},
+              ${typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id},
               ${session.amount_total},
               ${session.currency},
               ${event_slug},
@@ -97,7 +100,7 @@ export async function POST(request: NextRequest) {
             )
             ON CONFLICT (stripe_session_id) DO UPDATE SET
               payment_status = 'completed',
-              stripe_payment_intent_id = ${session.payment_intent as string},
+              stripe_payment_intent_id = ${typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id},
               amount_paid = ${session.amount_total},
               currency = ${session.currency}
           `;
