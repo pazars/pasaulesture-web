@@ -9,7 +9,9 @@ import type { Locale } from "@/i18n/request";
 import { Caveat_Brush, BioRhyme, Josefin_Sans } from "next/font/google";
 
 // Display font - for headers and titles
-const caveatBrush = Caveat_Brush({
+// Switch between these two fonts by commenting/uncommenting:
+
+const displayFont = Caveat_Brush({
   weight: "400",
   subsets: ["latin", "latin-ext"],
   variable: "--font-display",
@@ -79,7 +81,7 @@ export default async function LocaleLayout({
   const messages = (await import(`@/messages/${locale}.json`)).default;
 
   return (
-    <html lang={locale} className={`${caveatBrush.variable} ${bioRhyme.variable} ${josefinSans.variable}`}>
+    <html lang={locale} className={`${displayFont.variable} ${bioRhyme.variable} ${josefinSans.variable}`}>
       <head>
         {/* Google Tag Manager */}
         <Script id="gtm-script" strategy="afterInteractive">
@@ -90,7 +92,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-WR2D5CTT');`}
         </Script>
       </head>
-      <body className="antialiased">
+      <body className={`antialiased ${josefinSans.className}`}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

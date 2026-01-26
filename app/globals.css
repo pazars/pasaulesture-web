@@ -1,10 +1,15 @@
 /* ===== FONTS ===== */
-/* Fonts are loaded via <link> tags in layout.tsx for better performance */
+/* Fonts are loaded via next/font in layout.tsx */
 
 @import "tailwindcss";
 
 /* ===== DESIGN TOKENS ===== */
 :root {
+  /* Fonts - Fallbacks that next/font will override */
+  --font-display: ui-serif, Georgia, serif;
+  --font-accent: ui-serif, Georgia, serif;
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+
   /* Retro Pop Palette */
   --beige: #E4DAD1;
   --lime: #BAFD9C;
@@ -71,11 +76,10 @@
   --color-dakara: var(--bronze);
   --color-malta: var(--blue);
 
-  /* Font families - next/font sets these variables on html element */
-  /* These are fallbacks that get overridden by next/font */
-  --font-display: 'Caveat Brush', cursive;
-  --font-accent: 'BioRhyme', serif;
-  --font-sans: 'Josefin Sans', system-ui, sans-serif;
+  /* Font families - reference from :root (next/font overrides on html element) */
+  --font-display: var(--font-display);
+  --font-accent: var(--font-accent);
+  --font-sans: var(--font-sans);
 }
 
 /* ===== BASE STYLES ===== */
