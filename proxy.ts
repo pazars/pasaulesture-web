@@ -11,8 +11,9 @@ export const proxy = createMiddleware({
   // Don't add prefix for default locale
   localePrefix: "as-needed",
 
-  // Custom locale detection - check cookie first
-  localeDetection: true,
+  // Disable Accept-Language header detection - always default to Latvian
+  // Users can switch language manually via LanguageSwitcher (sets NEXT_LOCALE cookie)
+  localeDetection: false,
 });
 
 export const config = {
