@@ -278,30 +278,40 @@ export default function EventPage({ event }: EventPageProps) {
             <div className="flex flex-col items-center gap-4">
 
               {/* Start Location - Top, centered */}
-              <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all">
-                <div className={`p-2 rounded-lg ${isDakar ? "bg-beige/25" : "bg-pink/25"
-                  }`}>
-                  <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
-                    }`} />
-                </div>
-                <div>
-                  <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
-                  {event.location.googleMapsUrl ? (
-                    <a
-                      href={event.location.googleMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
-                        }`}
-                    >
+              {event.location.googleMapsUrl ? (
+                <a
+                  href={event.location.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all cursor-pointer"
+                >
+                  <div className={`p-2 rounded-lg ${isDakar ? "bg-beige/25" : "bg-pink/25"
+                    }`}>
+                    <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
+                      }`} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
+                    <p className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${isDakar ? "group-hover:text-[#FFD87F]" : "group-hover:text-pink"
+                      }`}>
                       {event.location.name}
                       <ExternalLinkIcon className="w-3 h-3" />
-                    </a>
-                  ) : (
+                    </p>
+                  </div>
+                </a>
+              ) : (
+                <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8">
+                  <div className={`p-2 rounded-lg ${isDakar ? "bg-beige/25" : "bg-pink/25"
+                    }`}>
+                    <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
+                      }`} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
                     <p className="font-bold text-beige">{event.location.name}</p>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Route Selection - Centered, larger buttons with clear hover states */}
               <div className="flex flex-wrap justify-center gap-4">
