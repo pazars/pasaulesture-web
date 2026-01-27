@@ -116,6 +116,7 @@
   "checkout_error_dorm_full": "Dorm spots filled while you were registering. Please refresh to update availability.",
   "checkout_success_title": "Registration Complete!",
   "checkout_success_message": "Thank you for registering. Your payment has been successfully processed.",
+  "checkout_registration_confirmed": "Registration Confirmed",
   "checkout_error_title": "Error",
   "checkout_no_session": "No session found.",
   "checkout_invalid_session": "Unable to verify payment session.",
