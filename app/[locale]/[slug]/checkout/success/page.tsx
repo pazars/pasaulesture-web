@@ -111,6 +111,18 @@ export default async function CheckoutSuccessPage({
     ? (session.amount_total / 100).toFixed(2)
     : "0.00";
 
+  // Extract discount information
+  const originalPriceFromMetadata = session.metadata?.original_price
+    ? parseInt(session.metadata.original_price)
+    : null;
+  const hasDiscount = originalPriceFromMetadata && session.amount_total && originalPriceFromMetadata > session.amount_total;
+  const originalAmount = originalPriceFromMetadata
+    ? (originalPriceFromMetadata / 100).toFixed(2)
+    : null;
+  const savedAmount = hasDiscount && originalPriceFromMetadata && session.amount_total
+    ? ((originalPriceFromMetadata - session.amount_total) / 100).toFixed(2)
+    : null;
+
   const eventUrl = locale === "en" ? `/en/${slug}` : `/${slug}`;
 
   return (
@@ -219,11 +231,33 @@ export default async function CheckoutSuccessPage({
 
               {/* Amount Paid */}
               <div className="pt-4 border-t border-slate-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-                    {t("label_amount_paid")}
-                  </span>
-                  <span className="text-2xl font-bold text-emerald-600">€{amountPaid}</span>
+                <div className="space-y-2">
+                  {hasDiscount && originalAmount && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                        {t("label_original_price")}
+                      </span>
+                      <span className="text-lg font-medium text-slate-400 line-through">
+                        €{originalAmount}
+                      </span>
+                    </div>
+                  )}
+                  {hasDiscount && savedAmount && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">
+                        {t("label_discount_saved")}
+                      </span>
+                      <span className="text-base font-semibold text-emerald-600">
+                        -€{savedAmount}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
+                      {t("label_amount_paid")}
+                    </span>
+                    <span className="text-2xl font-bold text-emerald-600">€{amountPaid}</span>
+                  </div>
                 </div>
               </div>
             </div>

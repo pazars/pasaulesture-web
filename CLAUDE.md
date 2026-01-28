@@ -71,36 +71,6 @@ tests/
     └── seo-metadata.spec.ts
 ```
 
-## Design System
-
-### Colors (CSS variables in globals.css)
-
-- **Forest palette**: `forest-deep`, `forest-medium`, `forest-light`, `moss`
-- **Accent**: `amber`, `amber-light`, `amber-glow`
-- **Neutrals**: `earth-dark`, `earth-warm`, `stone`, `sand`, `cream`, `cream-light`
-
-### Typography
-
-- **Display font**: Archivo Black (`.font-display` class)
-- **Body font**: DM Sans (default)
-
-### CSS Utilities (globals.css)
-
-- `.hero-overlay` - Gradient overlay for hero images
-- `.topo-pattern` / `.topo-pattern-light` - Topographic line backgrounds
-- `.noise-overlay` - Subtle grain texture
-- `.glass` / `.glass-dark` - Glassmorphism effects
-- `.btn-primary` / `.btn-secondary` - Button styles
-- `.card-elevated` - Elevated card with hover effect
-- `.section-divider` - Gradient divider line
-- Animation classes: `.animate-fade-in-up`, `.animate-float`, `.animate-pulse-glow`
-
-### Layout Patterns
-
-- All sections use `rounded-3xl` corners
-- Section spacing: `mt-6 mx-2`
-- Content constrained to `max-w-5xl` on desktop
-
 ## Internationalization (i18n)
 
 ### URL Structure
@@ -234,18 +204,6 @@ npm run test:e2e -- --project=chromium
 npm run test:e2e -- tests/e2e/language-switching.spec.ts
 ```
 
-### Test Coverage
-- **250 total tests** (43 unit + 207 E2E)
-- Proxy routing logic
-- Translation completeness
-- Language switching functionality
-- SEO metadata (lang, title, description)
-- Navigation between pages
-- Cookie persistence
-- Contact page functionality
-- Contact information consistency across all pages
-- Centralized configuration validation
-
 ## Stripe Payments
 
 ### Architecture
@@ -270,66 +228,3 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 **Getting environment variables:**
 - Vercel integration: `vercel env pull --environment development`
-- Neon directly: Copy from Neon dashboard
-
-### Local Development
-See [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md) for complete setup guide.
-
-**Quick start:**
-1. Create Stripe products with metadata (`event_slug`, `distance_index`)
-2. Set up `.env.local` with API keys (use `vercel env pull` for Neon)
-3. Run database migration: `npm run db:migrate`
-4. Start webhook listener: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
-5. Test with card `4242 4242 4242 4242`
-
-### Testing
-- Unit tests: `npm test` (API routes, price matching, webhook handling)
-- E2E tests: `npm run test:e2e` (full checkout flow)
-- Manual: Use Stripe test cards (see docs)
-
-### Database Schema
-
-The `registrations` table tracks registration lifecycle:
-
-```sql
-CREATE TABLE registrations (
-  id SERIAL PRIMARY KEY,
-  stripe_session_id VARCHAR(255) UNIQUE NOT NULL,
-  stripe_payment_intent_id VARCHAR(255),
-  amount_paid INT,                           -- NULL until payment completes
-  currency VARCHAR(3) DEFAULT 'eur',
-  event_slug VARCHAR(100) NOT NULL,
-  distance_index INT NOT NULL,
-  participant_name VARCHAR(255) NOT NULL,
-  participant_email VARCHAR(255) NOT NULL,
-  locale VARCHAR(5) DEFAULT 'lv',
-  payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- pending, completed, expired, failed
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-**Payment Status Flow:**
-1. `pending` - Created when checkout session starts (before Stripe redirect)
-2. `completed` - Updated by webhook when `checkout.session.completed` fires
-3. `expired` - Updated by webhook when `checkout.session.expired` fires (user abandoned)
-
-### Product Metadata
-
-Each Stripe product must have these metadata fields:
-- `event_slug` - Maps to `events` object key (e.g., `egipte-malta`)
-- `distance_index` - Zero-based index in `event.distances` array (e.g., `0`, `1`)
-
-## Deployment
-
-### Translation Updates
-
-**Workflow:**
-1. Edit translations in `messages/lv.json` or `messages/en.json`
-2. Commit the message files
-3. Push to deploy
-
-**Notes:**
-- next-intl loads translations at runtime from JSON files - no compilation step needed
-- Translation files are automatically included in the build
-- Changes to translations take effect immediately after deployment

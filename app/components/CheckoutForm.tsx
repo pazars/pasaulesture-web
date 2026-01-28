@@ -4,6 +4,7 @@ import { useState, FormEvent, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EventData } from "@/app/data/events";
+import { CONTACT_INFO } from "@/app/data/contact";
 import { useTranslations, useLocale } from "next-intl";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -67,6 +68,10 @@ export default function CheckoutForm({
     const [priceError, setPriceError] = useState<string | null>(null);
     const [dormAvailability, setDormAvailability] = useState<AccommodationAvailability | null>(null);
     const [dormFullError, setDormFullError] = useState(false);
+    const [discountCode, setDiscountCode] = useState("");
+    const [discountStatus, setDiscountStatus] = useState<"idle" | "checking" | "applied" | "error">("idle");
+    const [discountData, setDiscountData] = useState<{ couponId: string; percentOff: number; code: string } | null>(null);
+    const [discountError, setDiscountError] = useState("");
 
     // Load persisted form data on mount
     useEffect(() => {
@@ -147,6 +152,23 @@ export default function CheckoutForm({
         p => p.eventSlug === event.slug && p.distanceIndex === selectedDistanceIndex
     );
 
+    // Calculate final price with discount
+    const originalPrice = matchingPrice?.amount ?? 0;
+    let finalPrice = originalPrice;
+
+    console.log("finalPrice", finalPrice);
+
+    if (discountData && originalPrice > 0) {
+        const discountAmount = originalPrice * (discountData.percentOff / 100);
+        finalPrice = Math.round(originalPrice - discountAmount);
+        console.log("Discount Applied:", {
+            originalPrice,
+            percentOff: discountData.percentOff,
+            discountAmount,
+            finalPrice
+        });
+    }
+
     // Check if dorm is available or user must join waitlist
     const dormSpotsRemaining = dormAvailability?.dorm?.remaining ?? 0;
     const isDormWaitlist = dormSpotsRemaining <= 0;
@@ -223,6 +245,8 @@ export default function CheckoutForm({
                     wantsPreparationTips: formData.wantsPreparationTips,
                     preparationTipsChannel: formData.preparationTipsChannels.length > 0 ? formData.preparationTipsChannels.join(',') : null,
                     locale,
+                    couponId: discountData?.code || null,
+                    originalPrice,
                 }),
             });
 
@@ -280,6 +304,48 @@ export default function CheckoutForm({
         router.push(path, { scroll: false });
     };
 
+    const handleApplyDiscount = async () => {
+
+        const code = discountCode.trim().toUpperCase();
+        if (!code) return;
+
+        setDiscountStatus("checking");
+        setDiscountError("");
+
+        try {
+            const response = await fetch('/api/checkout/validate-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setDiscountStatus("error");
+                if (data.error === 'INVALID_COUPON') {
+                    setDiscountError(t("checkout_discount_invalid"));
+                } else if (data.error === 'EXPIRED_COUPON') {
+                    setDiscountError(t("checkout_discount_expired"));
+                } else {
+                    setDiscountError(t("checkout_discount_error"));
+                }
+                return;
+            }
+
+            setDiscountStatus("applied");
+            setDiscountData({
+                couponId: data.couponId,
+                percentOff: data.percentOff,
+                code: data.code,
+            });
+        } catch (error) {
+            console.error('Error applying discount:', error);
+            setDiscountStatus("error");
+            setDiscountError(t("checkout_discount_error"));
+        }
+    };
+
     const termsUrl = locale === "en" ? "/en/noteikumi" : "/noteikumi";
 
     // Show error if price not found
@@ -303,7 +369,7 @@ export default function CheckoutForm({
                             />
                         </svg>
                         <p className="text-sm text-red-700">
-                            Registration is temporarily unavailable. Please contact us at pasaulesture@gmail.com
+                            Registration is temporarily unavailable. Please contact us at {CONTACT_INFO.email}
                         </p>
                     </div>
                 </div>
@@ -344,7 +410,16 @@ export default function CheckoutForm({
                             {priceLoading ? (
                                 <span className="text-xl font-semibold text-slate-400">...</span>
                             ) : matchingPrice ? (
-                                <span className="text-2xl font-bold text-emerald-400">€{(matchingPrice.amount / 100).toFixed(0)}</span>
+                                <div className="flex items-baseline justify-end gap-2">
+                                    <span className="text-2xl font-bold text-emerald-400">
+                                        €{(finalPrice / 100).toFixed(2)}
+                                    </span>
+                                    {discountStatus === 'applied' && discountData && (
+                                        <span className="text-slate-400 line-through text-base">
+                                            €{(originalPrice / 100).toFixed(2)}
+                                        </span>
+                                    )}
+                                </div>
                             ) : (
                                 <span className="text-lg text-red-400">N/A</span>
                             )}
@@ -637,6 +712,52 @@ export default function CheckoutForm({
                             <p className="mt-1.5 text-sm text-red-600">{errors.emergencyPhone}</p>
                         )}
                     </div>
+                </div>
+
+                {/* Discount Code Section */}
+                <div className="space-y-3">
+                    <label htmlFor="discountCode" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                        {t("checkout_discount_label")}
+                    </label>
+
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            id="discountCode"
+                            value={discountCode}
+                            onChange={(e) => {
+                                setDiscountCode(e.target.value.toUpperCase());
+                                setDiscountError("");
+                            }}
+                            disabled={discountStatus === 'applied'}
+                            className={`flex-1 px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 uppercase focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${discountStatus === 'applied' ? 'bg-slate-100 cursor-not-allowed' : 'border-slate-300 hover:border-slate-400'
+                                }`}
+                            placeholder={t("checkout_discount_placeholder")}
+                        />
+                        <button
+                            type="button"
+                            onClick={handleApplyDiscount}
+                            disabled={!discountCode || discountStatus === 'checking' || discountStatus === 'applied'}
+                            className="px-6 py-3 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 text-white font-medium rounded-xl transition-all disabled:cursor-not-allowed whitespace-nowrap"
+                        >
+                            {discountStatus === 'checking' ? t("checkout_discount_checking") : t("checkout_discount_apply")}
+                        </button>
+                    </div>
+
+                    {/* Success Message */}
+                    {discountStatus === 'applied' && discountData && (
+                        <div className="flex items-center gap-2 text-sm text-emerald-600">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            {t("checkout_discount_applied", { percent: discountData.percentOff })}
+                        </div>
+                    )}
+
+                    {/* Error Message */}
+                    {discountError && (
+                        <p className="text-sm text-red-600">{discountError}</p>
+                    )}
                 </div>
 
                 {/* Terms Acceptance */}

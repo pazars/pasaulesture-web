@@ -124,5 +124,18 @@
   "label_participant": "Participant",
   "label_event": "Event",
   "label_amount_paid": "Amount Paid",
-  "button_back_to_event": "Back to Event"
+  "button_back_to_event": "Back to Event",
+  "checkout_discount_label": "Discount Code",
+  "checkout_discount_placeholder": "Enter code",
+  "checkout_discount_apply": "Apply",
+  "checkout_discount_checking": "Checking...",
+  "checkout_discount_applied": "Discount applied! -{percent}%",
+  "checkout_discount_invalid": "Invalid discount code",
+  "checkout_discount_expired": "Discount code expired",
+  "checkout_discount_error": "Failed to verify code",
+  "checkout_discount_rate_limit": "Too many attempts. Please wait.",
+  "checkout_discount_attempts_remaining": "{count, plural, one {# attempt remaining} other {# attempts remaining}}",
+  "checkout_price_original": "Original Price",
+  "label_original_price": "Original Price",
+  "label_discount_saved": "Saved"
 }

@@ -124,5 +124,18 @@
   "label_participant": "Dalībnieks",
   "label_event": "Pasākums",
   "label_amount_paid": "Summa",
-  "button_back_to_event": "Atpakaļ uz pasākumu"
+  "button_back_to_event": "Atpakaļ uz pasākumu",
+  "checkout_discount_label": "Atlaides kods",
+  "checkout_discount_placeholder": "Ievadi kodu",
+  "checkout_discount_apply": "Pielietot",
+  "checkout_discount_checking": "Pārbauda...",
+  "checkout_discount_applied": "Atlaide pielietota! -{percent}%",
+  "checkout_discount_invalid": "Nederīgs atlaides kods",
+  "checkout_discount_expired": "Atlaides kods ir beidzies",
+  "checkout_discount_error": "Neizdevās pārbaudīt kodu",
+  "checkout_discount_rate_limit": "Pārāk daudz mēģinājumu. Lūdzu, uzgaidi.",
+  "checkout_discount_attempts_remaining": "{count, plural, one {Atlicis # mēģinājums} other {Atlikuši # mēģinājumi}}",
+  "checkout_price_original": "Sākotnējā cena",
+  "label_original_price": "Sākotnējā cena",
+  "label_discount_saved": "Ietaupīts"
 }

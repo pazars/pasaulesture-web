@@ -26,6 +26,8 @@ export async function POST(request: NextRequest) {
       wantsPreparationTips,
       preparationTipsChannel,
       locale,
+      couponId,
+      originalPrice,
     } = body;
 
     // Validate ALL required fields
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const localePrefix = locale === 'lv' ? '' : `/${locale}`;
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       line_items: [
         {
           price: matchingPrice.id,
@@ -118,8 +120,17 @@ export async function POST(request: NextRequest) {
         wants_preparation_tips: String(wantsPreparationTips || false),
         preparation_tips_channel: preparationTipsChannel || '',
         locale: locale,
+        coupon_id: couponId || '',
+        original_price: originalPrice ? String(originalPrice) : '',
       },
-    });
+    };
+
+    // Add discounts array if coupon is valid
+    if (couponId) {
+      sessionParams.discounts = [{ coupon: couponId }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     // Create pending registration in database
     try {
@@ -139,7 +150,9 @@ export async function POST(request: NextRequest) {
           wants_preparation_tips,
           preparation_tips_channel,
           locale,
-          payment_status
+          payment_status,
+          coupon_id,
+          original_price
         ) VALUES (
           ${session.id},
           ${eventSlug},
@@ -155,7 +168,9 @@ export async function POST(request: NextRequest) {
           ${wantsPreparationTips || false},
           ${preparationTipsChannel || null},
           ${locale},
-          'pending'
+          'pending',
+          ${couponId},
+          ${originalPrice}
         )
       `;
     } catch (dbError) {

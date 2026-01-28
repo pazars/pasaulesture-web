@@ -82,7 +82,9 @@ export async function POST(request: NextRequest) {
             payment_status = 'completed',
             stripe_payment_intent_id = ${typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id},
             amount_paid = ${session.amount_total},
-            currency = ${session.currency}
+            currency = ${session.currency},
+            coupon_id = ${session.metadata?.coupon_id || null},
+            original_price = ${session.metadata?.original_price ? parseInt(session.metadata.original_price) : null}
           WHERE stripe_session_id = ${session.id}
           RETURNING id
         `;
@@ -100,7 +102,9 @@ export async function POST(request: NextRequest) {
               participant_name,
               participant_email,
               locale,
-              payment_status
+              payment_status,
+              coupon_id,
+              original_price
             ) VALUES (
               ${session.id},
               ${typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id},
@@ -111,13 +115,17 @@ export async function POST(request: NextRequest) {
               ${participant_name},
               ${participant_email},
               ${locale || 'lv'},
-              'completed'
+              'completed',
+              ${session.metadata?.coupon_id || null},
+              ${session.metadata?.original_price ? parseInt(session.metadata.original_price) : null}
             )
             ON CONFLICT (stripe_session_id) DO UPDATE SET
               payment_status = 'completed',
               stripe_payment_intent_id = ${typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id},
               amount_paid = ${session.amount_total},
-              currency = ${session.currency}
+              currency = ${session.currency},
+              coupon_id = ${session.metadata?.coupon_id || null},
+              original_price = ${session.metadata?.original_price ? parseInt(session.metadata.original_price) : null}
           `;
           console.log('Registration created for session:', session.id);
         } else {
