@@ -10,7 +10,7 @@ export default function TermsContentEN() {
                 </p>
             </div>
 
-            <h2 className="text-2xl font-display text-forest-deep mt-8 mb-4">
+            <h2 className="text-2xl font-accent text-forest-deep mt-8 mb-4">
                 Distance Agreement
             </h2>
 

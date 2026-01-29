@@ -3,7 +3,7 @@
  * Update these values to change contact details across the site
  */
 export const CONTACT_INFO = {
-  email: "pasaulesture@gmail.com",
+  email: "toms@pasaulesture.lv",
   organizationName: "Biedrība \"Pasaules Tūre\"",
   registrationNumber: "40008345302",
   address: "Vestienas iela 43, Rīga LV-1035",

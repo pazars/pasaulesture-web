@@ -23,18 +23,18 @@ export default function Toast({ message, onClose, isDakar = false }: ToastProps)
       <div
         className={`relative px-8 py-5 rounded-2xl shadow-2xl backdrop-blur-md border-2 flex items-center gap-4 min-w-[320px] max-w-[90vw] ${
           isDakar
-            ? "bg-beige/95 border-bronze/30 shadow-bronze/20"
+            ? "bg-beige/95 border-dakar-brown/30 shadow-dakar-brown/20"
             : "bg-pink/95 border-blue/30 shadow-pink/20"
         }`}
       >
         {/* Icon */}
         <div
           className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-            isDakar ? "bg-bronze/20" : "bg-blue/20"
+            isDakar ? "bg-dakar-brown/20" : "bg-blue/20"
           }`}
         >
           <svg
-            className={`w-6 h-6 ${isDakar ? "text-bronze" : "text-blue"}`}
+            className={`w-6 h-6 ${isDakar ? "text-dakar-brown" : "text-blue"}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -51,7 +51,7 @@ export default function Toast({ message, onClose, isDakar = false }: ToastProps)
         {/* Message */}
         <p
           className={`flex-1 font-semibold text-lg ${
-            isDakar ? "text-bronze" : "text-blue"
+            isDakar ? "text-dakar-brown" : "text-blue"
           }`}
         >
           {message}
@@ -62,7 +62,7 @@ export default function Toast({ message, onClose, isDakar = false }: ToastProps)
           onClick={onClose}
           className={`flex-shrink-0 p-1 rounded-full transition-all hover:scale-110 ${
             isDakar
-              ? "text-bronze/60 hover:text-bronze hover:bg-bronze/10"
+              ? "text-dakar-brown/60 hover:text-dakar-brown hover:bg-dakar-brown/10"
               : "text-blue/60 hover:text-blue hover:bg-blue/10"
           }`}
           aria-label="Close notification"
@@ -80,7 +80,7 @@ export default function Toast({ message, onClose, isDakar = false }: ToastProps)
         {/* Animated progress bar */}
         <div
           className={`absolute bottom-0 left-0 h-1 rounded-b-2xl ${
-            isDakar ? "bg-bronze/40" : "bg-blue/40"
+            isDakar ? "bg-dakar-brown/40" : "bg-blue/40"
           }`}
           style={{
             width: "100%",

@@ -126,7 +126,7 @@
   "label_amount_paid": "Amount Paid",
   "button_back_to_event": "Back to Event",
   "checkout_discount_label": "Discount Code",
-  "checkout_discount_placeholder": "Enter code",
+  "checkout_discount_placeholder": "",
   "checkout_discount_apply": "Apply",
   "checkout_discount_checking": "Checking...",
   "checkout_discount_applied": "Discount applied! -{percent}%",

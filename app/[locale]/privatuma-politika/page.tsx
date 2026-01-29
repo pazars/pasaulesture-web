@@ -42,7 +42,7 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
           </svg>
         </Link>
 
-        <h1 className="text-4xl font-display text-forest-deep mb-12">
+        <h1 className="text-4xl font-accent text-forest-deep mb-12">
           {t("page_privacy_title")}
         </h1>
         <Content />

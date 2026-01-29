@@ -6,12 +6,12 @@ import { getTranslations } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { locales } from "@/i18n/request";
 import type { Locale } from "@/i18n/request";
-import { Caveat_Brush, BioRhyme, Josefin_Sans } from "next/font/google";
+import { Caveat_Brush, BioRhyme, Josefin_Sans, Kalam, Sriracha, Oregano, Shantell_Sans, Solitreo, Mynerve } from "next/font/google";
 
 // Display font - for headers and titles
 // Switch between these two fonts by commenting/uncommenting:
 
-const displayFont = Caveat_Brush({
+const displayFont = Mynerve({
   weight: "400",
   subsets: ["latin", "latin-ext"],
   variable: "--font-display",

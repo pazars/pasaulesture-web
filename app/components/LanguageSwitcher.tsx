@@ -92,7 +92,7 @@ export default function LanguageSwitcher({ isDakar = false }: LanguageSwitcherPr
             className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer ${
               isActive
                 ? isDakar
-                  ? "bg-beige text-bronze"
+                  ? "bg-dakar-cream text-dakar-brown"
                   : "bg-pink text-blue"
                 : isDakar
                   ? "text-beige/80 hover:text-beige hover:bg-beige/20 hover:scale-105"

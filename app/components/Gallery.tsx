@@ -20,32 +20,39 @@ export default function Gallery({ images, title }: GalleryProps) {
         <section className="py-16 px-6 max-w-5xl mx-auto">
             {title && (
                 <div className="text-center mb-10">
-                    <h2 className="font-display text-4xl sm:text-5xl text-beige mb-3">{title}</h2>
+                    <h2 className="font-accent text-4xl sm:text-5xl text-beige mb-3">{title}</h2>
                     <div className="section-divider w-24 mx-auto" />
                 </div>
             )}
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {images.map((src, index) => (
-                    <div
-                        key={src}
-                        className="relative aspect-square overflow-hidden rounded-xl cursor-pointer group bg-white/5"
-                        onClick={() => openLightbox(index)}
-                    >
-                        <Image
-                            src={src}
-                            alt={`Gallery image ${index + 1}`}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                            sizes="(max-width: 768px) 50vw, 33vw"
-                        />
-                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                            <svg className="w-8 h-8 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                {images.map((src, index) => {
+                    // Hide last image on small screens if odd number (to keep pairs)
+                    const isLastImage = index === images.length - 1;
+                    const isOddCount = images.length % 2 !== 0;
+                    const hideOnSmall = isLastImage && isOddCount;
+
+                    return (
+                        <div
+                            key={src}
+                            className={`relative aspect-square overflow-hidden rounded-xl cursor-pointer group bg-white/5 ${hideOnSmall ? 'hidden md:block' : ''}`}
+                            onClick={() => openLightbox(index)}
+                        >
+                            <Image
+                                src={src}
+                                alt={`Gallery image ${index + 1}`}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                sizes="(max-width: 768px) 50vw, 33vw"
+                            />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <svg className="w-8 h-8 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Lightbox */}

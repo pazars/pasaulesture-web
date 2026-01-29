@@ -139,7 +139,7 @@ export default function EventPage({ event }: EventPageProps) {
             <div
               className={`text-center transition-all duration-1200 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8"}`}
             >
-              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)] leading-tight">
+              <h1 className="font-accent text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)] leading-tight">
                 {formattedDate}
               </h1>
             </div>
@@ -272,10 +272,12 @@ export default function EventPage({ event }: EventPageProps) {
         </section>
 
         {/* Route Selection with Start Location */}
-        <section className="relative mt-4 mx-2 rounded-3xl overflow-hidden py-4">
-          <div className="max-w-5xl mx-auto px-6">
-            {/* Vertical layout: Start on top, Routes below */}
-            <div className="flex flex-col items-center gap-4">
+        {/* Only show route selection if there are multiple routes */}
+        {event.distances.length > 1 && (
+          <section className="relative mt-4 mx-2 rounded-3xl overflow-hidden py-4">
+            <div className="max-w-5xl mx-auto px-6">
+              {/* Vertical layout: Start on top, Routes below */}
+              <div className="flex flex-col items-center gap-4">
 
               {/* Start Location - Top, centered */}
               {event.location.googleMapsUrl ? (
@@ -285,14 +287,14 @@ export default function EventPage({ event }: EventPageProps) {
                   rel="noopener noreferrer"
                   className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all cursor-pointer"
                 >
-                  <div className={`p-2 rounded-lg ${isDakar ? "bg-beige/25" : "bg-pink/25"
+                  <div className={`p-2 rounded-lg ${isDakar ? "bg-dakar-cream/25" : "bg-pink/25"
                     }`}>
                     <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
                       }`} />
                   </div>
                   <div>
                     <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
-                    <p className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${isDakar ? "group-hover:text-[#FFD87F]" : "group-hover:text-pink"
+                    <p className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${isDakar ? "group-hover:text-dakar-yellow" : "group-hover:text-pink"
                       }`}>
                       {event.location.name}
                       <ExternalLinkIcon className="w-3 h-3" />
@@ -301,7 +303,7 @@ export default function EventPage({ event }: EventPageProps) {
                 </a>
               ) : (
                 <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8">
-                  <div className={`p-2 rounded-lg ${isDakar ? "bg-beige/25" : "bg-pink/25"
+                  <div className={`p-2 rounded-lg ${isDakar ? "bg-dakar-cream/25" : "bg-pink/25"
                     }`}>
                     <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
                       }`} />
@@ -328,19 +330,19 @@ export default function EventPage({ event }: EventPageProps) {
                       onClick={() => handleDistanceSelect(index)}
                       className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden min-w-40 cursor-pointer ${isSelected
                         ? isDakar
-                          ? "bg-beige text-bronze shadow-lg shadow-beige/40 scale-105"
+                          ? "bg-dakar-cream text-dakar-brown shadow-lg shadow-dakar-cream/40 scale-105"
                           : "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
                         : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
                         }`}
                     >
                       {isSelected && (
-                        <div className={`absolute top-0 right-0 w-6 h-6 transform rotate-45 translate-x-3 -translate-y-3 ${isDakar ? "bg-[#FFD87F]" : "bg-lime"
+                        <div className={`absolute top-0 right-0 w-6 h-6 transform rotate-45 translate-x-3 -translate-y-3 ${isDakar ? "bg-dakar-yellow" : "bg-lime"
                           }`} />
                       )}
                       <span className="block text-lg relative z-10 font-accent">{distanceName}</span>
                       <div className={`flex items-center justify-center gap-2 mt-1.5 relative z-10 text-sm ${isSelected
                         ? isDakar
-                          ? "text-bronze/70"
+                          ? "text-dakar-brown/70"
                           : "text-blue/70"
                         : "text-beige/60"
                         }`}>
@@ -354,12 +356,13 @@ export default function EventPage({ event }: EventPageProps) {
             </div>
           </div>
         </section>
+        )}
 
         {/* Route Section */}
         <section className="py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">
           <div className="max-w-5xl mx-auto px-6 relative z-10">
             <div className="text-center mb-10">
-              <h2 className="font-display text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
+              <h2 className="font-accent text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
               <div className="section-divider w-24 mx-auto" />
             </div>
 
@@ -386,26 +389,14 @@ export default function EventPage({ event }: EventPageProps) {
                   {isDakar ? (
                     <>
                       <p className="text-beige/70 text-lg font-medium mb-6">{t("route_reveal_countdown")}</p>
-                      <div className="flex justify-center gap-3 sm:gap-6">
-                        <div className="flex flex-col items-center">
-                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.days}</span>
-                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_days")}</span>
-                        </div>
-                        <span className="font-display text-3xl sm:text-5xl text-beige/30">:</span>
-                        <div className="flex flex-col items-center">
-                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.hours.toString().padStart(2, '0')}</span>
-                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_hours")}</span>
-                        </div>
-                        <span className="font-display text-3xl sm:text-5xl text-beige/30">:</span>
-                        <div className="flex flex-col items-center">
-                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.minutes.toString().padStart(2, '0')}</span>
-                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_minutes")}</span>
-                        </div>
-                        <span className="font-display text-3xl sm:text-5xl text-beige/30">:</span>
-                        <div className="flex flex-col items-center">
-                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.seconds.toString().padStart(2, '0')}</span>
-                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_seconds")}</span>
-                        </div>
+                      <div className="flex justify-center items-baseline gap-2">
+                        <span className="font-accent text-3xl sm:text-5xl text-beige">{countdown.days}d</span>
+                        <span className="font-accent text-3xl sm:text-5xl text-beige/30">:</span>
+                        <span className="font-accent text-3xl sm:text-5xl text-beige">{countdown.hours.toString().padStart(2, '0')}h</span>
+                        <span className="font-accent text-3xl sm:text-5xl text-beige/30">:</span>
+                        <span className="font-accent text-3xl sm:text-5xl text-beige">{countdown.minutes.toString().padStart(2, '0')}m</span>
+                        <span className="font-accent text-3xl sm:text-5xl text-beige/30">:</span>
+                        <span className="font-accent text-3xl sm:text-5xl text-beige">{countdown.seconds.toString().padStart(2, '0')}s</span>
                       </div>
                     </>
                   ) : (
@@ -425,15 +416,38 @@ export default function EventPage({ event }: EventPageProps) {
           />
         )}
 
-        {/* Registration Section - simplified, centered */}
-        <section className="relative py-20 overflow-hidden rounded-3xl mt-6 mx-2">
-          <div className={`absolute inset-0 rounded-3xl ${isDakar
-            ? "bg-linear-to-br from-beige via-[#FFD87F] to-[#E4DAD1]"
-            : "bg-linear-to-br from-pink via-pink/80 to-lime"
-            }`} />
+        {/* Registration Section - collage style */}
+        <section className="relative py-12 sm:py-16 mt-6 mx-2">
 
+          {/* Left stamp - sits above text, slightly askew */}
+          <div className="absolute z-10 hidden sm:block" style={{ left: '8%', top: '50%', transform: 'translateY(-50%)' }}>
+            <Image
+              src={stamps[0].src}
+              alt=""
+              width={95}
+              height={124}
+              aria-hidden="true"
+              className="drop-shadow-xl"
+              style={{ transform: 'rotate(-7deg)' }}
+            />
+          </div>
+
+          {/* Right stamp - sits BELOW text (lower z-index), near the ? mark, slightly rotated */}
+          <div className="absolute z-5 hidden sm:block" style={{ right: '10%', top: '50%', transform: 'translateY(-50%)' }}>
+            <Image
+              src={stamps[1].src}
+              alt=""
+              width={88}
+              height={115}
+              aria-hidden="true"
+              className="drop-shadow-xl"
+              style={{ transform: 'rotate(11deg)' }}
+            />
+          </div>
+
+          {/* CTA content — sits on top */}
           <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
-            <h2 className={`font-display text-4xl sm:text-5xl mb-8 ${isDakar ? "text-bronze" : "text-blue"
+            <h2 className={`font-accent text-3xl sm:text-4xl mb-8 ${isDakar ? "text-dakar-cream" : "text-beige"
               }`}>
               {t("register_heading")}
             </h2>
@@ -441,7 +455,7 @@ export default function EventPage({ event }: EventPageProps) {
             {isDakar ? (
               <button
                 onClick={handleRegistrationClick}
-                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-bronze text-beige shadow-bronze/40 hover:shadow-bronze/50"
+                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30 hover:shadow-dakar-yellow/40"
               >
                 <span>{t("register_button")}</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -451,7 +465,7 @@ export default function EventPage({ event }: EventPageProps) {
             ) : (
               <Link
                 href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
-                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-blue text-white shadow-blue/40 hover:shadow-blue/50"
+                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-pink text-blue shadow-pink/30 hover:shadow-pink/40"
               >
                 <span>{t("register_button")}</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -477,21 +491,21 @@ export default function EventPage({ event }: EventPageProps) {
             <nav className="flex justify-center gap-8">
               <Link
                 href={locale === "en" ? "/en/privatuma-politika" : "/privatuma-politika"}
-                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-dakar-yellow" : "hover:text-pink"
                   }`}
               >
                 {t("footer_privacy")}
               </Link>
               <Link
                 href={locale === "en" ? "/en/noteikumi" : "/noteikumi"}
-                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-dakar-yellow" : "hover:text-pink"
                   }`}
               >
                 {t("footer_terms")}
               </Link>
               <Link
                 href={locale === "en" ? "/en/kontakti" : "/kontakti"}
-                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-dakar-yellow" : "hover:text-pink"
                   }`}
               >
                 {t("footer_contact")}

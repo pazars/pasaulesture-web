@@ -30,7 +30,7 @@ export default function Header({ currentSlug }: HeaderProps) {
                   key={e.slug}
                   className={`relative px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-bold text-lg cursor-default whitespace-nowrap scale-105 ${
                     isDakar
-                      ? "bg-beige text-bronze shadow-xl shadow-beige/40"
+                      ? "bg-dakar-cream text-dakar-brown shadow-xl shadow-dakar-cream/40"
                       : "bg-pink text-blue shadow-xl shadow-pink/40"
                   }`}
                 >
@@ -42,7 +42,7 @@ export default function Header({ currentSlug }: HeaderProps) {
                   href={`/${e.slug}`}
                   className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-accent font-semibold text-lg transition-all whitespace-nowrap ${
                     isDakar
-                      ? "text-beige/80 hover:text-beige hover:bg-beige/10"
+                      ? "text-beige/80 hover:text-beige hover:bg-dakar-cream/10"
                       : "text-beige/70 hover:text-beige hover:bg-white/10"
                   }`}
                 >
@@ -61,7 +61,7 @@ export default function Header({ currentSlug }: HeaderProps) {
               rel="noopener noreferrer"
               className={`transition-colors ${
                 isDakar
-                  ? "text-beige hover:text-[#FFD87F]"
+                  ? "text-beige hover:text-dakar-yellow"
                   : "text-beige hover:text-pink"
               }`}
               aria-label="Instagram @pasaulesture"

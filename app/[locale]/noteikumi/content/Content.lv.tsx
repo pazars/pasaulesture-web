@@ -3,7 +3,7 @@ import { CONTACT_INFO } from "@/app/data/contact";
 export default function TermsContentLV() {
     return (
         <div className="prose prose-lg max-w-none text-earth-dark">
-            <h2 className="text-2xl font-display text-forest-deep mt-8 mb-4">
+            <h2 className="text-2xl font-accent text-forest-deep mt-8 mb-4">
                 Distances līgums
             </h2>
 
