@@ -59,10 +59,28 @@ export async function generateMetadata({
   }
 
   const t = await getTranslations({ locale });
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://pasaulesture.lv';
 
   return {
+    metadataBase: new URL(baseUrl),
     title: t("site_title"),
     description: t("site_description"),
+    icons: {
+      icon: '/favicon.ico',
+    },
+    openGraph: {
+      title: t("site_title"),
+      description: t("site_description"),
+      url: baseUrl,
+      siteName: t("site_title"),
+      locale: locale,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("site_title"),
+      description: t("site_description"),
+    },
   };
 }
 
