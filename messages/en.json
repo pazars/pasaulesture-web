@@ -138,5 +138,7 @@
   "checkout_discount_attempts_remaining": "{count, plural, one {# attempt remaining} other {# attempts remaining}}",
   "checkout_price_original": "Original Price",
   "label_original_price": "Original Price",
-  "label_discount_saved": "Saved"
+  "label_discount_saved": "Saved",
+  "menu_open": "Menu",
+  "menu_close": "Close"
 }

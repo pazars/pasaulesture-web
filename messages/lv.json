@@ -138,5 +138,7 @@
   "checkout_discount_attempts_remaining": "{count, plural, one {Atlicis # mēģinājums} other {Atlikuši # mēģinājumi}}",
   "checkout_price_original": "Sākotnējā cena",
   "label_original_price": "Sākotnējā cena",
-  "label_discount_saved": "Ietaupīts"
+  "label_discount_saved": "Ietaupīts",
+  "menu_open": "Izvēlne",
+  "menu_close": "Aizvērt"
 }

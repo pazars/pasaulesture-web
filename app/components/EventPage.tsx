@@ -128,15 +128,24 @@ export default function EventPage({ event }: EventPageProps) {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <Header currentSlug={event.slug} />
-        <p className="text-center text-beige text-base font-accent tracking-[0.15em] pt-2 pb-1">
+        <p className="hidden sm:block text-center text-beige text-base font-accent tracking-[0.15em] pt-2 pb-1">
           {t("header_subtitle")}
         </p>
 
         {/* Hero Section - Postcard Collage */}
-        <section className="relative w-full min-h-[60vh] sm:min-h-[70vh] overflow-hidden rounded-3xl mx-auto pt-2 pb-8 sm:pb-12" style={{ maxWidth: 'calc(100% - 1rem)', marginLeft: '0.5rem', marginRight: '0.5rem' }}>
+        <section className="relative w-full sm:min-h-[70vh] overflow-visible sm:overflow-hidden rounded-3xl mx-auto pt-2 pb-2 sm:pb-12" style={{ maxWidth: 'calc(100% - 1rem)', marginLeft: '0.5rem', marginRight: '0.5rem' }}>
+
+          {/* Mobile: Event name above date */}
+          <div className="sm:hidden relative z-20 text-center px-6 mb-5">
+            <h2 className={`font-accent text-3xl tracking-wide ${
+              isDakar ? "text-dakar-yellow" : "text-pink"
+            }`}>
+              {t(event.nameKey as any)}
+            </h2>
+          </div>
 
           {/* Elegant Spelled-Out Date - Top */}
-          <div className="relative z-20 flex justify-center px-6 mb-8 sm:mb-12">
+          <div className="relative z-20 flex justify-center px-6 mb-6 sm:mb-12">
             <div className="text-center">
               <h1 className="font-accent text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)] leading-tight">
                 {formattedDate}
@@ -144,8 +153,51 @@ export default function EventPage({ event }: EventPageProps) {
             </div>
           </div>
 
-          {/* Scattered Collage Container */}
-          <div className="relative w-full max-w-4xl mx-auto px-4" style={{ minHeight: '400px' }}>
+          {/* Mobile: Compact postcard collage — stamps tucked into postcard corners */}
+          <div className="sm:hidden relative w-full max-w-xs mx-auto px-4 mb-4">
+            <div className="relative">
+              {/* Main Postcard */}
+              <div className="rotate-[-2deg]">
+                <Image
+                  src={postcardSrc}
+                  alt="Pasaules Tūre Postcard"
+                  width={520}
+                  height={360}
+                  className="rounded-lg shadow-2xl w-full h-auto"
+                  priority
+                />
+              </div>
+
+              {/* Stamp 1 — top-left, overlapping the postcard corner */}
+              <div className="absolute z-20 -top-6 -left-3">
+                <div className="stamp-hover">
+                  <Image
+                    src={stamps[0].src}
+                    alt={stamps[0].alt}
+                    width={70}
+                    height={91}
+                    className="drop-shadow-md rotate-[-12deg]"
+                  />
+                </div>
+              </div>
+
+              {/* Stamp 2 — bottom-right, overlapping the postcard corner */}
+              <div className="absolute z-20 -bottom-5 -right-2">
+                <div className="stamp-hover">
+                  <Image
+                    src={stamps[1].src}
+                    alt={stamps[1].alt}
+                    width={65}
+                    height={85}
+                    className="drop-shadow-md rotate-[10deg]"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop: Scattered Collage Container */}
+          <div className="relative w-full max-w-4xl mx-auto px-4 hidden sm:block" style={{ minHeight: '400px' }}>
 
             {/* Main Postcard - Center, slightly tilted */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rotate-[-2deg]">
@@ -201,7 +253,7 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Extra Stamp 1 - Top Right */}
             <div
-              className="absolute z-15 hidden sm:block"
+              className="absolute z-15"
               style={{
                 right: '3%',
                 top: '15%',
@@ -220,7 +272,7 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Extra Stamp 2 - Bottom Left */}
             <div
-              className="absolute z-15 hidden sm:block"
+              className="absolute z-15"
               style={{
                 left: '2%',
                 bottom: '15%',
@@ -239,8 +291,8 @@ export default function EventPage({ event }: EventPageProps) {
 
           </div>
 
-          {/* Scroll indicator */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+          {/* Scroll indicator (desktop only — mobile layout is compact) */}
+          <div className="hidden sm:block absolute bottom-6 left-1/2 -translate-x-1/2">
             <div className="animate-float">
               <svg className="w-6 h-6 text-beige/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -250,7 +302,7 @@ export default function EventPage({ event }: EventPageProps) {
         </section>
 
         {/* Quote Section - two paragraphs */}
-        <section className="relative py-10 overflow-hidden rounded-3xl mt-6 mx-2">
+        <section className="relative py-6 sm:py-10 overflow-hidden rounded-3xl mt-2 sm:mt-6 mx-2">
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
             <p className="text-xl sm:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-6">
               &ldquo;{t(event.heroQuoteKey as any)}&rdquo;
