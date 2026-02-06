@@ -300,18 +300,19 @@ export default function EventPage({ event }: EventPageProps) {
 
           </div>
 
-          {/* Scroll indicator (desktop only — mobile layout is compact) */}
-          <div className="hidden sm:block absolute bottom-6 left-1/2 -translate-x-1/2">
-            <div className="animate-float">
-              <svg className="w-6 h-6 text-beige/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </div>
+          {/* Route description (desktop only — fills space below collage) */}
+          <div className="hidden sm:block relative z-20 max-w-2xl mx-auto px-6 text-center mt-8">
+            <p className="text-lg md:text-xl lg:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-4">
+              &ldquo;{t(event.heroQuoteKey as any)}&rdquo;
+            </p>
+            <p className="text-base md:text-lg text-beige/70 leading-relaxed">
+              {t(event.heroQuote2Key as any)}
+            </p>
           </div>
         </section>
 
         {/* Quote Section - two paragraphs */}
-        <section className="relative py-6 sm:py-10 overflow-hidden rounded-3xl mt-2 sm:mt-6 mx-2">
+        <section className="relative py-6 overflow-hidden rounded-3xl mt-2 mx-2 sm:hidden">
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
             <p className="text-xl sm:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-6">
               &ldquo;{t(event.heroQuoteKey as any)}&rdquo;
