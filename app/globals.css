@@ -810,6 +810,12 @@ body::after {
   box-shadow: 0 0 0 2px #ef4444;
 }
 
+/* ===== SAFE AREA INSETS ===== */
+/* For notched mobile devices (iPhone X+) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* Country dropdown */
 .PhoneInputCountrySelect {
   position: absolute;

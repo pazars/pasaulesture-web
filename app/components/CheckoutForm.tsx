@@ -156,17 +156,9 @@ export default function CheckoutForm({
     const originalPrice = matchingPrice?.amount ?? 0;
     let finalPrice = originalPrice;
 
-    console.log("finalPrice", finalPrice);
-
     if (discountData && originalPrice > 0) {
         const discountAmount = originalPrice * (discountData.percentOff / 100);
         finalPrice = Math.round(originalPrice - discountAmount);
-        console.log("Discount Applied:", {
-            originalPrice,
-            percentOff: discountData.percentOff,
-            discountAmount,
-            finalPrice
-        });
     }
 
     // Check if dorm is available or user must join waitlist
@@ -207,14 +199,21 @@ export default function CheckoutForm({
         }
 
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        return newErrors;
     };
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setDormFullError(false);
 
-        if (!validateForm()) {
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            // Scroll to first error field
+            const firstErrorKey = Object.keys(validationErrors)[0];
+            const el = document.getElementById(firstErrorKey);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             return;
         }
 
@@ -502,6 +501,7 @@ export default function CheckoutForm({
                     <input
                         type="text"
                         id="name"
+                        autoComplete="name"
                         value={formData.name}
                         onChange={(e) => handleInputChange("name", e.target.value)}
                         className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.name ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
@@ -520,6 +520,8 @@ export default function CheckoutForm({
                     <input
                         type="email"
                         id="email"
+                        autoComplete="email"
+                        inputMode="email"
                         value={formData.email}
                         onChange={(e) => handleInputChange("email", e.target.value)}
                         className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.email ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
@@ -549,7 +551,7 @@ export default function CheckoutForm({
 
                 {/* Accommodation Checkbox */}
                 <div className="-mt-2 !mb-4">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 py-2">
                         <input
                             type="checkbox"
                             id="needsAccommodation"
@@ -569,9 +571,9 @@ export default function CheckoutForm({
 
                     {/* Accommodation Options */}
                     {formData.needsAccommodation && (
-                        <div className="ml-8 mt-3 space-y-3">
+                        <div className="ml-8 mt-3 space-y-1">
                             {/* Dorm Option */}
-                            <label className="flex items-start gap-3 cursor-pointer">
+                            <label className="flex items-start gap-3 py-2 cursor-pointer">
                                 <input
                                     type="radio"
                                     name="accommodationType"
@@ -594,7 +596,7 @@ export default function CheckoutForm({
                             </label>
 
                             {/* Tent Option */}
-                            <label className="flex items-start gap-3 cursor-pointer">
+                            <label className="flex items-start gap-3 py-2 cursor-pointer">
                                 <input
                                     type="radio"
                                     name="accommodationType"
@@ -617,7 +619,7 @@ export default function CheckoutForm({
 
                 {/* Preparation Tips Checkbox */}
                 <div className="space-y-4">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 py-2">
                         <input
                             type="checkbox"
                             id="wantsPreparationTips"
@@ -641,7 +643,7 @@ export default function CheckoutForm({
                             <p className="text-sm font-medium text-slate-700 leading-relaxed">
                                 {t("checkout_tips_channel_label")}
                             </p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                                 {[
                                     { id: 'email', label: 'checkout_tips_channel_email' },
                                     { id: 'website', label: 'checkout_tips_channel_website' },
@@ -650,7 +652,7 @@ export default function CheckoutForm({
                                     { id: 'whatsapp', label: 'checkout_tips_channel_whatsapp' },
                                     { id: 'other', label: 'checkout_tips_channel_other' }
                                 ].map((channel) => (
-                                    <label key={channel.id} className="flex items-center gap-2 cursor-pointer group">
+                                    <label key={channel.id} className="flex items-center gap-2 py-2 cursor-pointer group">
                                         <input
                                             type="checkbox"
                                             value={channel.id}
@@ -678,6 +680,14 @@ export default function CheckoutForm({
 
                 {/* Emergency Contact Section */}
                 <div className="space-y-6 !mt-8">
+                    <div className="flex items-center gap-3">
+                        <div className="h-px flex-1 bg-slate-200" />
+                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                            {t("checkout_emergency_section_label")}
+                        </span>
+                        <div className="h-px flex-1 bg-slate-200" />
+                    </div>
+
                     {/* Emergency Name */}
                     <div>
                         <label htmlFor="emergencyName" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
@@ -686,6 +696,7 @@ export default function CheckoutForm({
                         <input
                             type="text"
                             id="emergencyName"
+                            autoComplete="off"
                             value={formData.emergencyName}
                             onChange={(e) => handleInputChange("emergencyName", e.target.value)}
                             className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.emergencyName ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
@@ -720,7 +731,7 @@ export default function CheckoutForm({
                         {t("checkout_discount_label")}
                     </label>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                         <input
                             type="text"
                             id="discountCode"
@@ -761,7 +772,7 @@ export default function CheckoutForm({
                 </div>
 
                 {/* Terms Acceptance */}
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 py-2">
                     <input
                         type="checkbox"
                         id="terms"
@@ -798,29 +809,31 @@ export default function CheckoutForm({
                     </p>
                 </div>
 
-                {/* Submit Button */}
-                <button
-                    type="submit"
-                    disabled={isSubmitting || priceLoading || showPriceError}
-                    className="w-full py-4 px-6 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 text-white font-semibold text-lg rounded-xl transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
-                >
-                    {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-3">
-                            <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                            </svg>
-                            {t("checkout_submit")}
-                        </span>
-                    ) : (
-                        <span className="flex items-center justify-center gap-2">
-                            {t("checkout_submit")}
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </span>
-                    )}
-                </button>
+                {/* Submit Button - sticky on mobile for visibility */}
+                <div className="sticky bottom-0 sm:static bg-white/95 backdrop-blur-sm sm:backdrop-blur-none -mx-6 px-6 py-4 sm:py-0 sm:mx-0 sm:px-0 border-t border-slate-100 sm:border-t-0 pb-safe">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting || priceLoading || showPriceError}
+                        className="w-full py-4 px-6 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 text-white font-semibold text-lg rounded-xl transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? (
+                            <span className="flex items-center justify-center gap-3">
+                                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                </svg>
+                                {t("checkout_submit")}
+                            </span>
+                        ) : (
+                            <span className="flex items-center justify-center gap-2">
+                                {t("checkout_submit")}
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </span>
+                        )}
+                    </button>
+                </div>
             </form>
         </div>
     );

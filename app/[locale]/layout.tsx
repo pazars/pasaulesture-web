@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import "../globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
@@ -83,6 +83,10 @@ export async function generateMetadata({
     },
   };
 }
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
 
 export default async function LocaleLayout({
   children,
