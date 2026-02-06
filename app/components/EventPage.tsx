@@ -45,7 +45,6 @@ export default function EventPage({ event }: EventPageProps) {
   const t = useTranslations();
   const locale = useLocale();
   const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(event.distances.length - 1);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [showToast, setShowToast] = useState(false);
 
@@ -67,7 +66,6 @@ export default function EventPage({ event }: EventPageProps) {
     ];
 
   useEffect(() => {
-    setIsLoaded(true);
     const savedDistance = localStorage.getItem(`last_distance_${event.slug}`);
     if (savedDistance !== null) {
       const index = parseInt(savedDistance, 10);
@@ -130,15 +128,16 @@ export default function EventPage({ event }: EventPageProps) {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <Header currentSlug={event.slug} />
+        <p className="text-center text-beige text-base font-accent tracking-[0.15em] pt-2 pb-1">
+          {t("header_subtitle")}
+        </p>
 
         {/* Hero Section - Postcard Collage */}
-        <section className="relative w-full min-h-[60vh] sm:min-h-[70vh] overflow-hidden rounded-3xl mx-auto py-8 sm:py-12" style={{ maxWidth: 'calc(100% - 1rem)', marginLeft: '0.5rem', marginRight: '0.5rem' }}>
+        <section className="relative w-full min-h-[60vh] sm:min-h-[70vh] overflow-hidden rounded-3xl mx-auto pt-2 pb-8 sm:pb-12" style={{ maxWidth: 'calc(100% - 1rem)', marginLeft: '0.5rem', marginRight: '0.5rem' }}>
 
           {/* Elegant Spelled-Out Date - Top */}
           <div className="relative z-20 flex justify-center px-6 mb-8 sm:mb-12">
-            <div
-              className={`text-center transition-all duration-1200 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8"}`}
-            >
+            <div className="text-center">
               <h1 className="font-accent text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)] leading-tight">
                 {formattedDate}
               </h1>
@@ -149,10 +148,7 @@ export default function EventPage({ event }: EventPageProps) {
           <div className="relative w-full max-w-4xl mx-auto px-4" style={{ minHeight: '400px' }}>
 
             {/* Main Postcard - Center, slightly tilted */}
-            <div
-              className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 transition-all duration-1000 ${isLoaded ? "opacity-100 scale-100 rotate-[-2deg]" : "opacity-0 scale-90 rotate-0"}`}
-              style={{ transitionDelay: '200ms' }}
-            >
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rotate-[-2deg]">
               <div className="relative group">
                 <Image
                   src={postcardSrc}
@@ -167,11 +163,10 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Stamp 1 - Top Left, tilted */}
             <div
-              className={`absolute z-20 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8"}`}
+              className="absolute z-20"
               style={{
                 left: '5%',
                 top: '5%',
-                transitionDelay: '400ms'
               }}
             >
               <div className="stamp-hover">
@@ -187,11 +182,10 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Stamp 2 - Bottom Right, tilted other way */}
             <div
-              className={`absolute z-20 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+              className="absolute z-20"
               style={{
                 right: '8%',
                 bottom: '10%',
-                transitionDelay: '600ms'
               }}
             >
               <div className="stamp-hover">
@@ -207,11 +201,10 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Extra Stamp 1 - Top Right */}
             <div
-              className={`absolute z-15 transition-all duration-700 hidden sm:block ${isLoaded ? "opacity-100" : "opacity-0"}`}
+              className="absolute z-15 hidden sm:block"
               style={{
                 right: '3%',
                 top: '15%',
-                transitionDelay: '700ms'
               }}
             >
               <div className="stamp-hover">
@@ -227,11 +220,10 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Extra Stamp 2 - Bottom Left */}
             <div
-              className={`absolute z-15 transition-all duration-700 hidden sm:block ${isLoaded ? "opacity-100" : "opacity-0"}`}
+              className="absolute z-15 hidden sm:block"
               style={{
                 left: '2%',
                 bottom: '15%',
-                transitionDelay: '800ms'
               }}
             >
               <div className="stamp-hover">
@@ -248,9 +240,7 @@ export default function EventPage({ event }: EventPageProps) {
           </div>
 
           {/* Scroll indicator */}
-          <div
-            className={`absolute bottom-6 left-1/2 -translate-x-1/2 transition-all duration-1000 delay-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}
-          >
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
             <div className="animate-float">
               <svg className="w-6 h-6 text-beige/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -412,7 +402,6 @@ export default function EventPage({ event }: EventPageProps) {
         {event.gallery && event.gallery.length > 0 && (
           <Gallery
             images={event.gallery}
-            title={t("section_gallery")}
           />
         )}
 
@@ -447,11 +436,6 @@ export default function EventPage({ event }: EventPageProps) {
 
           {/* CTA content — sits on top */}
           <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
-            <h2 className={`font-accent text-3xl sm:text-4xl mb-8 ${isDakar ? "text-dakar-cream" : "text-beige"
-              }`}>
-              {t("register_heading")}
-            </h2>
-
             {isDakar ? (
               <button
                 onClick={handleRegistrationClick}

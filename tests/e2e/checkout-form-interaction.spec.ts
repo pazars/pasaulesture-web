@@ -5,7 +5,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
     // Set Latvian locale for consistent testing
     await context.addCookies([
       {
-        name: "language_preference",
+        name: "NEXT_LOCALE",
         value: "lv",
         domain: "localhost",
         path: "/",

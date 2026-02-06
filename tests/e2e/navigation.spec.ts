@@ -4,7 +4,7 @@ test.describe('Navigation', () => {
   test.describe('Event navigation', () => {
     test('should maintain locale when navigating between events in LV', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -27,7 +27,7 @@ test.describe('Navigation', () => {
 
     test('should maintain locale when navigating between events in EN', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -51,7 +51,7 @@ test.describe('Navigation', () => {
   test.describe('Footer links', () => {
     test('should maintain locale when clicking footer links in LV', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -70,7 +70,7 @@ test.describe('Navigation', () => {
 
     test('should maintain locale when clicking footer links in EN', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -88,7 +88,7 @@ test.describe('Navigation', () => {
 
     test('should navigate to terms page and maintain locale in LV', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -107,7 +107,7 @@ test.describe('Navigation', () => {
 
     test('should navigate to terms page and maintain locale in EN', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -127,7 +127,7 @@ test.describe('Navigation', () => {
   test.describe('Browser navigation', () => {
     test('should work correctly with browser back button in LV', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -152,7 +152,7 @@ test.describe('Navigation', () => {
 
     test('should work correctly with browser back button in EN', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -177,7 +177,7 @@ test.describe('Navigation', () => {
 
     test('should work correctly with browser forward button', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -202,7 +202,7 @@ test.describe('Navigation', () => {
   test.describe('Direct URL access', () => {
     test('should handle direct URL access to event page in LV', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -219,7 +219,7 @@ test.describe('Navigation', () => {
 
     test('should handle direct URL access to event page in EN', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -239,7 +239,7 @@ test.describe('Navigation', () => {
   test.describe('External links', () => {
     test('should have contact link with proper mailto', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -256,7 +256,7 @@ test.describe('Navigation', () => {
 
     test('should have location links with proper Google Maps URLs', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',

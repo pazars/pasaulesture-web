@@ -5,7 +5,7 @@ test.describe("Payment Flow E2E", () => {
     // Set Latvian locale
     await context.addCookies([
       {
-        name: "language_preference",
+        name: "NEXT_LOCALE",
         value: "lv",
         domain: "localhost",
         path: "/",
@@ -169,7 +169,7 @@ test.describe("Payment Flow E2E", () => {
       await context.clearCookies();
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",

@@ -89,7 +89,7 @@ export default function LanguageSwitcher({ isDakar = false }: LanguageSwitcherPr
             onClick={() => {
               handleLocaleChange(locale);
             }}
-            className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer ${
+            className={`px-3 pt-[7px] pb-[5px] rounded-full text-sm font-semibold leading-none transition-all cursor-pointer ${
               isActive
                 ? isDakar
                   ? "bg-dakar-cream text-dakar-brown"

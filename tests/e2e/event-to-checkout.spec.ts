@@ -6,7 +6,7 @@ test.describe("Event to Checkout Flow", () => {
     await context.clearCookies();
     await context.addCookies([
       {
-        name: "language_preference",
+        name: "NEXT_LOCALE",
         value: "lv",
         domain: "localhost",
         path: "/",
@@ -47,7 +47,7 @@ test.describe("Event to Checkout Flow", () => {
       await context.clearCookies();
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",

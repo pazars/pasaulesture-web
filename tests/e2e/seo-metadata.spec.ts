@@ -4,7 +4,7 @@ test.describe('SEO and Metadata', () => {
   test.describe('HTML lang attribute', () => {
     test('should have lang="lv" for Latvian pages', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -18,7 +18,7 @@ test.describe('SEO and Metadata', () => {
 
     test('should have lang="en" for English pages', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -34,7 +34,7 @@ test.describe('SEO and Metadata', () => {
   test.describe('Page titles', () => {
     test('should have consistent title for LV pages', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -48,7 +48,7 @@ test.describe('SEO and Metadata', () => {
 
     test('should have title without macron for EN pages', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -62,7 +62,7 @@ test.describe('SEO and Metadata', () => {
 
     test('should have title for static pages in LV', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -76,7 +76,7 @@ test.describe('SEO and Metadata', () => {
 
     test('should have title for static pages in EN', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -92,7 +92,7 @@ test.describe('SEO and Metadata', () => {
   test.describe('Meta descriptions', () => {
     test('should have Latvian meta description for LV pages', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -107,7 +107,7 @@ test.describe('SEO and Metadata', () => {
 
     test('should have English meta description for EN pages', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -124,7 +124,7 @@ test.describe('SEO and Metadata', () => {
   test.describe('Viewport and charset', () => {
     test('should have viewport meta tag', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -139,7 +139,7 @@ test.describe('SEO and Metadata', () => {
 
     test('should have UTF-8 charset', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -155,7 +155,7 @@ test.describe('SEO and Metadata', () => {
   test.describe('Favicon', () => {
     test('should have favicon link', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -172,7 +172,7 @@ test.describe('SEO and Metadata', () => {
   test.describe('Accessibility', () => {
     test('should have proper heading hierarchy in LV', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',
@@ -190,7 +190,7 @@ test.describe('SEO and Metadata', () => {
 
     test('should have proper heading hierarchy in EN', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'en',
         domain: 'localhost',
         path: '/',
@@ -208,7 +208,7 @@ test.describe('SEO and Metadata', () => {
 
     test('should have ARIA labels for navigation elements', async ({ page, context }) => {
       await context.addCookies([{
-        name: 'language_preference',
+        name: 'NEXT_LOCALE',
         value: 'lv',
         domain: 'localhost',
         path: '/',

@@ -8,7 +8,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -34,7 +34,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -60,7 +60,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -81,7 +81,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -103,7 +103,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -124,7 +124,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -148,7 +148,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -168,7 +168,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -188,7 +188,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -210,7 +210,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -236,7 +236,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -272,7 +272,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -296,7 +296,7 @@ test.describe("Checkout Page - Loading & Routing", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",

@@ -4,7 +4,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
   test.beforeEach(async ({ page, context }) => {
     await context.addCookies([
       {
-        name: "language_preference",
+        name: "NEXT_LOCALE",
         value: "lv",
         domain: "localhost",
         path: "/",
@@ -316,7 +316,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
       await context.clearCookies();
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",

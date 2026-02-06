@@ -14,6 +14,9 @@ Pasaules Tūre website - a Next.js 16 application for ultra cycling events in La
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
+### Troubleshooting
+- `rm -rf .next` - Clear Next.js cache. Do this after branch switches or if styles/pages look stale, then restart the dev server.
+
 ### Testing
 - `npm test` - Run unit tests (Vitest)
 - `npm run test:e2e` - Run E2E tests (Playwright, all browsers)
@@ -83,8 +86,10 @@ tests/
 - **Redirect behavior**: `/lv/...` always redirects to clean URL
 
 ### Locale Detection Priority (proxy.ts)
-1. `language_preference` cookie (expires after 30 days)
+1. `NEXT_LOCALE` cookie (expires after 30 days)
 2. Default to Latvian (`lv`)
+
+**Note:** `localeDetection` is set to `false` — the browser's `Accept-Language` header is intentionally ignored.
 
 ### Translation Files
 - Located in `messages/lv.json` and `messages/en.json`
@@ -228,3 +233,70 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 **Getting environment variables:**
 - Vercel integration: `vercel env pull --environment development`
+- Neon directly: Copy from Neon dashboard
+
+### Local Development
+See [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md) for complete setup guide.
+
+**Quick start:**
+1. Create Stripe products with metadata (`event_slug`, `distance_index`)
+2. Set up `.env.local` with API keys (use `vercel env pull` for Neon)
+3. Run database migration: `npm run db:migrate`
+4. Start webhook listener: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
+5. Test with card `4242 4242 4242 4242`
+
+### Testing
+- Unit tests: `npm test` (API routes, price matching, webhook handling)
+- E2E tests: `npm run test:e2e` (full checkout flow)
+- Manual: Use Stripe test cards (see docs)
+
+### Database Schema
+
+The `registrations` table tracks registration lifecycle:
+
+```sql
+CREATE TABLE registrations (
+  id SERIAL PRIMARY KEY,
+  stripe_session_id VARCHAR(255) UNIQUE NOT NULL,
+  stripe_payment_intent_id VARCHAR(255),
+  amount_paid INT,                           -- NULL until payment completes
+  currency VARCHAR(3) DEFAULT 'eur',
+  event_slug VARCHAR(100) NOT NULL,
+  distance_index INT NOT NULL,
+  participant_name VARCHAR(255) NOT NULL,
+  participant_email VARCHAR(255) NOT NULL,
+  locale VARCHAR(5) DEFAULT 'lv',
+  payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- pending, completed, expired, failed
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**Payment Status Flow:**
+1. `pending` - Created when checkout session starts (before Stripe redirect)
+2. `completed` - Updated by webhook when `checkout.session.completed` fires
+3. `expired` - Updated by webhook when `checkout.session.expired` fires (user abandoned)
+
+### Product Metadata
+
+Each Stripe product must have these metadata fields:
+- `event_slug` - Maps to `events` object key (e.g., `egipte-malta`)
+- `distance_index` - Zero-based index in `event.distances` array (e.g., `0`, `1`)
+
+## Deployment
+
+### Translation Updates
+
+**Workflow:**
+1. Edit translations in `messages/lv.json` or `messages/en.json`
+2. Commit the message files
+3. Push to deploy
+
+**Notes:**
+- next-intl loads translations at runtime from JSON files - no compilation step needed
+- Translation files are automatically included in the build
+- Changes to translations take effect immediately after deployment
+
+## Change Log
+
+Each Claude Code session creates a markdown file in `docs/changes/` named `YYYY-MM-DD-short-description.md` documenting all changes, reasoning, and affected files. See `docs/changes/` for the full history.

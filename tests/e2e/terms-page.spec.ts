@@ -8,7 +8,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -29,7 +29,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -50,7 +50,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -75,7 +75,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -102,7 +102,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -127,7 +127,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -152,7 +152,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -178,7 +178,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -206,7 +206,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -237,7 +237,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -268,7 +268,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -297,7 +297,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -321,7 +321,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -344,7 +344,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -368,7 +368,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -393,7 +393,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -414,7 +414,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -440,7 +440,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -463,7 +463,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -488,7 +488,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -507,7 +507,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -523,7 +523,7 @@ test.describe("Terms Page", () => {
     test("should have page title in Latvian", async ({ page, context }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -541,7 +541,7 @@ test.describe("Terms Page", () => {
     test("should have page title in English", async ({ page, context }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
@@ -563,7 +563,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -585,7 +585,7 @@ test.describe("Terms Page", () => {
     test("should be keyboard navigable", async ({ page, context }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -611,7 +611,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "lv",
           domain: "localhost",
           path: "/",
@@ -636,7 +636,7 @@ test.describe("Terms Page", () => {
     }) => {
       await context.addCookies([
         {
-          name: "language_preference",
+          name: "NEXT_LOCALE",
           value: "en",
           domain: "localhost",
           path: "/",
