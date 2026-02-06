@@ -370,7 +370,7 @@ export default function EventPage({ event }: EventPageProps) {
                     <button
                       key={distance.nameKey}
                       onClick={() => handleDistanceSelect(index)}
-                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden min-w-40 cursor-pointer ${isSelected
+                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden w-full sm:w-auto sm:min-w-40 cursor-pointer ${isSelected
                         ? isDakar
                           ? "bg-dakar-cream text-dakar-brown shadow-lg shadow-dakar-cream/40 scale-105"
                           : "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
@@ -401,7 +401,7 @@ export default function EventPage({ event }: EventPageProps) {
         )}
 
         {/* Route Section */}
-        <section className="py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">
+        <section className="py-10 sm:py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">
           <div className="max-w-5xl mx-auto px-6 relative z-10">
             <div className="text-center mb-10">
               <h2 className="font-accent text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
@@ -413,10 +413,10 @@ export default function EventPage({ event }: EventPageProps) {
                 <iframe
                   src={selectedDistance.distanceEmbedUrl}
                   title="Route Map"
+                  className="h-[400px] sm:h-[700px]"
                   style={{
                     width: '1px',
                     minWidth: '100%',
-                    height: '700px',
                     border: 'none',
                     overflow: "hidden"
                   }}
@@ -524,7 +524,7 @@ export default function EventPage({ event }: EventPageProps) {
             </div>
 
             {/* Links centered below */}
-            <nav className="flex justify-center gap-8">
+            <nav className="flex justify-center gap-4 sm:gap-8">
               <Link
                 href={locale === "en" ? "/en/privatuma-politika" : "/privatuma-politika"}
                 className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-dakar-yellow" : "hover:text-pink"

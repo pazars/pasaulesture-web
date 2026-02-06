@@ -174,7 +174,7 @@ export default function FAQ({ isDakar = false }: FAQProps) {
   };
 
   return (
-    <section className="py-20 relative overflow-hidden rounded-3xl mt-6 mx-2">
+    <section className="py-12 sm:py-20 relative overflow-hidden rounded-3xl mt-6 mx-2">
       <div className="max-w-3xl mx-auto px-6 relative z-10">
         {/* Section header - clean, no badge */}
         <div className="text-center mb-12">
@@ -217,7 +217,7 @@ export default function FAQ({ isDakar = false }: FAQProps) {
                 >
                   <div className="overflow-hidden">
                     <div className="px-6 pb-6 pt-2">
-                      <div className={`pl-12 border-l-4 ${isDakar ? "border-beige/40" : "border-pink/40"
+                      <div className={`pl-4 sm:pl-12 border-l-4 ${isDakar ? "border-beige/40" : "border-pink/40"
                         }`}>
                         <div className="text-beige/90 leading-relaxed">
                           {formatText(t(item.answerKey as any))}
