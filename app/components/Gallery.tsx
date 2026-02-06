@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface GalleryProps {
     images: string[];
@@ -11,10 +11,35 @@ interface GalleryProps {
 export default function Gallery({ images, title }: GalleryProps) {
     const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
+    const touchStartX = useRef<number | null>(null);
+
     const openLightbox = (index: number) => setSelectedImage(index);
     const closeLightbox = () => setSelectedImage(null);
     const nextImage = () => setSelectedImage((prev) => (prev !== null ? (prev + 1) % images.length : null));
     const prevImage = () => setSelectedImage((prev) => (prev !== null ? (prev - 1 + images.length) % images.length : null));
+
+    useEffect(() => {
+        if (selectedImage === null) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "ArrowRight") nextImage();
+            else if (e.key === "ArrowLeft") prevImage();
+            else if (e.key === "Escape") closeLightbox();
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [selectedImage]);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        if (touchStartX.current === null) return;
+        const delta = e.changedTouches[0].clientX - touchStartX.current;
+        touchStartX.current = null;
+        if (delta < -50) nextImage();
+        else if (delta > 50) prevImage();
+    };
 
     return (
         <section className="py-16 px-6 max-w-5xl mx-auto">
@@ -57,7 +82,7 @@ export default function Gallery({ images, title }: GalleryProps) {
 
             {/* Lightbox */}
             {selectedImage !== null && (
-                <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 animate-in fade-in duration-300" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
                     <button
                         onClick={closeLightbox}
                         className="absolute top-6 right-6 text-white/50 hover:text-white p-2 transition-colors z-[60]"
