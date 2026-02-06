@@ -47,6 +47,15 @@ export default function EventPage({ event }: EventPageProps) {
   const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(event.distances.length - 1);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [showToast, setShowToast] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
@@ -411,7 +420,7 @@ export default function EventPage({ event }: EventPageProps) {
             {selectedDistance.distanceEmbedUrl ? (
               <div className="bg-white p-3 rounded-xl">
                 <iframe
-                  src={selectedDistance.distanceEmbedUrl}
+                  src={selectedDistance.distanceEmbedUrl.replace(/sampleGraph=(true|false)/, `sampleGraph=${!isMobile}`)}
                   title="Route Map"
                   className="h-[400px] sm:h-[700px]"
                   style={{
