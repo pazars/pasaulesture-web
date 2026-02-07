@@ -52,15 +52,6 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      // Debug logging
-      console.log('Session retrieved:', {
-        id: session.id,
-        payment_intent: session.payment_intent,
-        amount_total: session.amount_total,
-        currency: session.currency,
-        metadata: session.metadata,
-      });
-
       try {
         const {
           event_slug,
