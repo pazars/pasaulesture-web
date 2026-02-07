@@ -156,7 +156,7 @@ export default function EventPage({ event }: EventPageProps) {
           {/* Elegant Spelled-Out Date - Top */}
           <div className="relative z-20 flex justify-center px-6 mb-6 sm:mb-12">
             <div className="text-center">
-              <h1 className="font-accent text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)] leading-tight">
+              <h1 className="font-accent text-[clamp(1.5rem,7.5vw,2.25rem)] sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)] leading-tight whitespace-nowrap">
                 {formattedDate}
               </h1>
             </div>
@@ -411,11 +411,13 @@ export default function EventPage({ event }: EventPageProps) {
         )}
 
         {/* Route Section */}
-        <section className="py-10 sm:py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">
+        <section id="route" className="py-10 sm:py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">
           <div className="max-w-5xl mx-auto px-6 relative z-10">
             <div className="text-center mb-10">
               <h2 className="font-accent text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
               <div className="section-divider w-24 mx-auto" />
+              {/* TODO: Remove isDakar check once Parīze-Dakāra route is revealed */}
+              {!isDakar && <p className="sm:hidden text-beige/40 text-sm mt-3">{t("route_best_on_pc")}</p>}
             </div>
 
             {selectedDistance.distanceEmbedUrl ? (
@@ -435,20 +437,24 @@ export default function EventPage({ event }: EventPageProps) {
             ) : (
               <div className="w-full bg-white/5 rounded-xl flex items-center justify-center border-2 border-dashed border-white/20 py-12 px-6">
                 <div className="text-center">
-                  <svg className="w-16 h-16 text-beige/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7" />
-                  </svg>
+                  <span className="block text-5xl mb-4" role="img" aria-hidden="true">👀</span>
                   {isDakar ? (
                     <>
                       <p className="text-beige/70 text-lg font-medium mb-6">{t("route_reveal_countdown")}</p>
-                      <div className="flex justify-center items-baseline gap-2">
-                        <span className="font-accent text-3xl sm:text-5xl text-beige">{countdown.days}d</span>
-                        <span className="font-accent text-3xl sm:text-5xl text-beige/30">:</span>
-                        <span className="font-accent text-3xl sm:text-5xl text-beige">{countdown.hours.toString().padStart(2, '0')}h</span>
-                        <span className="font-accent text-3xl sm:text-5xl text-beige/30">:</span>
-                        <span className="font-accent text-3xl sm:text-5xl text-beige">{countdown.minutes.toString().padStart(2, '0')}m</span>
-                        <span className="font-accent text-3xl sm:text-5xl text-beige/30">:</span>
-                        <span className="font-accent text-3xl sm:text-5xl text-beige">{countdown.seconds.toString().padStart(2, '0')}s</span>
+                      <div className="grid grid-cols-4 gap-3 sm:gap-5 w-full max-w-xs sm:max-w-md mx-auto">
+                        {[
+                          { value: countdown.days, label: t("countdown_days", { count: countdown.days }) },
+                          { value: countdown.hours, label: t("countdown_hours", { count: countdown.hours }) },
+                          { value: countdown.minutes, label: t("countdown_minutes", { count: countdown.minutes }) },
+                          { value: countdown.seconds, label: t("countdown_seconds", { count: countdown.seconds }) },
+                        ].map((unit) => (
+                          <div key={unit.label} className="text-center">
+                            <span className="block font-sans tabular-nums text-3xl sm:text-5xl text-beige font-bold">
+                              {unit.value.toString().padStart(2, '0')}
+                            </span>
+                            <span className="block text-beige/40 text-xs sm:text-sm mt-1">{unit.label}</span>
+                          </div>
+                        ))}
                       </div>
                     </>
                   ) : (
@@ -468,7 +474,7 @@ export default function EventPage({ event }: EventPageProps) {
         )}
 
         {/* Registration Section - collage style */}
-        <section className="relative py-12 sm:py-16 mt-6 mx-2">
+        <section id="register" className="relative py-6 sm:py-16 mt-2 sm:mt-6 mx-2">
 
           {/* Left stamp - sits above text, slightly askew */}
           <div className="absolute z-10 hidden sm:block" style={{ left: '8%', top: '50%', transform: 'translateY(-50%)' }}>

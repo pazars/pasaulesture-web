@@ -174,7 +174,7 @@ export default function FAQ({ isDakar = false }: FAQProps) {
   };
 
   return (
-    <section className="py-12 sm:py-20 relative overflow-hidden rounded-3xl mt-6 mx-2">
+    <section id="faq" className="py-12 sm:py-20 relative overflow-hidden rounded-3xl mt-2 sm:mt-6 mx-2">
       <div className="max-w-3xl mx-auto px-6 relative z-10">
         {/* Section header - clean, no badge */}
         <div className="text-center mb-12">

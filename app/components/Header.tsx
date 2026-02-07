@@ -6,7 +6,7 @@ import { events } from "@/app/data/events";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { InstagramIcon, MenuIcon } from "./Icons";
 import MobileMenu from "./MobileMenu";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface HeaderProps {
   currentSlug: string;
@@ -14,14 +14,16 @@ interface HeaderProps {
 
 export default function Header({ currentSlug }: HeaderProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const allEvents = Object.values(events);
   const isDakar = currentSlug === "parize-dakara";
   const [menuOpen, setMenuOpen] = useState(false);
+  const localePath = (slug: string) => `/${locale === "en" ? "en/" : ""}${slug}`;
 
   return (
     <>
       {/* Mobile header bar (<640px) */}
-      <header className="sm:hidden bg-transparent py-4 px-4">
+      <header className="sm:hidden bg-transparent pt-4 px-4">
         <div className="flex items-center justify-between">
           {/* Hamburger */}
           <button
@@ -49,6 +51,42 @@ export default function Header({ currentSlug }: HeaderProps) {
           {/* Spacer for symmetry */}
           <div className="w-11" aria-hidden="true" />
         </div>
+
+        {/* Mobile event switcher tabs */}
+        <nav className="mt-3 px-2 pb-3">
+          <div className={`flex rounded-full p-1 border ${
+            isDakar
+              ? "bg-dakar-brown/30 border-dakar-cream/12"
+              : "bg-blue/30 border-white/10"
+          } backdrop-blur-md`}>
+            {allEvents.map((e) => {
+              const isCurrent = e.slug === currentSlug;
+              const eventName = t(e.nameKey as any);
+              const isTabDakar = e.slug === "parize-dakara";
+
+              return isCurrent ? (
+                <span
+                  key={e.slug}
+                  className={`flex-1 text-center py-2 rounded-full font-accent font-bold text-sm cursor-default transition-all ${
+                    isTabDakar
+                      ? "bg-dakar-cream text-dakar-brown shadow-md shadow-dakar-cream/25"
+                      : "bg-pink text-blue shadow-md shadow-pink/25"
+                  }`}
+                >
+                  {eventName}
+                </span>
+              ) : (
+                <Link
+                  key={e.slug}
+                  href={localePath(e.slug)}
+                  className="flex-1 text-center py-2 rounded-full font-accent font-semibold text-sm text-beige/50 transition-all active:scale-95"
+                >
+                  {eventName}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
       </header>
 
       {/* Mobile menu overlay */}
@@ -81,7 +119,7 @@ export default function Header({ currentSlug }: HeaderProps) {
                 ) : (
                   <Link
                     key={e.slug}
-                    href={`/${e.slug}`}
+                    href={localePath(e.slug)}
                     className={`px-8 py-3.5 rounded-full font-accent font-semibold text-lg transition-all whitespace-nowrap ${
                       isDakar
                         ? "text-beige/80 hover:text-beige hover:bg-dakar-cream/10"

@@ -3,10 +3,9 @@
 import { useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Suspense } from "react";
-import { events } from "@/app/data/events";
 import { CloseIcon, InstagramIcon } from "./Icons";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface MobileMenuProps {
   currentSlug: string;
@@ -16,10 +15,19 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ currentSlug, isOpen, onClose }: MobileMenuProps) {
   const t = useTranslations();
-  const allEvents = Object.values(events);
+  const locale = useLocale();
   const isDakar = currentSlug === "parize-dakara";
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  const checkoutPath = `/${locale === "en" ? "en/" : ""}${currentSlug}/checkout`;
+
+  const scrollTo = (id: string) => {
+    onClose();
+    setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }, 150);
+  };
 
   // Lock body scroll when open
   useEffect(() => {
@@ -70,6 +78,12 @@ export default function MobileMenu({ currentSlug, isOpen, onClose }: MobileMenuP
 
   if (!isOpen) return null;
 
+  const linkClass = `block text-center px-6 py-4 rounded-2xl font-accent font-semibold text-lg transition-all ${
+    isDakar
+      ? "text-beige bg-beige/8 active:bg-beige/15"
+      : "text-beige bg-white/8 active:bg-white/15"
+  }`;
+
   return (
     <div className="fixed inset-0 z-50 sm:hidden" onKeyDown={handleKeyDown}>
       {/* Backdrop */}
@@ -105,37 +119,25 @@ export default function MobileMenu({ currentSlug, isOpen, onClose }: MobileMenuP
           </button>
         </div>
 
-        {/* Event buttons */}
+        {/* Page navigation */}
         <nav className="px-6 pb-2 flex flex-col gap-3">
-          {allEvents.map((e) => {
-            const isCurrent = e.slug === currentSlug;
-            const eventName = t(e.nameKey as any);
-            return isCurrent ? (
-              <span
-                key={e.slug}
-                className={`block text-center px-6 py-4 rounded-2xl font-accent font-bold text-lg ${
-                  isDakar
-                    ? "bg-dakar-cream text-dakar-brown shadow-lg shadow-dakar-cream/30"
-                    : "bg-pink text-blue shadow-lg shadow-pink/30"
-                }`}
-              >
-                {eventName}
-              </span>
-            ) : (
-              <Link
-                key={e.slug}
-                href={`/${e.slug}`}
-                onClick={onClose}
-                className={`block text-center px-6 py-4 rounded-2xl font-accent font-semibold text-lg transition-all ${
-                  isDakar
-                    ? "text-beige bg-beige/8 hover:bg-beige/15"
-                    : "text-beige bg-white/8 hover:bg-white/15"
-                }`}
-              >
-                {eventName}
-              </Link>
-            );
-          })}
+          <Link
+            href={checkoutPath}
+            onClick={onClose}
+            className={`block text-center px-6 py-4 rounded-2xl font-accent font-bold text-lg transition-all ${
+              isDakar
+                ? "bg-dakar-cream text-dakar-brown shadow-lg shadow-dakar-cream/30 active:shadow-dakar-cream/50"
+                : "bg-pink text-blue shadow-lg shadow-pink/30 active:shadow-pink/50"
+            }`}
+          >
+            {t("register_button")}
+          </Link>
+          <button onClick={() => scrollTo("route")} className={linkClass}>
+            {t("section_route")}
+          </button>
+          <button onClick={() => scrollTo("faq")} className={linkClass}>
+            {t("faq_badge")}
+          </button>
         </nav>
 
         {/* Bottom row: Instagram + Language Switcher */}
