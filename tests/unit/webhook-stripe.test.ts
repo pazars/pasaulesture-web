@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 
 // Create persistent mock functions
 const mockConstructEvent = vi.fn();
+const mockSessionRetrieve = vi.fn();
 const mockSql = vi.fn();
 
 // Mock the modules
@@ -10,6 +11,11 @@ vi.mock('@/app/lib/stripe', () => ({
   getStripeClient: vi.fn(() => ({
     webhooks: {
       constructEvent: mockConstructEvent,
+    },
+    checkout: {
+      sessions: {
+        retrieve: mockSessionRetrieve,
+      },
     },
   })),
 }));
@@ -45,26 +51,29 @@ describe('POST /api/webhooks/stripe', () => {
   });
 
   it('should update existing pending registration on checkout.session.completed', async () => {
+    const sessionData = {
+      id: 'cs_test_123',
+      payment_intent: 'pi_test_123',
+      amount_total: 6900,
+      currency: 'eur',
+      metadata: {
+        event_slug: 'egipte-malta',
+        distance_index: '0',
+        participant_name: 'Jānis Bērziņš',
+        participant_email: 'janis@example.com',
+        locale: 'lv',
+      },
+    };
+
     const mockEvent = {
       type: 'checkout.session.completed',
       data: {
-        object: {
-          id: 'cs_test_123',
-          payment_intent: 'pi_test_123',
-          amount_total: 6900,
-          currency: 'eur',
-          metadata: {
-            event_slug: 'egipte-malta',
-            distance_index: '0',
-            participant_name: 'Jānis Bērziņš',
-            participant_email: 'janis@example.com',
-            locale: 'lv',
-          },
-        },
+        object: sessionData,
       },
     };
 
     mockConstructEvent.mockReturnValue(mockEvent);
+    mockSessionRetrieve.mockResolvedValue(sessionData);
     // First call is UPDATE (returns 1 row updated)
     mockSql.mockResolvedValueOnce([{ id: 1 }] as any);
 
@@ -85,26 +94,29 @@ describe('POST /api/webhooks/stripe', () => {
   });
 
   it('should insert new registration if no pending registration exists', async () => {
+    const sessionData = {
+      id: 'cs_test_456',
+      payment_intent: 'pi_test_456',
+      amount_total: 6900,
+      currency: 'eur',
+      metadata: {
+        event_slug: 'egipte-malta',
+        distance_index: '0',
+        participant_name: 'Test User',
+        participant_email: 'test@example.com',
+        locale: 'lv',
+      },
+    };
+
     const mockEvent = {
       type: 'checkout.session.completed',
       data: {
-        object: {
-          id: 'cs_test_456',
-          payment_intent: 'pi_test_456',
-          amount_total: 6900,
-          currency: 'eur',
-          metadata: {
-            event_slug: 'egipte-malta',
-            distance_index: '0',
-            participant_name: 'Test User',
-            participant_email: 'test@example.com',
-            locale: 'lv',
-          },
-        },
+        object: sessionData,
       },
     };
 
     mockConstructEvent.mockReturnValue(mockEvent);
+    mockSessionRetrieve.mockResolvedValue(sessionData);
     // First call is UPDATE (returns 0 rows - no pending registration)
     mockSql.mockResolvedValueOnce([] as any);
     // Second call is INSERT
@@ -127,26 +139,29 @@ describe('POST /api/webhooks/stripe', () => {
   });
 
   it('should return 200 even if database insert fails (idempotent)', async () => {
+    const sessionData = {
+      id: 'cs_test_123',
+      payment_intent: 'pi_test_123',
+      amount_total: 6900,
+      currency: 'eur',
+      metadata: {
+        event_slug: 'egipte-malta',
+        distance_index: '0',
+        participant_name: 'Test',
+        participant_email: 'test@example.com',
+        locale: 'lv',
+      },
+    };
+
     const mockEvent = {
       type: 'checkout.session.completed',
       data: {
-        object: {
-          id: 'cs_test_123',
-          payment_intent: 'pi_test_123',
-          amount_total: 6900,
-          currency: 'eur',
-          metadata: {
-            event_slug: 'egipte-malta',
-            distance_index: '0',
-            participant_name: 'Test',
-            participant_email: 'test@example.com',
-            locale: 'lv',
-          },
-        },
+        object: sessionData,
       },
     };
 
     mockConstructEvent.mockReturnValue(mockEvent);
+    mockSessionRetrieve.mockResolvedValue(sessionData);
     mockSql.mockRejectedValue(new Error('Database error'));
 
     const { POST } = await import('@/app/api/webhooks/stripe/route');

@@ -1,16 +1,8 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Payment Flow E2E", () => {
-  test.beforeEach(async ({ page, context }) => {
-    // Set Latvian locale
-    await context.addCookies([
-      {
-        name: "NEXT_LOCALE",
-        value: "lv",
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
+  test.beforeEach(async ({ page }) => {
+    // No setup needed - tests navigate directly to URLs
   });
 
   test.describe("Checkout Form to Stripe Redirect", () => {
@@ -22,12 +14,12 @@ test.describe("Payment Flow E2E", () => {
       // Wait for prices to load (any price starting with €)
       await expect(page.locator("text=/€\\d+/")).toBeVisible({ timeout: 10000 });
 
-      // Verify event selection shows correct event
-      const eventSelect = page.locator("select").first();
-      await expect(eventSelect).toHaveValue("egipte-malta");
+      // Verify event name shows correct event (read-only div)
+      const eventName = page.getByTestId("event-name");
+      await expect(eventName).toHaveText("Ēģipte-Malta");
 
       // Verify distance selection
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await expect(distanceSelect).toHaveValue("0");
     });
 
@@ -40,9 +32,7 @@ test.describe("Payment Flow E2E", () => {
       await expect(page.locator('input[id="name"]')).toBeVisible();
 
       // Try to submit empty form
-      const submitButton = page.getByRole("button", {
-        name: /Turpināt uz maksājumu/i,
-      });
+      const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
 
       // Should show validation errors
@@ -72,11 +62,12 @@ test.describe("Payment Flow E2E", () => {
       // Fill form but don't accept terms
       await page.fill('input[id="name"]', "Test User");
       await page.fill('input[id="email"]', "test@example.com");
+      await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
+      await page.fill('input[id="emergencyName"]', "Emergency Contact");
+      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
 
       // Submit without checking terms
-      const submitButton = page.getByRole("button", {
-        name: /Turpināt uz maksājumu/i,
-      });
+      const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
 
       // Should show terms error
@@ -96,12 +87,13 @@ test.describe("Payment Flow E2E", () => {
       // Fill valid form
       await page.fill('input[id="name"]', "E2E Test User");
       await page.fill('input[id="email"]', "e2e-test@example.com");
+      await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
+      await page.fill('input[id="emergencyName"]', "Emergency Contact");
+      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.check('input[id="terms"]');
 
       // Submit form
-      const submitButton = page.getByRole("button", {
-        name: /Turpināt uz maksājumu/i,
-      });
+      const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
 
       // Wait for redirect to Stripe checkout
@@ -120,12 +112,13 @@ test.describe("Payment Flow E2E", () => {
       // Fill form
       await page.fill('input[id="name"]', "E2E Test User");
       await page.fill('input[id="email"]', "e2e-test@example.com");
+      await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
+      await page.fill('input[id="emergencyName"]', "Emergency Contact");
+      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.check('input[id="terms"]');
 
       // Click submit and check for loading state
-      const submitButton = page.getByRole("button", {
-        name: /Turpināt uz maksājumu/i,
-      });
+      const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
 
       // Button should show loading spinner (SVG with animate-spin class)
@@ -167,14 +160,6 @@ test.describe("Payment Flow E2E", () => {
   test.describe("English Locale", () => {
     test.beforeEach(async ({ context }) => {
       await context.clearCookies();
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
     });
 
     test("should display checkout form in English", async ({ page }) => {
@@ -193,9 +178,7 @@ test.describe("Payment Flow E2E", () => {
       await page.goto("/en/egipte-malta/checkout?distance=0");
 
       // Submit empty form
-      const submitButton = page.getByRole("button", {
-        name: /Continue to payment/i,
-      });
+      const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
 
       // Should show English error
@@ -218,9 +201,7 @@ test.describe("Payment Flow E2E", () => {
       await page.goto("/egipte-malta/checkout?distance=0");
 
       // Initially, button may be disabled until prices load
-      const submitButton = page.getByRole("button", {
-        name: /Turpināt uz maksājumu/i,
-      });
+      const submitButton = page.locator('button[type="submit"]');
 
       // Wait for prices to load (any price starting with €)
       await expect(page.locator("text=/€\\d+/")).toBeVisible({ timeout: 10000 });
@@ -261,7 +242,7 @@ test.describe("Payment Flow E2E", () => {
       await expect(page.locator("text=/€\\d+/")).toBeVisible({ timeout: 10000 });
 
       // Change to distance 1 (Challenge)
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await distanceSelect.selectOption("1");
 
       // Wait for potential price update
@@ -275,28 +256,23 @@ test.describe("Payment Flow E2E", () => {
       await page.goto("/egipte-malta/checkout?distance=0");
 
       // Wait for page to load
-      await expect(page.locator("select").nth(1)).toBeVisible();
+      const distanceSelect = page.getByTestId("distance-select");
+      await expect(distanceSelect).toBeVisible();
 
       // Change distance
-      const distanceSelect = page.locator("select").nth(1);
       await distanceSelect.selectOption("1");
 
       // URL should update
       await expect(page).toHaveURL(/distance=1/);
     });
 
-    test("should navigate to different event checkout", async ({ page }) => {
+    test("should show correct event name on checkout", async ({ page }) => {
       await page.goto("/egipte-malta/checkout");
 
-      // Wait for page to load
-      await expect(page.locator("select").first()).toBeVisible();
-
-      // Change event
-      const eventSelect = page.locator("select").first();
-      await eventSelect.selectOption("parize-dakara");
-
-      // Should navigate to Paris-Dakar checkout
-      await expect(page).toHaveURL(/\/parize-dakara\/checkout/);
+      // Event name should be displayed as read-only
+      const eventName = page.getByTestId("event-name");
+      await expect(eventName).toBeVisible();
+      await expect(eventName).toHaveText("Ēģipte-Malta");
     });
   });
 
@@ -304,14 +280,22 @@ test.describe("Payment Flow E2E", () => {
     test("should persist name and email in localStorage", async ({ page }) => {
       await page.goto("/egipte-malta/checkout?distance=0");
 
+      // Wait for form to be interactive
+      const nameInput = page.locator('input[id="name"]');
+      await nameInput.waitFor({ state: "visible" });
+
       // Fill form
-      await page.fill('input[id="name"]', "Persistent User");
+      await nameInput.fill("Persistent User");
       await page.fill('input[id="email"]', "persistent@example.com");
 
-      // Small wait for onChange handlers to execute
-      await page.waitForTimeout(100);
+      // Wait for localStorage to be written by onChange handlers
+      await page.waitForFunction(
+        () =>
+          localStorage.getItem("checkout_name") === "Persistent User" &&
+          localStorage.getItem("checkout_email") === "persistent@example.com",
+        { timeout: 5000 }
+      );
 
-      // Check localStorage
       const savedName = await page.evaluate(() =>
         localStorage.getItem("checkout_name")
       );

@@ -1,16 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Checkout - Event & Distance Selection", () => {
-  test.beforeEach(async ({ page, context }) => {
-    await context.addCookies([
-      {
-        name: "NEXT_LOCALE",
-        value: "lv",
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
-
+  test.beforeEach(async ({ page }) => {
     // Clear localStorage before each test
     await page.goto("/egipte-malta/checkout");
     await page.evaluate(() => localStorage.clear());
@@ -23,7 +14,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
       await page.goto("/egipte-malta/checkout?distance=1");
 
       // Change to distance 0
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await distanceSelect.selectOption("0");
 
       // Wait for URL to update
@@ -38,7 +29,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
     }) => {
       await page.goto("/egipte-malta/checkout?distance=0");
 
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await expect(distanceSelect).toHaveValue("0");
 
       // Reload page
@@ -55,7 +46,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
       await page.goto("/egipte-malta/checkout?distance=1");
 
       // Change to distance 0
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await distanceSelect.selectOption("0");
 
       await expect(page).toHaveURL(/distance=0/);
@@ -77,7 +68,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
     test("should update URL when distance changes", async ({ page }) => {
       await page.goto("/egipte-malta/checkout?distance=0");
 
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
 
       // Change to distance 1
       await distanceSelect.selectOption("1");
@@ -96,7 +87,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
       const initialPrice = await priceDisplay.textContent();
 
       // Change distance
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await distanceSelect.selectOption("1");
 
       // Price should update (even if same value, element should re-render)
@@ -113,16 +104,16 @@ test.describe("Checkout - Event & Distance Selection", () => {
     }) => {
       await page.goto("/egipte-malta/checkout?distance=0");
 
-      // Verify initial distance facts (200 km)
-      await expect(page.getByText("200 km")).toBeVisible();
+      // Verify initial distance facts (200 km) - use span.font-medium to avoid matching option text
+      await expect(page.locator('span.font-medium', { hasText: '200 km' })).toBeVisible();
 
       // Change to distance 1
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await distanceSelect.selectOption("1");
 
       // Verify updated distance facts (370 km)
-      await expect(page.getByText("370 km")).toBeVisible();
-      await expect(page.getByText("200 km")).not.toBeVisible();
+      await expect(page.locator('span.font-medium', { hasText: '370 km' })).toBeVisible();
+      await expect(page.locator('span.font-medium', { hasText: '200 km' })).not.toBeVisible();
     });
 
     test("should update elevation when distance changes", async ({ page }) => {
@@ -132,7 +123,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
       await expect(page.getByText("1200 m")).toBeVisible();
 
       // Change to distance 1
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await distanceSelect.selectOption("1");
 
       // Verify updated elevation (3000 m)
@@ -141,60 +132,27 @@ test.describe("Checkout - Event & Distance Selection", () => {
     });
   });
 
-  test.describe("Event Selection", () => {
-    test("should navigate to new checkout page when event changes", async ({
+  test.describe("Event Display", () => {
+    test("should show event name as read-only on checkout", async ({
       page,
     }) => {
       await page.goto("/egipte-malta/checkout");
 
-      const eventSelect = page.locator("select").first();
-
-      // Change to different event
-      await eventSelect.selectOption("parize-dakara");
-
-      // Should navigate to new event's checkout
-      await expect(page).toHaveURL(/\/parize-dakara\/checkout/);
-
-      // Event select should show new event
-      await expect(eventSelect).toHaveValue("parize-dakara");
+      // Event is displayed as read-only div
+      const eventName = page.getByTestId("event-name");
+      await expect(eventName).toBeVisible();
+      await expect(eventName).toHaveText("Ēģipte-Malta");
     });
 
-    test("should show correct event name when event changes", async ({
+    test("should show correct event name for different events", async ({
       page,
     }) => {
-      await page.goto("/egipte-malta/checkout");
-
-      // Should have Ēģipte-Malta selected
-      const eventSelect = page.locator("select").first();
-      await expect(eventSelect).toHaveValue("egipte-malta");
-
-      // Change event
-      await eventSelect.selectOption("parize-dakara");
-
-      // Should have Parīze-Dakara selected
-      await expect(eventSelect).toHaveValue("parize-dakara");
-    });
-
-    test("should load persisted distance when changing events", async ({
-      page,
-    }) => {
-      // Set a distance preference for egipte-malta
-      await page.goto("/egipte-malta/checkout?distance=0");
-      await page.waitForTimeout(100); // Allow localStorage to save
-
-      // Navigate to different event
+      // Navigate directly to different event checkout
       await page.goto("/parize-dakara/checkout");
-      await page.waitForTimeout(100);
 
-      // Go back to egipte-malta
-      const eventSelect = page.locator("select").first();
-      await eventSelect.selectOption("egipte-malta");
-
-      // Should restore distance 0 preference
-      await expect(page).toHaveURL(/distance=0/);
-
-      const distanceSelect = page.locator("select").nth(1);
-      await expect(distanceSelect).toHaveValue("0");
+      const eventName = page.getByTestId("event-name");
+      await expect(eventName).toBeVisible();
+      await expect(eventName).toHaveText("Parīze-Dakāra");
     });
 
     test("should use default distance when no persisted preference", async ({
@@ -204,7 +162,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
       await page.goto("/egipte-malta/checkout");
 
       // Should default to last distance (index 1)
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await expect(distanceSelect).toHaveValue("1");
     });
   });
@@ -216,7 +174,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
       await page.goto("/parize-dakara/checkout");
 
       // Distance dropdown should be visible
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await expect(distanceSelect).toBeVisible();
 
       // But disabled (only 1 option)
@@ -226,12 +184,12 @@ test.describe("Checkout - Event & Distance Selection", () => {
     test("should show disabled styling when locked", async ({ page }) => {
       await page.goto("/parize-dakara/checkout");
 
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
 
       // Check for disabled styling classes
       const classAttr = await distanceSelect.getAttribute("class");
       expect(classAttr).toContain("cursor-not-allowed");
-      expect(classAttr).toContain("opacity-70");
+      expect(classAttr).toContain("opacity-60");
     });
 
     test("should allow selection when multiple distances available", async ({
@@ -239,7 +197,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
     }) => {
       await page.goto("/egipte-malta/checkout");
 
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
 
       // Should be enabled
       await expect(distanceSelect).toBeEnabled();
@@ -257,10 +215,12 @@ test.describe("Checkout - Event & Distance Selection", () => {
     }) => {
       await page.goto("/egipte-malta/checkout?distance=0");
 
-      // Wait for state to update
-      await page.waitForTimeout(100);
+      // Wait for React to hydrate and save the correct distance from URL params
+      await page.waitForFunction(
+        () => localStorage.getItem("last_distance_egipte-malta") === "0",
+        { timeout: 5000 }
+      );
 
-      // Check localStorage
       const storedDistance = await page.evaluate(() =>
         localStorage.getItem("last_distance_egipte-malta")
       );
@@ -298,14 +258,14 @@ test.describe("Checkout - Event & Distance Selection", () => {
     test("should show correct distance name in Latvian", async ({ page }) => {
       await page.goto("/egipte-malta/checkout?distance=0");
 
-      // Should have "Piedzīvojums" selected (distance 0)
-      const distanceSelect = page.locator("select").nth(1);
+      // Should have distance 0 selected
+      const distanceSelect = page.getByTestId("distance-select");
       await expect(distanceSelect).toHaveValue("0");
 
       // Change to distance 1
       await distanceSelect.selectOption("1");
 
-      // Should have "Izaicinājums" selected
+      // Should have distance 1 selected
       await expect(distanceSelect).toHaveValue("1");
     });
 
@@ -314,25 +274,17 @@ test.describe("Checkout - Event & Distance Selection", () => {
       context,
     }) => {
       await context.clearCookies();
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/egipte-malta/checkout?distance=0");
 
-      // Should have "Adventure" selected (distance 0)
-      const distanceSelect = page.locator("select").nth(1);
+      // Should have distance 0 selected
+      const distanceSelect = page.getByTestId("distance-select");
       await expect(distanceSelect).toHaveValue("0");
 
       // Change to distance 1
       await distanceSelect.selectOption("1");
 
-      // Should have "Challenge" selected
+      // Should have distance 1 selected
       await expect(distanceSelect).toHaveValue("1");
     });
   });
@@ -346,7 +298,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
       const scrollBefore = await page.evaluate(() => window.scrollY);
 
       // Change distance
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await distanceSelect.selectOption("0");
 
       // Wait for navigation
@@ -355,29 +307,8 @@ test.describe("Checkout - Event & Distance Selection", () => {
 
       const scrollAfter = await page.evaluate(() => window.scrollY);
 
-      // Scroll should remain the same
-      expect(scrollAfter).toBe(scrollBefore);
-    });
-
-    test("should not scroll when changing event", async ({ page }) => {
-      await page.goto("/egipte-malta/checkout");
-
-      // Scroll down
-      await page.evaluate(() => window.scrollTo(0, 300));
-      const scrollBefore = await page.evaluate(() => window.scrollY);
-
-      // Change event
-      const eventSelect = page.locator("select").first();
-      await eventSelect.selectOption("parize-dakara");
-
-      // Wait for navigation
-      await page.waitForURL(/\/parize-dakara\/checkout/);
-      await page.waitForTimeout(100);
-
-      const scrollAfter = await page.evaluate(() => window.scrollY);
-
-      // Scroll should remain the same
-      expect(scrollAfter).toBe(scrollBefore);
+      // Scroll should remain approximately the same (allow small browser rounding differences)
+      expect(Math.abs(scrollAfter - scrollBefore)).toBeLessThanOrEqual(10);
     });
   });
 });

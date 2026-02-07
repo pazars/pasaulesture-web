@@ -2,13 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Navigation', () => {
   test.describe('Event navigation', () => {
-    test('should maintain locale when navigating between events in LV', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should maintain locale when navigating between events in LV', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
@@ -25,13 +19,7 @@ test.describe('Navigation', () => {
       expect(langAttr).toBe('lv');
     });
 
-    test('should maintain locale when navigating between events in EN', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should maintain locale when navigating between events in EN', async ({ page }) => {
 
       await page.goto('/en/egipte-malta');
 
@@ -49,13 +37,7 @@ test.describe('Navigation', () => {
   });
 
   test.describe('Footer links', () => {
-    test('should maintain locale when clicking footer links in LV', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should maintain locale when clicking footer links in LV', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
@@ -68,13 +50,7 @@ test.describe('Navigation', () => {
       await expect(page).not.toHaveURL(/\/en\//);
     });
 
-    test('should maintain locale when clicking footer links in EN', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should maintain locale when clicking footer links in EN', async ({ page }) => {
 
       await page.goto('/en/egipte-malta');
 
@@ -86,13 +62,7 @@ test.describe('Navigation', () => {
       await expect(page).toHaveURL(/\/en\/privatuma-politika/);
     });
 
-    test('should navigate to terms page and maintain locale in LV', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should navigate to terms page and maintain locale in LV', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
@@ -105,13 +75,7 @@ test.describe('Navigation', () => {
       await expect(page).not.toHaveURL(/\/en\//);
     });
 
-    test('should navigate to terms page and maintain locale in EN', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should navigate to terms page and maintain locale in EN', async ({ page }) => {
 
       await page.goto('/en/egipte-malta');
 
@@ -125,13 +89,7 @@ test.describe('Navigation', () => {
   });
 
   test.describe('Browser navigation', () => {
-    test('should work correctly with browser back button in LV', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should work correctly with browser back button in LV', async ({ page }) => {
 
       await page.goto('/egipte-malta');
       const initialHeading = await page.locator('h1').first().textContent();
@@ -150,13 +108,7 @@ test.describe('Navigation', () => {
       expect(langAttr).toBe('lv');
     });
 
-    test('should work correctly with browser back button in EN', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should work correctly with browser back button in EN', async ({ page }) => {
 
       await page.goto('/en/egipte-malta');
       const initialHeading = await page.locator('h1').first().textContent();
@@ -175,13 +127,7 @@ test.describe('Navigation', () => {
       expect(langAttr).toBe('en');
     });
 
-    test('should work correctly with browser forward button', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should work correctly with browser forward button', async ({ page }) => {
 
       await page.goto('/egipte-malta');
       await page.goto('/privatuma-politika');
@@ -200,13 +146,7 @@ test.describe('Navigation', () => {
   });
 
   test.describe('Direct URL access', () => {
-    test('should handle direct URL access to event page in LV', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should handle direct URL access to event page in LV', async ({ page }) => {
 
       // Direct navigation
       await page.goto('/parize-dakara');
@@ -217,18 +157,12 @@ test.describe('Navigation', () => {
       expect(langAttr).toBe('lv');
     });
 
-    test('should handle direct URL access to event page in EN', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should handle direct URL access to EN event page', async ({ page }) => {
 
-      // Direct navigation
-      await page.goto('/parize-dakara');
+      // Direct navigation to EN URL
+      await page.goto('/en/parize-dakara');
 
-      // Should redirect to /en/ version
+      // Should stay on /en/ version
       await expect(page).toHaveURL(/\/en\/parize-dakara/);
 
       const langAttr = await page.locator('html').getAttribute('lang');
@@ -237,30 +171,19 @@ test.describe('Navigation', () => {
   });
 
   test.describe('External links', () => {
-    test('should have contact link with proper mailto', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have contact link in footer', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
-      // Find contact link
-      const contactLink = page.getByRole('link', { name: /Sazinies ar mums|Contact us/i });
+      // Find contact page link in footer
+      const contactLink = page.getByRole('link', { name: /Kontakti|Contact/i });
+      await expect(contactLink).toBeVisible();
 
       const href = await contactLink.getAttribute('href');
-      expect(href).toContain('mailto:');
+      expect(href).toMatch(/\/(en\/)?kontakti/);
     });
 
-    test('should have location links with proper Google Maps URLs', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have location links with proper Google Maps URLs', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 

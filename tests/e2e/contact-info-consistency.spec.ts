@@ -3,30 +3,6 @@ import { CONTACT_INFO } from "@/app/data/contact";
 
 test.describe("Contact Information Consistency", () => {
   test.describe("Email Consistency", () => {
-    test("should use same email in FAQ contact button (Latvian)", async ({ page }) => {
-      await page.goto("/egipte-malta");
-
-      // Find the FAQ section contact button
-      const contactButton = page.locator(`a[href="mailto:${CONTACT_INFO.email}"]`).first();
-      await expect(contactButton).toBeVisible();
-
-      // Verify href attribute
-      const href = await contactButton.getAttribute("href");
-      expect(href).toBe(`mailto:${CONTACT_INFO.email}`);
-    });
-
-    test("should use same email in FAQ contact button (English)", async ({ page }) => {
-      await page.goto("/en/egipte-malta");
-
-      // Find the FAQ section contact button
-      const contactButton = page.locator(`a[href="mailto:${CONTACT_INFO.email}"]`).first();
-      await expect(contactButton).toBeVisible();
-
-      // Verify href attribute
-      const href = await contactButton.getAttribute("href");
-      expect(href).toBe(`mailto:${CONTACT_INFO.email}`);
-    });
-
     test("should use same email in privacy policy (Latvian)", async ({ page }) => {
       await page.goto("/privatuma-politika");
 

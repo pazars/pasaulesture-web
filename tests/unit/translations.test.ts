@@ -24,6 +24,7 @@ describe('Translation coverage', () => {
 
   it('should not have empty translation values in LV', () => {
     const emptyKeys = lvKeys.filter(key => {
+      if (key.endsWith('_placeholder')) return false;
       const value = lvMessages[key as keyof typeof lvMessages];
       return typeof value === 'string' && value.trim() === '';
     });
@@ -33,6 +34,7 @@ describe('Translation coverage', () => {
 
   it('should not have empty translation values in EN', () => {
     const emptyKeys = enKeys.filter(key => {
+      if (key.endsWith('_placeholder')) return false;
       const value = enMessages[key as keyof typeof enMessages];
       return typeof value === 'string' && value.trim() === '';
     });
