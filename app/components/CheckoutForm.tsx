@@ -433,7 +433,7 @@ export default function CheckoutForm({
                         <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                             {t("checkout_event_label")}
                         </label>
-                        <div className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium">
+                        <div data-testid="event-name" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium">
                             {eventName}
                         </div>
                     </div>
@@ -445,6 +445,7 @@ export default function CheckoutForm({
                         </label>
                         <div className="relative">
                             <select
+                                data-testid="distance-select"
                                 value={selectedDistanceIndex.toString()}
                                 onChange={(e) => handleDistanceChange(parseInt(e.target.value, 10))}
                                 disabled={event.distances.length <= 1}
