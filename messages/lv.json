@@ -91,6 +91,7 @@
   "checkout_terms_label": "Es piekrītu",
   "checkout_terms_link": "noteikumiem",
   "checkout_submit": "Turpināt uz maksājumu",
+  "checkout_submit_disabled": "Drīzumā pieejams",
   "checkout_error_required": "Šis lauks ir obligāts",
   "checkout_error_email": "Nederīga e-pasta adrese",
   "checkout_error_terms": "Jums jāpiekrīt noteikumiem",
