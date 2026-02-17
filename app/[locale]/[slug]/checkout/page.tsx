@@ -56,7 +56,7 @@ export default async function CheckoutPage({
                 </Link>
 
                 {/* Title */}
-                <h1 className="font-display text-4xl md:text-5xl text-slate-800 mb-8">
+                <h1 className="font-accent text-4xl md:text-5xl text-slate-800 mb-8">
                     {t("checkout_title")}
                 </h1>
 

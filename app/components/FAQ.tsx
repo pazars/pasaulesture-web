@@ -3,6 +3,64 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
+// Format text with basic markdown-like features: newlines and bullet points
+function formatText(text: string) {
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  let listItems: string[] = [];
+  let paragraphLines: string[] = [];
+
+  const flushParagraph = () => {
+    if (paragraphLines.length > 0) {
+      elements.push(
+        <p key={`p-${elements.length}`} className="mb-3 last:mb-0">
+          {paragraphLines.join(' ')}
+        </p>
+      );
+      paragraphLines = [];
+    }
+  };
+
+  const flushList = () => {
+    if (listItems.length > 0) {
+      elements.push(
+        <ul key={`ul-${elements.length}`} className="list-disc pl-5 mb-3 space-y-1">
+          {listItems.map((item, i) => (
+            <li key={i}>{item}</li>
+          ))}
+        </ul>
+      );
+      listItems = [];
+    }
+  };
+
+  lines.forEach((line) => {
+    const trimmedLine = line.trim();
+
+    // Check if line is a bullet point
+    if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
+      flushParagraph();
+      listItems.push(trimmedLine.substring(2));
+    }
+    // Empty line - paragraph break
+    else if (trimmedLine === '') {
+      flushList();
+      flushParagraph();
+    }
+    // Regular text line
+    else {
+      flushList();
+      paragraphLines.push(trimmedLine);
+    }
+  });
+
+  // Flush any remaining content
+  flushList();
+  flushParagraph();
+
+  return <>{elements}</>;
+}
+
 interface FAQItem {
   questionKey: string;
   answerKey: string;
@@ -67,14 +125,14 @@ function ChevronIcon({ isOpen, isDakar }: { isOpen: boolean; isDakar: boolean })
   return (
     <div className={`p-2 rounded-full transition-all duration-300 ${isOpen
         ? isDakar
-          ? "bg-beige rotate-180"
+          ? "bg-dakar-cream rotate-180"
           : "bg-pink rotate-180"
         : "bg-white/10 group-hover:bg-white/20"
       }`}>
       <svg
         className={`w-5 h-5 transition-colors duration-300 ${isOpen
             ? isDakar
-              ? "text-bronze"
+              ? "text-dakar-brown"
               : "text-blue"
             : "text-beige"
           }`}
@@ -96,9 +154,9 @@ function ChevronIcon({ isOpen, isDakar }: { isOpen: boolean; isDakar: boolean })
 
 function QuestionIcon({ isDakar }: { isDakar: boolean }) {
   return (
-    <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mr-4 ${isDakar ? "bg-beige" : "bg-pink"
+    <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mr-4 ${isDakar ? "bg-dakar-cream" : "bg-pink"
       }`}>
-      <span className={`font-bold text-lg ${isDakar ? "text-bronze" : "text-blue"}`}>?</span>
+      <span className={`font-bold text-lg ${isDakar ? "text-dakar-brown" : "text-blue"}`}>?</span>
     </div>
   );
 }
@@ -116,11 +174,11 @@ export default function FAQ({ isDakar = false }: FAQProps) {
   };
 
   return (
-    <section className="py-20 relative overflow-hidden rounded-3xl mt-6 mx-2">
+    <section id="faq" className="py-12 sm:py-20 relative overflow-hidden rounded-3xl mt-2 sm:mt-6 mx-2">
       <div className="max-w-3xl mx-auto px-6 relative z-10">
         {/* Section header - clean, no badge */}
         <div className="text-center mb-12">
-          <h2 className="font-display text-4xl sm:text-5xl text-beige mb-3">
+          <h2 className="font-accent text-3xl sm:text-4xl text-beige mb-3">
             {t("faq_heading")}
           </h2>
           <div className="section-divider w-24 mx-auto" />
@@ -134,13 +192,13 @@ export default function FAQ({ isDakar = false }: FAQProps) {
               <div
                 key={index}
                 className={`backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-300 shadow-lg ${isDakar
-                    ? `bg-bronze/80 ${isOpen ? "ring-2 ring-beige/50" : ""}`
+                    ? `bg-dakar-brown/80 ${isOpen ? "ring-2 ring-beige/50" : ""}`
                     : `bg-blue/90 ${isOpen ? "ring-2 ring-pink/50" : ""}`
                   }`}
               >
                 <button
                   onClick={() => toggleItem(index)}
-                  className={`group w-full px-6 py-5 text-left flex items-center justify-between transition-colors ${isDakar ? "hover:bg-bronze/90" : "hover:bg-blue/95"
+                  className={`group w-full px-6 py-5 text-left flex items-center justify-between transition-colors ${isDakar ? "hover:bg-dakar-brown/90" : "hover:bg-blue/95"
                     }`}
                 >
                   <div className="flex items-center">
@@ -159,9 +217,11 @@ export default function FAQ({ isDakar = false }: FAQProps) {
                 >
                   <div className="overflow-hidden">
                     <div className="px-6 pb-6 pt-2">
-                      <div className={`pl-12 border-l-4 ${isDakar ? "border-beige/40" : "border-pink/40"
+                      <div className={`pl-4 sm:pl-12 border-l-4 ${isDakar ? "border-beige/40" : "border-pink/40"
                         }`}>
-                        <p className="text-beige/90 leading-relaxed">{t(item.answerKey as any)}</p>
+                        <div className="text-beige/90 leading-relaxed">
+                          {formatText(t(item.answerKey as any))}
+                        </div>
                       </div>
                     </div>
                   </div>

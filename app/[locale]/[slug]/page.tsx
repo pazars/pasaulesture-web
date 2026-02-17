@@ -27,9 +27,9 @@ export async function generateMetadata({ params }: PageProps) {
 
   const eventName = t(event.nameKey as any);
   const eventDescription = t(`${event.nameKey}_og_description` as any);
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const ogImageUrl = `${baseUrl}/events/${slug}/og/og-image-${locale}.jpg`;
-  const pageUrl = `${baseUrl}/${locale === "lv" ? "" : "en/"}${slug}`;
+  // Use relative path - metadataBase from layout will make it absolute
+  const ogImageUrl = `/events/${slug}/og/og-image-${locale}.jpg`;
+  const pageUrl = locale === "lv" ? `/${slug}` : `/en/${slug}`;
 
   return {
     title: eventName,

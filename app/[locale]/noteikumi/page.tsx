@@ -41,7 +41,7 @@ export default async function TermsPage({ params }: PageProps) {
           </svg>
         </Link>
 
-        <h1 className="text-4xl font-display text-forest-deep mb-12">
+        <h1 className="text-4xl font-accent text-forest-deep mb-12">
           {t("page_terms_title")}
         </h1>
 

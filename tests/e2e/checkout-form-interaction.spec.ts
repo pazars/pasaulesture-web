@@ -1,17 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Checkout Form - Interaction & Validation", () => {
-  test.beforeEach(async ({ page, context }) => {
-    // Set Latvian locale for consistent testing
-    await context.addCookies([
-      {
-        name: "language_preference",
-        value: "lv",
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
-
+  test.beforeEach(async ({ page }) => {
     // Clear localStorage before each test
     await page.goto("/egipte-malta/checkout");
     await page.evaluate(() => localStorage.clear());
@@ -55,25 +45,19 @@ test.describe("Checkout Form - Interaction & Validation", () => {
   });
 
   test.describe("Event & Distance Selection", () => {
-    test("should change event selection", async ({ page }) => {
+    test("should display event name as read-only", async ({ page }) => {
       await page.goto("/egipte-malta/checkout");
 
-      const eventSelect = page.locator("select").first();
-
-      // Initially should be egipte-malta
-      await expect(eventSelect).toHaveValue("egipte-malta");
-
-      // Change to parize-dakara
-      await eventSelect.selectOption("parize-dakara");
-
-      // Should navigate to new checkout page
-      await expect(page).toHaveURL(/\/parize-dakara\/checkout/);
+      // Event is now a read-only div, not a select
+      const eventName = page.getByTestId("event-name");
+      await expect(eventName).toBeVisible();
+      await expect(eventName).toHaveText("Ēģipte-Malta");
     });
 
     test("should change distance selection", async ({ page }) => {
       await page.goto("/egipte-malta/checkout?distance=1");
 
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
 
       // Initially should be distance 1
       await expect(distanceSelect).toHaveValue("1");
@@ -96,7 +80,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       const scrollBefore = await page.evaluate(() => window.scrollY);
 
       // Change distance
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
       await distanceSelect.selectOption("0");
 
       // Wait a bit for any potential scroll
@@ -120,7 +104,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       await page.locator('input[id="terms"]').check();
 
       // Submit form
-      await page.getByRole("button", { name: /Turpināt uz maksājumu/ }).click();
+      await page.locator('button[type="submit"]').click();
 
       // Should show error message
       await expect(page.getByText("Šis lauks ir obligāts")).toBeVisible();
@@ -136,7 +120,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       await page.locator('input[id="terms"]').check();
 
       // Submit form
-      await page.getByRole("button", { name: /Turpināt uz maksājumu/ }).click();
+      await page.locator('button[type="submit"]').click();
 
       // Should show error message
       await expect(page.getByText("Šis lauks ir obligāts")).toBeVisible();
@@ -152,7 +136,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       await page.locator('input[id="email"]').fill("test@example.com");
 
       // Submit form
-      await page.getByRole("button", { name: /Turpināt uz maksājumu/ }).click();
+      await page.locator('button[type="submit"]').click();
 
       // Should show terms error
       await expect(
@@ -162,11 +146,6 @@ test.describe("Checkout Form - Interaction & Validation", () => {
   });
 
   test.describe("Form Validation - Invalid Email", () => {
-    // Note: The email input has type="email" which triggers HTML5 validation
-    // This prevents form submission before React validation runs
-    // So we skip testing invalid email formats that would be caught by HTML5
-    // Our regex validation is still tested but browser prevents reaching it
-
     test("should have HTML5 email validation on email field", async ({ page }) => {
       await page.goto("/egipte-malta/checkout");
 
@@ -182,7 +161,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       await page.goto("/egipte-malta/checkout");
 
       // Submit completely empty form
-      await page.getByRole("button", { name: /Turpināt uz maksājumu/ }).click();
+      await page.locator('button[type="submit"]').click();
 
       // Should show all three errors
       const obligatoryErrors = page.getByText("Šis lauks ir obligāts");
@@ -199,7 +178,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       // Submit with empty name to trigger error
       await page.locator('input[id="email"]').fill("test@example.com");
       await page.locator('input[id="terms"]').check();
-      await page.getByRole("button", { name: /Turpināt uz maksājumu/ }).click();
+      await page.locator('button[type="submit"]').click();
 
       // Error should be visible
       await expect(page.getByText("Šis lauks ir obligāts")).toBeVisible();
@@ -218,31 +197,35 @@ test.describe("Checkout Form - Interaction & Validation", () => {
     }) => {
       await page.goto("/egipte-malta/checkout");
 
-      // Fill valid form data
+      // Fill all required fields
       await page.locator('input[id="name"]').fill("Jānis Bērziņš");
       await page.locator('input[id="email"]').fill("janis@example.com");
+      await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
+      await page.locator('input[id="emergencyName"]').fill("Anna Bērziņa");
+      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.locator('input[id="terms"]').check();
 
       // Submit form
-      await page.getByRole("button", { name: /Turpināt uz maksājumu/ }).click();
+      await page.locator('button[type="submit"]').click();
 
       // Should redirect to Stripe checkout
-      await page.waitForURL(/checkout\.stripe\.com/, { timeout: 10000 });
+      await page.waitForURL(/checkout\.stripe\.com/, { timeout: 15000 });
       expect(page.url()).toContain("checkout.stripe.com");
     });
 
     test("should disable button during submission", async ({ page }) => {
       await page.goto("/egipte-malta/checkout");
 
-      // Fill valid form data
+      // Fill all required fields
       await page.locator('input[id="name"]').fill("Jānis Bērziņš");
       await page.locator('input[id="email"]').fill("janis@example.com");
+      await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
+      await page.locator('input[id="emergencyName"]').fill("Anna Bērziņa");
+      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.locator('input[id="terms"]').check();
 
       // Click submit
-      const submitButton = page.getByRole("button", {
-        name: /Turpināt uz maksājumu/,
-      });
+      const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
 
       // Button should be disabled during submission (before redirect)
@@ -251,7 +234,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
   });
 
   test.describe("Terms Link", () => {
-    test("should open terms page in new tab", async ({ page, context }) => {
+    test("should open terms page in new tab", async ({ page }) => {
       await page.goto("/egipte-malta/checkout");
 
       const termsLink = page.getByRole("link", { name: /noteikumiem/ });
@@ -281,7 +264,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       await page.goto("/parize-dakara/checkout");
 
       // Paris-Dakar only has one distance
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
 
       // Should be disabled
       await expect(distanceSelect).toBeDisabled();
@@ -296,7 +279,7 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       await page.goto("/egipte-malta/checkout");
 
       // Egypt-Malta has two distances
-      const distanceSelect = page.locator("select").nth(1);
+      const distanceSelect = page.getByTestId("distance-select");
 
       // Should be enabled
       await expect(distanceSelect).toBeEnabled();

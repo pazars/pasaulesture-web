@@ -1,20 +1,38 @@
 import { notFound } from "next/navigation";
-import { Geist, Geist_Mono } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
-import { getTranslations } from "next-intl/server";
-import { locales, type Locale } from "@/i18n/request";
-import type { Metadata } from "next";
-import Script from "next/script";
 import "../globals.css";
+import type { Metadata, Viewport } from "next";
+import Script from "next/script";
+import { getTranslations } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { locales } from "@/i18n/request";
+import type { Locale } from "@/i18n/request";
+import { Caveat_Brush, BioRhyme, Josefin_Sans, Kalam, Sriracha, Oregano, Shantell_Sans, Solitreo, Mynerve } from "next/font/google";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Display font - for headers and titles
+// Switch between these two fonts by commenting/uncommenting:
+
+const displayFont = Mynerve({
+  weight: "400",
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-display",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+// Accent font - for emphasis and buttons
+const bioRhyme = BioRhyme({
+  weight: ["400", "700", "800"],
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-accent",
+  display: "swap",
+});
+
+// Body font - for general text
+const josefinSans = Josefin_Sans({
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-sans",
+  display: "swap",
 });
 
 interface LocaleLayoutProps {
@@ -41,12 +59,34 @@ export async function generateMetadata({
   }
 
   const t = await getTranslations({ locale });
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://pasaulesture.lv';
 
   return {
+    metadataBase: new URL(baseUrl),
     title: t("site_title"),
     description: t("site_description"),
+    icons: {
+      icon: '/favicon.ico',
+    },
+    openGraph: {
+      title: t("site_title"),
+      description: t("site_description"),
+      url: baseUrl,
+      siteName: t("site_title"),
+      locale: locale,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("site_title"),
+      description: t("site_description"),
+    },
   };
 }
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
 
 export default async function LocaleLayout({
   children,
@@ -63,7 +103,7 @@ export default async function LocaleLayout({
   const messages = (await import(`@/messages/${locale}.json`)).default;
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={`${displayFont.variable} ${bioRhyme.variable} ${josefinSans.variable}`}>
       <head>
         {/* Google Tag Manager */}
         <Script id="gtm-script" strategy="afterInteractive">
@@ -74,9 +114,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-WR2D5CTT');`}
         </Script>
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`antialiased ${josefinSans.className}`}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

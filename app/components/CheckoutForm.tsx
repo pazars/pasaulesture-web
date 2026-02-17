@@ -4,6 +4,7 @@ import { useState, FormEvent, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EventData } from "@/app/data/events";
+import { CONTACT_INFO } from "@/app/data/contact";
 import { useTranslations, useLocale } from "next-intl";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -67,6 +68,10 @@ export default function CheckoutForm({
     const [priceError, setPriceError] = useState<string | null>(null);
     const [dormAvailability, setDormAvailability] = useState<AccommodationAvailability | null>(null);
     const [dormFullError, setDormFullError] = useState(false);
+    const [discountCode, setDiscountCode] = useState("");
+    const [discountStatus, setDiscountStatus] = useState<"idle" | "checking" | "applied" | "error">("idle");
+    const [discountData, setDiscountData] = useState<{ couponId: string; percentOff: number; code: string } | null>(null);
+    const [discountError, setDiscountError] = useState("");
 
     // Load persisted form data on mount
     useEffect(() => {
@@ -147,6 +152,15 @@ export default function CheckoutForm({
         p => p.eventSlug === event.slug && p.distanceIndex === selectedDistanceIndex
     );
 
+    // Calculate final price with discount
+    const originalPrice = matchingPrice?.amount ?? 0;
+    let finalPrice = originalPrice;
+
+    if (discountData && originalPrice > 0) {
+        const discountAmount = originalPrice * (discountData.percentOff / 100);
+        finalPrice = Math.round(originalPrice - discountAmount);
+    }
+
     // Check if dorm is available or user must join waitlist
     const dormSpotsRemaining = dormAvailability?.dorm?.remaining ?? 0;
     const isDormWaitlist = dormSpotsRemaining <= 0;
@@ -185,14 +199,21 @@ export default function CheckoutForm({
         }
 
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        return newErrors;
     };
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setDormFullError(false);
 
-        if (!validateForm()) {
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            // Scroll to first error field
+            const firstErrorKey = Object.keys(validationErrors)[0];
+            const el = document.getElementById(firstErrorKey);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             return;
         }
 
@@ -223,6 +244,8 @@ export default function CheckoutForm({
                     wantsPreparationTips: formData.wantsPreparationTips,
                     preparationTipsChannel: formData.preparationTipsChannels.length > 0 ? formData.preparationTipsChannels.join(',') : null,
                     locale,
+                    couponId: discountData?.code || null,
+                    originalPrice,
                 }),
             });
 
@@ -280,6 +303,48 @@ export default function CheckoutForm({
         router.push(path, { scroll: false });
     };
 
+    const handleApplyDiscount = async () => {
+
+        const code = discountCode.trim().toUpperCase();
+        if (!code) return;
+
+        setDiscountStatus("checking");
+        setDiscountError("");
+
+        try {
+            const response = await fetch('/api/checkout/validate-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setDiscountStatus("error");
+                if (data.error === 'INVALID_COUPON') {
+                    setDiscountError(t("checkout_discount_invalid"));
+                } else if (data.error === 'EXPIRED_COUPON') {
+                    setDiscountError(t("checkout_discount_expired"));
+                } else {
+                    setDiscountError(t("checkout_discount_error"));
+                }
+                return;
+            }
+
+            setDiscountStatus("applied");
+            setDiscountData({
+                couponId: data.couponId,
+                percentOff: data.percentOff,
+                code: data.code,
+            });
+        } catch (error) {
+            console.error('Error applying discount:', error);
+            setDiscountStatus("error");
+            setDiscountError(t("checkout_discount_error"));
+        }
+    };
+
     const termsUrl = locale === "en" ? "/en/noteikumi" : "/noteikumi";
 
     // Show error if price not found
@@ -303,7 +368,7 @@ export default function CheckoutForm({
                             />
                         </svg>
                         <p className="text-sm text-red-700">
-                            Registration is temporarily unavailable. Please contact us at pasaulesture@gmail.com
+                            Registration is temporarily unavailable. Please contact us at {CONTACT_INFO.email}
                         </p>
                     </div>
                 </div>
@@ -344,7 +409,16 @@ export default function CheckoutForm({
                             {priceLoading ? (
                                 <span className="text-xl font-semibold text-slate-400">...</span>
                             ) : matchingPrice ? (
-                                <span className="text-2xl font-bold text-emerald-400">€{(matchingPrice.amount / 100).toFixed(0)}</span>
+                                <div className="flex items-baseline justify-end gap-2">
+                                    <span className="text-2xl font-bold text-emerald-400">
+                                        €{(finalPrice / 100).toFixed(2)}
+                                    </span>
+                                    {discountStatus === 'applied' && discountData && (
+                                        <span className="text-slate-400 line-through text-base">
+                                            €{(originalPrice / 100).toFixed(2)}
+                                        </span>
+                                    )}
+                                </div>
                             ) : (
                                 <span className="text-lg text-red-400">N/A</span>
                             )}
@@ -359,7 +433,7 @@ export default function CheckoutForm({
                         <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                             {t("checkout_event_label")}
                         </label>
-                        <div className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium">
+                        <div data-testid="event-name" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium">
                             {eventName}
                         </div>
                     </div>
@@ -371,6 +445,7 @@ export default function CheckoutForm({
                         </label>
                         <div className="relative">
                             <select
+                                data-testid="distance-select"
                                 value={selectedDistanceIndex.toString()}
                                 onChange={(e) => handleDistanceChange(parseInt(e.target.value, 10))}
                                 disabled={event.distances.length <= 1}
@@ -427,6 +502,7 @@ export default function CheckoutForm({
                     <input
                         type="text"
                         id="name"
+                        autoComplete="name"
                         value={formData.name}
                         onChange={(e) => handleInputChange("name", e.target.value)}
                         className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.name ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
@@ -445,6 +521,8 @@ export default function CheckoutForm({
                     <input
                         type="email"
                         id="email"
+                        autoComplete="email"
+                        inputMode="email"
                         value={formData.email}
                         onChange={(e) => handleInputChange("email", e.target.value)}
                         className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.email ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
@@ -474,7 +552,7 @@ export default function CheckoutForm({
 
                 {/* Accommodation Checkbox */}
                 <div className="-mt-2 !mb-4">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 py-2">
                         <input
                             type="checkbox"
                             id="needsAccommodation"
@@ -494,9 +572,9 @@ export default function CheckoutForm({
 
                     {/* Accommodation Options */}
                     {formData.needsAccommodation && (
-                        <div className="ml-8 mt-3 space-y-3">
+                        <div className="ml-8 mt-3 space-y-1">
                             {/* Dorm Option */}
-                            <label className="flex items-start gap-3 cursor-pointer">
+                            <label className="flex items-start gap-3 py-2 cursor-pointer">
                                 <input
                                     type="radio"
                                     name="accommodationType"
@@ -519,7 +597,7 @@ export default function CheckoutForm({
                             </label>
 
                             {/* Tent Option */}
-                            <label className="flex items-start gap-3 cursor-pointer">
+                            <label className="flex items-start gap-3 py-2 cursor-pointer">
                                 <input
                                     type="radio"
                                     name="accommodationType"
@@ -542,7 +620,7 @@ export default function CheckoutForm({
 
                 {/* Preparation Tips Checkbox */}
                 <div className="space-y-4">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 py-2">
                         <input
                             type="checkbox"
                             id="wantsPreparationTips"
@@ -566,7 +644,7 @@ export default function CheckoutForm({
                             <p className="text-sm font-medium text-slate-700 leading-relaxed">
                                 {t("checkout_tips_channel_label")}
                             </p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                                 {[
                                     { id: 'email', label: 'checkout_tips_channel_email' },
                                     { id: 'website', label: 'checkout_tips_channel_website' },
@@ -575,7 +653,7 @@ export default function CheckoutForm({
                                     { id: 'whatsapp', label: 'checkout_tips_channel_whatsapp' },
                                     { id: 'other', label: 'checkout_tips_channel_other' }
                                 ].map((channel) => (
-                                    <label key={channel.id} className="flex items-center gap-2 cursor-pointer group">
+                                    <label key={channel.id} className="flex items-center gap-2 py-2 cursor-pointer group">
                                         <input
                                             type="checkbox"
                                             value={channel.id}
@@ -603,6 +681,14 @@ export default function CheckoutForm({
 
                 {/* Emergency Contact Section */}
                 <div className="space-y-6 !mt-8">
+                    <div className="flex items-center gap-3">
+                        <div className="h-px flex-1 bg-slate-200" />
+                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                            {t("checkout_emergency_section_label")}
+                        </span>
+                        <div className="h-px flex-1 bg-slate-200" />
+                    </div>
+
                     {/* Emergency Name */}
                     <div>
                         <label htmlFor="emergencyName" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
@@ -611,6 +697,7 @@ export default function CheckoutForm({
                         <input
                             type="text"
                             id="emergencyName"
+                            autoComplete="off"
                             value={formData.emergencyName}
                             onChange={(e) => handleInputChange("emergencyName", e.target.value)}
                             className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.emergencyName ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
@@ -639,8 +726,54 @@ export default function CheckoutForm({
                     </div>
                 </div>
 
+                {/* Discount Code Section */}
+                <div className="space-y-3">
+                    <label htmlFor="discountCode" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                        {t("checkout_discount_label")}
+                    </label>
+
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                            type="text"
+                            id="discountCode"
+                            value={discountCode}
+                            onChange={(e) => {
+                                setDiscountCode(e.target.value.toUpperCase());
+                                setDiscountError("");
+                            }}
+                            disabled={discountStatus === 'applied'}
+                            className={`flex-1 px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 uppercase focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${discountStatus === 'applied' ? 'bg-slate-100 cursor-not-allowed' : 'border-slate-300 hover:border-slate-400'
+                                }`}
+                            placeholder={t("checkout_discount_placeholder")}
+                        />
+                        <button
+                            type="button"
+                            onClick={handleApplyDiscount}
+                            disabled={!discountCode || discountStatus === 'checking' || discountStatus === 'applied'}
+                            className="px-6 py-3 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 text-white font-medium rounded-xl transition-all disabled:cursor-not-allowed whitespace-nowrap"
+                        >
+                            {discountStatus === 'checking' ? t("checkout_discount_checking") : t("checkout_discount_apply")}
+                        </button>
+                    </div>
+
+                    {/* Success Message */}
+                    {discountStatus === 'applied' && discountData && (
+                        <div className="flex items-center gap-2 text-sm text-emerald-600">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            {t("checkout_discount_applied", { percent: discountData.percentOff })}
+                        </div>
+                    )}
+
+                    {/* Error Message */}
+                    {discountError && (
+                        <p className="text-sm text-red-600">{discountError}</p>
+                    )}
+                </div>
+
                 {/* Terms Acceptance */}
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 py-2">
                     <input
                         type="checkbox"
                         id="terms"
@@ -677,19 +810,31 @@ export default function CheckoutForm({
                     </p>
                 </div>
 
-                {/* Submit Button */}
-                <button
-                    type="submit"
-                    disabled={true}
-                    className="w-full py-4 px-6 bg-slate-400 text-white font-semibold text-lg rounded-xl transition-all shadow-sm cursor-not-allowed"
-                >
-                    <span className="flex items-center justify-center gap-2">
-                        {t("checkout_submit_disabled")}
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                    </span>
-                </button>
+                {/* Submit Button - sticky on mobile for visibility */}
+                <div className="sticky bottom-0 sm:static bg-white/95 backdrop-blur-sm sm:backdrop-blur-none -mx-6 px-6 py-4 sm:py-0 sm:mx-0 sm:px-0 border-t border-slate-100 sm:border-t-0 pb-safe">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting || priceLoading || showPriceError}
+                        className="w-full py-4 px-6 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 text-white font-semibold text-lg rounded-xl transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? (
+                            <span className="flex items-center justify-center gap-3">
+                                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                </svg>
+                                {t("checkout_submit")}
+                            </span>
+                        ) : (
+                            <span className="flex items-center justify-center gap-2">
+                                {t("checkout_submit")}
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </span>
+                        )}
+                    </button>
+                </div>
             </form>
         </div>
     );

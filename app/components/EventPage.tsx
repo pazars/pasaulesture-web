@@ -45,9 +45,17 @@ export default function EventPage({ event }: EventPageProps) {
   const t = useTranslations();
   const locale = useLocale();
   const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(event.distances.length - 1);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [showToast, setShowToast] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
@@ -67,7 +75,6 @@ export default function EventPage({ event }: EventPageProps) {
     ];
 
   useEffect(() => {
-    setIsLoaded(true);
     const savedDistance = localStorage.getItem(`last_distance_${event.slug}`);
     if (savedDistance !== null) {
       const index = parseInt(savedDistance, 10);
@@ -130,29 +137,79 @@ export default function EventPage({ event }: EventPageProps) {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <Header currentSlug={event.slug} />
+        <p className="hidden sm:block text-center text-beige text-base font-accent tracking-[0.15em] pt-2 pb-1">
+          {t("header_subtitle")}
+        </p>
 
         {/* Hero Section - Postcard Collage */}
-        <section className="relative w-full min-h-[60vh] sm:min-h-[70vh] overflow-hidden rounded-3xl mx-auto py-8 sm:py-12" style={{ maxWidth: 'calc(100% - 1rem)', marginLeft: '0.5rem', marginRight: '0.5rem' }}>
+        <section className="relative w-full sm:min-h-[70vh] overflow-visible sm:overflow-hidden rounded-3xl mx-auto pt-2 pb-2 sm:pb-12" style={{ maxWidth: 'calc(100% - 1rem)', marginLeft: '0.5rem', marginRight: '0.5rem' }}>
+
+          {/* Mobile: Event name above date */}
+          <div className="sm:hidden relative z-20 text-center px-6 mb-5">
+            <h2 className={`font-accent text-3xl tracking-wide ${
+              isDakar ? "text-dakar-yellow" : "text-pink"
+            }`}>
+              {t(event.nameKey as any)}
+            </h2>
+          </div>
 
           {/* Elegant Spelled-Out Date - Top */}
-          <div className="relative z-20 flex justify-center px-6 mb-8 sm:mb-12">
-            <div
-              className={`text-center transition-all duration-1200 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8"}`}
-            >
-              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)] leading-tight">
+          <div className="relative z-20 flex justify-center px-6 mb-6 sm:mb-12">
+            <div className="text-center">
+              <h1 className="font-accent text-[clamp(1.5rem,7.5vw,2.25rem)] sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)] leading-tight whitespace-nowrap">
                 {formattedDate}
               </h1>
             </div>
           </div>
 
-          {/* Scattered Collage Container */}
-          <div className="relative w-full max-w-4xl mx-auto px-4" style={{ minHeight: '400px' }}>
+          {/* Mobile: Compact postcard collage — stamps tucked into postcard corners */}
+          <div className="sm:hidden relative w-full max-w-xs mx-auto px-4 mb-4">
+            <div className="relative">
+              {/* Main Postcard */}
+              <div className="rotate-[-2deg]">
+                <Image
+                  src={postcardSrc}
+                  alt="Pasaules Tūre Postcard"
+                  width={520}
+                  height={360}
+                  className="rounded-lg shadow-2xl w-full h-auto"
+                  priority
+                />
+              </div>
+
+              {/* Stamp 1 — top-left, overlapping the postcard corner */}
+              <div className="absolute z-20 -top-6 -left-3">
+                <div className="stamp-hover">
+                  <Image
+                    src={stamps[0].src}
+                    alt={stamps[0].alt}
+                    width={70}
+                    height={91}
+                    className="drop-shadow-md rotate-[-12deg]"
+                  />
+                </div>
+              </div>
+
+              {/* Stamp 2 — bottom-right, overlapping the postcard corner */}
+              <div className="absolute z-20 -bottom-5 -right-2">
+                <div className="stamp-hover">
+                  <Image
+                    src={stamps[1].src}
+                    alt={stamps[1].alt}
+                    width={65}
+                    height={85}
+                    className="drop-shadow-md rotate-[10deg]"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop: Scattered Collage Container */}
+          <div className="relative w-full max-w-4xl mx-auto px-4 hidden sm:block" style={{ minHeight: '400px' }}>
 
             {/* Main Postcard - Center, slightly tilted */}
-            <div
-              className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 transition-all duration-1000 ${isLoaded ? "opacity-100 scale-100 rotate-[-2deg]" : "opacity-0 scale-90 rotate-0"}`}
-              style={{ transitionDelay: '200ms' }}
-            >
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rotate-[-2deg]">
               <div className="relative group">
                 <Image
                   src={postcardSrc}
@@ -167,11 +224,10 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Stamp 1 - Top Left, tilted */}
             <div
-              className={`absolute z-20 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8"}`}
+              className="absolute z-20"
               style={{
                 left: '5%',
                 top: '5%',
-                transitionDelay: '400ms'
               }}
             >
               <div className="stamp-hover">
@@ -187,11 +243,10 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Stamp 2 - Bottom Right, tilted other way */}
             <div
-              className={`absolute z-20 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+              className="absolute z-20"
               style={{
                 right: '8%',
                 bottom: '10%',
-                transitionDelay: '600ms'
               }}
             >
               <div className="stamp-hover">
@@ -207,11 +262,10 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Extra Stamp 1 - Top Right */}
             <div
-              className={`absolute z-15 transition-all duration-700 hidden sm:block ${isLoaded ? "opacity-100" : "opacity-0"}`}
+              className="absolute z-15"
               style={{
                 right: '3%',
                 top: '15%',
-                transitionDelay: '700ms'
               }}
             >
               <div className="stamp-hover">
@@ -227,11 +281,10 @@ export default function EventPage({ event }: EventPageProps) {
 
             {/* Extra Stamp 2 - Bottom Left */}
             <div
-              className={`absolute z-15 transition-all duration-700 hidden sm:block ${isLoaded ? "opacity-100" : "opacity-0"}`}
+              className="absolute z-15"
               style={{
                 left: '2%',
                 bottom: '15%',
-                transitionDelay: '800ms'
               }}
             >
               <div className="stamp-hover">
@@ -247,20 +300,19 @@ export default function EventPage({ event }: EventPageProps) {
 
           </div>
 
-          {/* Scroll indicator */}
-          <div
-            className={`absolute bottom-6 left-1/2 -translate-x-1/2 transition-all duration-1000 delay-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}
-          >
-            <div className="animate-float">
-              <svg className="w-6 h-6 text-beige/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </div>
+          {/* Route description (desktop only — fills space below collage) */}
+          <div className="hidden sm:block relative z-20 max-w-2xl mx-auto px-6 text-center mt-8">
+            <p className="text-lg md:text-xl lg:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-4">
+              &ldquo;{t(event.heroQuoteKey as any)}&rdquo;
+            </p>
+            <p className="text-base md:text-lg text-beige/70 leading-relaxed">
+              {t(event.heroQuote2Key as any)}
+            </p>
           </div>
         </section>
 
         {/* Quote Section - two paragraphs */}
-        <section className="relative py-10 overflow-hidden rounded-3xl mt-6 mx-2">
+        <section className="relative py-6 overflow-hidden rounded-3xl mt-2 mx-2 sm:hidden">
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
             <p className="text-xl sm:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-6">
               &ldquo;{t(event.heroQuoteKey as any)}&rdquo;
@@ -272,36 +324,48 @@ export default function EventPage({ event }: EventPageProps) {
         </section>
 
         {/* Route Selection with Start Location */}
-        <section className="relative mt-4 mx-2 rounded-3xl overflow-hidden py-4">
-          <div className="max-w-5xl mx-auto px-6">
-            {/* Vertical layout: Start on top, Routes below */}
-            <div className="flex flex-col items-center gap-4">
+        {/* Only show route selection if there are multiple routes */}
+        {event.distances.length > 1 && (
+          <section className="relative mt-4 mx-2 rounded-3xl overflow-hidden py-4">
+            <div className="max-w-5xl mx-auto px-6">
+              {/* Vertical layout: Start on top, Routes below */}
+              <div className="flex flex-col items-center gap-4">
 
               {/* Start Location - Top, centered */}
-              <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all">
-                <div className={`p-2 rounded-lg ${isDakar ? "bg-beige/25" : "bg-pink/25"
-                  }`}>
-                  <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
-                    }`} />
-                </div>
-                <div>
-                  <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
-                  {event.location.googleMapsUrl ? (
-                    <a
-                      href={event.location.googleMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
-                        }`}
-                    >
+              {event.location.googleMapsUrl ? (
+                <a
+                  href={event.location.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all cursor-pointer"
+                >
+                  <div className={`p-2 rounded-lg ${isDakar ? "bg-dakar-cream/25" : "bg-pink/25"
+                    }`}>
+                    <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
+                      }`} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
+                    <p className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${isDakar ? "group-hover:text-dakar-yellow" : "group-hover:text-pink"
+                      }`}>
                       {event.location.name}
                       <ExternalLinkIcon className="w-3 h-3" />
-                    </a>
-                  ) : (
+                    </p>
+                  </div>
+                </a>
+              ) : (
+                <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8">
+                  <div className={`p-2 rounded-lg ${isDakar ? "bg-dakar-cream/25" : "bg-pink/25"
+                    }`}>
+                    <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
+                      }`} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
                     <p className="font-bold text-beige">{event.location.name}</p>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Route Selection - Centered, larger buttons with clear hover states */}
               <div className="flex flex-wrap justify-center gap-4">
@@ -316,21 +380,21 @@ export default function EventPage({ event }: EventPageProps) {
                     <button
                       key={distance.nameKey}
                       onClick={() => handleDistanceSelect(index)}
-                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden min-w-40 cursor-pointer ${isSelected
+                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden w-full sm:w-auto sm:min-w-40 cursor-pointer ${isSelected
                         ? isDakar
-                          ? "bg-beige text-bronze shadow-lg shadow-beige/40 scale-105"
+                          ? "bg-dakar-cream text-dakar-brown shadow-lg shadow-dakar-cream/40 scale-105"
                           : "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
                         : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
                         }`}
                     >
                       {isSelected && (
-                        <div className={`absolute top-0 right-0 w-6 h-6 transform rotate-45 translate-x-3 -translate-y-3 ${isDakar ? "bg-[#FFD87F]" : "bg-lime"
+                        <div className={`absolute top-0 right-0 w-6 h-6 transform rotate-45 translate-x-3 -translate-y-3 ${isDakar ? "bg-dakar-yellow" : "bg-lime"
                           }`} />
                       )}
                       <span className="block text-lg relative z-10 font-accent">{distanceName}</span>
                       <div className={`flex items-center justify-center gap-2 mt-1.5 relative z-10 text-sm ${isSelected
                         ? isDakar
-                          ? "text-bronze/70"
+                          ? "text-dakar-brown/70"
                           : "text-blue/70"
                         : "text-beige/60"
                         }`}>
@@ -344,24 +408,27 @@ export default function EventPage({ event }: EventPageProps) {
             </div>
           </div>
         </section>
+        )}
 
         {/* Route Section */}
-        <section className="py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">
+        <section id="route" className="py-10 sm:py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">
           <div className="max-w-5xl mx-auto px-6 relative z-10">
             <div className="text-center mb-10">
-              <h2 className="font-display text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
+              <h2 className="font-accent text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
               <div className="section-divider w-24 mx-auto" />
+              {/* TODO: Remove isDakar check once Parīze-Dakāra route is revealed */}
+              {!isDakar && <p className="sm:hidden text-beige/40 text-sm mt-3">{t("route_best_on_pc")}</p>}
             </div>
 
             {selectedDistance.distanceEmbedUrl ? (
               <div className="bg-white p-3 rounded-xl">
                 <iframe
-                  src={selectedDistance.distanceEmbedUrl}
+                  src={selectedDistance.distanceEmbedUrl.replace(/sampleGraph=(true|false)/, `sampleGraph=${!isMobile}`)}
                   title="Route Map"
+                  className="h-[400px] sm:h-[700px]"
                   style={{
                     width: '1px',
                     minWidth: '100%',
-                    height: '700px',
                     border: 'none',
                     overflow: "hidden"
                   }}
@@ -370,32 +437,24 @@ export default function EventPage({ event }: EventPageProps) {
             ) : (
               <div className="w-full bg-white/5 rounded-xl flex items-center justify-center border-2 border-dashed border-white/20 py-12 px-6">
                 <div className="text-center">
-                  <svg className="w-16 h-16 text-beige/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7" />
-                  </svg>
+                  <span className="block text-5xl mb-4" role="img" aria-hidden="true">👀</span>
                   {isDakar ? (
                     <>
                       <p className="text-beige/70 text-lg font-medium mb-6">{t("route_reveal_countdown")}</p>
-                      <div className="flex justify-center gap-3 sm:gap-6">
-                        <div className="flex flex-col items-center">
-                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.days}</span>
-                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_days")}</span>
-                        </div>
-                        <span className="font-display text-3xl sm:text-5xl text-beige/30">:</span>
-                        <div className="flex flex-col items-center">
-                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.hours.toString().padStart(2, '0')}</span>
-                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_hours")}</span>
-                        </div>
-                        <span className="font-display text-3xl sm:text-5xl text-beige/30">:</span>
-                        <div className="flex flex-col items-center">
-                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.minutes.toString().padStart(2, '0')}</span>
-                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_minutes")}</span>
-                        </div>
-                        <span className="font-display text-3xl sm:text-5xl text-beige/30">:</span>
-                        <div className="flex flex-col items-center">
-                          <span className="font-display text-3xl sm:text-5xl text-beige">{countdown.seconds.toString().padStart(2, '0')}</span>
-                          <span className="text-beige/50 text-xs sm:text-sm uppercase tracking-wider">{t("countdown_seconds")}</span>
-                        </div>
+                      <div className="grid grid-cols-4 gap-3 sm:gap-5 w-full max-w-xs sm:max-w-md mx-auto">
+                        {[
+                          { value: countdown.days, label: t("countdown_days", { count: countdown.days }) },
+                          { value: countdown.hours, label: t("countdown_hours", { count: countdown.hours }) },
+                          { value: countdown.minutes, label: t("countdown_minutes", { count: countdown.minutes }) },
+                          { value: countdown.seconds, label: t("countdown_seconds", { count: countdown.seconds }) },
+                        ].map((unit) => (
+                          <div key={unit.label} className="text-center">
+                            <span className="block font-sans tabular-nums text-3xl sm:text-5xl text-beige font-bold">
+                              {unit.value.toString().padStart(2, '0')}
+                            </span>
+                            <span className="block text-beige/40 text-xs sm:text-sm mt-1">{unit.label}</span>
+                          </div>
+                        ))}
                       </div>
                     </>
                   ) : (
@@ -411,27 +470,44 @@ export default function EventPage({ event }: EventPageProps) {
         {event.gallery && event.gallery.length > 0 && (
           <Gallery
             images={event.gallery}
-            title={t("section_gallery")}
           />
         )}
 
-        {/* Registration Section - simplified, centered */}
-        <section className="relative py-20 overflow-hidden rounded-3xl mt-6 mx-2">
-          <div className={`absolute inset-0 rounded-3xl ${isDakar
-            ? "bg-linear-to-br from-beige via-[#FFD87F] to-[#E4DAD1]"
-            : "bg-linear-to-br from-pink via-pink/80 to-lime"
-            }`} />
+        {/* Registration Section - collage style */}
+        <section id="register" className="relative py-6 sm:py-16 mt-2 sm:mt-6 mx-2">
 
+          {/* Left stamp - sits above text, slightly askew */}
+          <div className="absolute z-10 hidden sm:block" style={{ left: '8%', top: '50%', transform: 'translateY(-50%)' }}>
+            <Image
+              src={stamps[0].src}
+              alt=""
+              width={95}
+              height={124}
+              aria-hidden="true"
+              className="drop-shadow-xl"
+              style={{ transform: 'rotate(-7deg)' }}
+            />
+          </div>
+
+          {/* Right stamp - sits BELOW text (lower z-index), near the ? mark, slightly rotated */}
+          <div className="absolute z-5 hidden sm:block" style={{ right: '10%', top: '50%', transform: 'translateY(-50%)' }}>
+            <Image
+              src={stamps[1].src}
+              alt=""
+              width={88}
+              height={115}
+              aria-hidden="true"
+              className="drop-shadow-xl"
+              style={{ transform: 'rotate(11deg)' }}
+            />
+          </div>
+
+          {/* CTA content — sits on top */}
           <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
-            <h2 className={`font-display text-4xl sm:text-5xl mb-8 ${isDakar ? "text-bronze" : "text-blue"
-              }`}>
-              {t("register_heading")}
-            </h2>
-
             {isDakar ? (
               <button
                 onClick={handleRegistrationClick}
-                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-bronze text-beige shadow-bronze/40 hover:shadow-bronze/50"
+                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30 hover:shadow-dakar-yellow/40"
               >
                 <span>{t("register_button")}</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -441,7 +517,7 @@ export default function EventPage({ event }: EventPageProps) {
             ) : (
               <Link
                 href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
-                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-blue text-white shadow-blue/40 hover:shadow-blue/50"
+                className="inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all bg-pink text-blue shadow-pink/30 hover:shadow-pink/40"
               >
                 <span>{t("register_button")}</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -464,24 +540,24 @@ export default function EventPage({ event }: EventPageProps) {
             </div>
 
             {/* Links centered below */}
-            <nav className="flex justify-center gap-8">
+            <nav className="flex justify-center gap-4 sm:gap-8">
               <Link
                 href={locale === "en" ? "/en/privatuma-politika" : "/privatuma-politika"}
-                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-dakar-yellow" : "hover:text-pink"
                   }`}
               >
                 {t("footer_privacy")}
               </Link>
               <Link
                 href={locale === "en" ? "/en/noteikumi" : "/noteikumi"}
-                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-dakar-yellow" : "hover:text-pink"
                   }`}
               >
                 {t("footer_terms")}
               </Link>
               <Link
                 href={locale === "en" ? "/en/kontakti" : "/kontakti"}
-                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-[#FFD87F]" : "hover:text-pink"
+                className={`text-beige/60 transition-colors text-sm ${isDakar ? "hover:text-dakar-yellow" : "hover:text-pink"
                   }`}
               >
                 {t("footer_contact")}

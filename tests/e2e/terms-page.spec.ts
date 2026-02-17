@@ -4,16 +4,7 @@ test.describe("Terms Page", () => {
   test.describe("Page Loading", () => {
     test("should load terms page successfully in Latvian", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -25,16 +16,7 @@ test.describe("Terms Page", () => {
 
     test("should load terms page successfully in English", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -46,16 +28,7 @@ test.describe("Terms Page", () => {
 
     test("should display non-empty content in Latvian", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -71,16 +44,7 @@ test.describe("Terms Page", () => {
 
     test("should display non-empty content in English", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -98,16 +62,7 @@ test.describe("Terms Page", () => {
   test.describe("Home Button Navigation", () => {
     test("should have home button linking to Latvian home", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -123,16 +78,7 @@ test.describe("Terms Page", () => {
 
     test("should have home button linking to English home", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -148,16 +94,7 @@ test.describe("Terms Page", () => {
 
     test("should navigate to home when clicking button (Latvian)", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -174,16 +111,7 @@ test.describe("Terms Page", () => {
 
     test("should navigate to home when clicking button (English)", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -202,16 +130,7 @@ test.describe("Terms Page", () => {
   test.describe("External Links", () => {
     test("should have external link indicators on outgoing links (Latvian)", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -233,16 +152,7 @@ test.describe("Terms Page", () => {
 
     test("should have external link indicators on outgoing links (English)", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -264,16 +174,7 @@ test.describe("Terms Page", () => {
 
     test("should open external links in new tab", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -293,16 +194,7 @@ test.describe("Terms Page", () => {
   test.describe("Content Structure", () => {
     test("should have proper heading hierarchy in Latvian", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -317,16 +209,7 @@ test.describe("Terms Page", () => {
 
     test("should have proper heading hierarchy in English", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -340,16 +223,7 @@ test.describe("Terms Page", () => {
 
     test("should not contain placeholder text in Latvian", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -364,16 +238,7 @@ test.describe("Terms Page", () => {
 
     test("should not contain placeholder text in English", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -389,16 +254,7 @@ test.describe("Terms Page", () => {
   test.describe("AI Translation Note", () => {
     test("should not show AI translation note on Latvian page", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -410,16 +266,7 @@ test.describe("Terms Page", () => {
 
     test("should show AI translation note on English page", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -436,16 +283,7 @@ test.describe("Terms Page", () => {
   test.describe("Navigation from Checkout", () => {
     test("should open terms in new tab from checkout page", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/egipte-malta/checkout");
 
@@ -459,16 +297,7 @@ test.describe("Terms Page", () => {
 
     test("should open English terms from English checkout page", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/egipte-malta/checkout");
 
@@ -484,16 +313,7 @@ test.describe("Terms Page", () => {
   test.describe("SEO & Metadata", () => {
     test("should have correct lang attribute in Latvian", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -503,16 +323,7 @@ test.describe("Terms Page", () => {
 
     test("should have correct lang attribute in English", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -520,15 +331,7 @@ test.describe("Terms Page", () => {
       expect(langAttr).toBe("en");
     });
 
-    test("should have page title in Latvian", async ({ page, context }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
+    test("should have page title in Latvian", async ({ page }) => {
 
       await page.goto("/noteikumi");
 
@@ -538,15 +341,7 @@ test.describe("Terms Page", () => {
       expect(title.length).toBeGreaterThan(0);
     });
 
-    test("should have page title in English", async ({ page, context }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
+    test("should have page title in English", async ({ page }) => {
 
       await page.goto("/en/noteikumi");
 
@@ -559,16 +354,7 @@ test.describe("Terms Page", () => {
   test.describe("Accessibility", () => {
     test("should have aria-label on home button", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -582,15 +368,7 @@ test.describe("Terms Page", () => {
       expect(ariaLabel).toBeTruthy();
     });
 
-    test("should be keyboard navigable", async ({ page, context }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
+    test("should be keyboard navigable", async ({ page }) => {
 
       await page.goto("/noteikumi");
 
@@ -607,16 +385,7 @@ test.describe("Terms Page", () => {
   test.describe("Locale-Specific Content Components", () => {
     test("should load Latvian content component", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -632,16 +401,7 @@ test.describe("Terms Page", () => {
 
     test("should load English content component", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "language_preference",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 

@@ -14,11 +14,16 @@ Pasaules Tūre website - a Next.js 16 application for ultra cycling events in La
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
+### Troubleshooting
+- `rm -rf .next` - Clear Next.js cache. Do this after branch switches or if styles/pages look stale, then restart the dev server.
+
 ### Testing
 - `npm test` - Run unit tests (Vitest)
-- `npm run test:e2e` - Run E2E tests (Playwright, all browsers)
+- `npm run test:e2e -- --project=chromium` - Run E2E tests in Chromium only (⚡ **recommended for development**, ~6 min)
+- `npm run test:e2e` - Run E2E tests in all browsers (Chromium, Firefox, WebKit, ~18 min)
 - `npm run test:e2e:ui` - Run E2E tests with Playwright UI
-- `npm run test:e2e -- --project=chromium` - Run E2E tests in Chromium only
+
+**Note:** During development, use `--project=chromium` for faster testing. Run all browsers only before deployment or in CI.
 
 ## Architecture
 
@@ -71,36 +76,6 @@ tests/
     └── seo-metadata.spec.ts
 ```
 
-## Design System
-
-### Colors (CSS variables in globals.css)
-
-- **Forest palette**: `forest-deep`, `forest-medium`, `forest-light`, `moss`
-- **Accent**: `amber`, `amber-light`, `amber-glow`
-- **Neutrals**: `earth-dark`, `earth-warm`, `stone`, `sand`, `cream`, `cream-light`
-
-### Typography
-
-- **Display font**: Archivo Black (`.font-display` class)
-- **Body font**: DM Sans (default)
-
-### CSS Utilities (globals.css)
-
-- `.hero-overlay` - Gradient overlay for hero images
-- `.topo-pattern` / `.topo-pattern-light` - Topographic line backgrounds
-- `.noise-overlay` - Subtle grain texture
-- `.glass` / `.glass-dark` - Glassmorphism effects
-- `.btn-primary` / `.btn-secondary` - Button styles
-- `.card-elevated` - Elevated card with hover effect
-- `.section-divider` - Gradient divider line
-- Animation classes: `.animate-fade-in-up`, `.animate-float`, `.animate-pulse-glow`
-
-### Layout Patterns
-
-- All sections use `rounded-3xl` corners
-- Section spacing: `mt-6 mx-2`
-- Content constrained to `max-w-5xl` on desktop
-
 ## Internationalization (i18n)
 
 ### URL Structure
@@ -113,8 +88,10 @@ tests/
 - **Redirect behavior**: `/lv/...` always redirects to clean URL
 
 ### Locale Detection Priority (proxy.ts)
-1. `language_preference` cookie (expires after 30 days)
+1. `NEXT_LOCALE` cookie (expires after 30 days)
 2. Default to Latvian (`lv`)
+
+**Note:** `localeDetection` is set to `false` — the browser's `Accept-Language` header is intentionally ignored.
 
 ### Translation Files
 - Located in `messages/lv.json` and `messages/en.json`
@@ -234,18 +211,6 @@ npm run test:e2e -- --project=chromium
 npm run test:e2e -- tests/e2e/language-switching.spec.ts
 ```
 
-### Test Coverage
-- **250 total tests** (43 unit + 207 E2E)
-- Proxy routing logic
-- Translation completeness
-- Language switching functionality
-- SEO metadata (lang, title, description)
-- Navigation between pages
-- Cookie persistence
-- Contact page functionality
-- Contact information consistency across all pages
-- Centralized configuration validation
-
 ## Stripe Payments
 
 ### Architecture
@@ -333,3 +298,7 @@ Each Stripe product must have these metadata fields:
 - next-intl loads translations at runtime from JSON files - no compilation step needed
 - Translation files are automatically included in the build
 - Changes to translations take effect immediately after deployment
+
+## Change Log
+
+Each Claude Code session creates a markdown file in `docs/changes/` named `YYYY-MM-DD-short-description.md` documenting all changes, reasoning, and affected files. See `docs/changes/` for the full history.

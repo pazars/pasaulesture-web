@@ -225,7 +225,7 @@ import { test, expect } from '@playwright/test';
 test('should show correct language', async ({ page, context }) => {
   // Set up locale preference
   await context.addCookies([{
-    name: 'language_preference',
+    name: 'NEXT_LOCALE',
     value: 'lv',
     domain: 'localhost',
     path: '/',
@@ -246,7 +246,7 @@ All E2E tests should set the locale cookie before navigation:
 
 ```typescript
 await context.addCookies([{
-  name: 'language_preference',
+  name: 'NEXT_LOCALE',
   value: 'lv', // or 'en'
   domain: 'localhost',
   path: '/',
@@ -443,7 +443,7 @@ npm run test:e2e -- tests/e2e/checkout-selection.spec.ts --project=chromium
 
 1. **E2E tests require dev server**: Tests automatically start `npm run dev`
 2. **Browser tests only**: E2E tests require browser context
-3. **Cookie setup**: Always set `language_preference` cookie explicitly before navigation to avoid race conditions with Accept-Language header
+3. **Cookie setup**: Always set `NEXT_LOCALE` cookie explicitly before navigation to avoid race conditions with Accept-Language header
 4. **Alert handling**: Form submission shows placeholder alert - tests must handle dialog
 5. **localStorage cleanup**: Must manually clear localStorage in `beforeEach` hooks
 6. **Strict mode violations**: When adding LanguageSwitcher to pages, use `.last()`, `.first()`, or specific selectors to avoid matching duplicate elements
@@ -454,7 +454,7 @@ npm run test:e2e -- tests/e2e/checkout-selection.spec.ts --project=chromium
 
 **❌ Bad - Cookie race condition:**
 ```typescript
-await context.addCookies([{ name: 'language_preference', value: 'lv', ... }]);
+await context.addCookies([{ name: 'NEXT_LOCALE', value: 'lv', ... }]);
 await page.goto("/checkout"); // May load with wrong locale
 ```
 

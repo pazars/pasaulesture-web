@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const stripe = getStripeClient();
   let event: Stripe.Event;
 
   try {
-    const stripe = getStripeClient();
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
     console.error('Webhook signature verification failed:', error);
@@ -41,7 +41,25 @@ export async function POST(request: NextRequest) {
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session;
+      let session: Stripe.Checkout.Session;
+      try {
+        // Fetch full session from API (thin events only include minimal data)
+        session = await stripe.checkout.sessions.retrieve(
+          (event.data.object as Stripe.Checkout.Session).id
+        );
+      } catch (fetchError) {
+        console.error('Failed to fetch session from Stripe:', fetchError);
+        break;
+      }
+
+      // Debug logging
+      console.log('Session retrieved:', {
+        id: session.id,
+        payment_intent: session.payment_intent,
+        amount_total: session.amount_total,
+        currency: session.currency,
+        metadata: session.metadata,
+      });
 
       try {
         const {
@@ -62,9 +80,11 @@ export async function POST(request: NextRequest) {
           UPDATE registrations
           SET
             payment_status = 'completed',
-            stripe_payment_intent_id = ${session.payment_intent as string},
+            stripe_payment_intent_id = ${typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id},
             amount_paid = ${session.amount_total},
-            currency = ${session.currency}
+            currency = ${session.currency},
+            coupon_id = ${session.metadata?.coupon_id || null},
+            original_price = ${session.metadata?.original_price ? parseInt(session.metadata.original_price) : null}
           WHERE stripe_session_id = ${session.id}
           RETURNING id
         `;
@@ -82,10 +102,12 @@ export async function POST(request: NextRequest) {
               participant_name,
               participant_email,
               locale,
-              payment_status
+              payment_status,
+              coupon_id,
+              original_price
             ) VALUES (
               ${session.id},
-              ${session.payment_intent as string},
+              ${typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id},
               ${session.amount_total},
               ${session.currency},
               ${event_slug},
@@ -93,13 +115,17 @@ export async function POST(request: NextRequest) {
               ${participant_name},
               ${participant_email},
               ${locale || 'lv'},
-              'completed'
+              'completed',
+              ${session.metadata?.coupon_id || null},
+              ${session.metadata?.original_price ? parseInt(session.metadata.original_price) : null}
             )
             ON CONFLICT (stripe_session_id) DO UPDATE SET
               payment_status = 'completed',
-              stripe_payment_intent_id = ${session.payment_intent as string},
+              stripe_payment_intent_id = ${typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id},
               amount_paid = ${session.amount_total},
-              currency = ${session.currency}
+              currency = ${session.currency},
+              coupon_id = ${session.metadata?.coupon_id || null},
+              original_price = ${session.metadata?.original_price ? parseInt(session.metadata.original_price) : null}
           `;
           console.log('Registration created for session:', session.id);
         } else {
