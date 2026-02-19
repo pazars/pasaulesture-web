@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
+import { Analytics } from "@vercel/analytics/next";
 import { locales } from "@/i18n/request";
 import type { Locale } from "@/i18n/request";
 import { Caveat_Brush, BioRhyme, Josefin_Sans, Kalam, Sriracha, Oregano, Shantell_Sans, Solitreo, Mynerve } from "next/font/google";
@@ -127,6 +128,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
