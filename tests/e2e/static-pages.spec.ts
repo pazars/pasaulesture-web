@@ -4,17 +4,8 @@ test.describe("Static Pages Navigation", () => {
   test.describe("Footer Links", () => {
     test("should navigate to Latvian privacy policy from Latvian event page", async ({
       page,
-      context,
     }) => {
       // Set Latvian locale cookie
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
       await page.goto("/egipte-malta");
 
       // Click privacy policy link in footer
@@ -50,17 +41,8 @@ test.describe("Static Pages Navigation", () => {
 
     test("should navigate to Latvian terms from Latvian event page", async ({
       page,
-      context,
     }) => {
       // Set Latvian locale cookie
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
       await page.goto("/egipte-malta");
 
       // Click terms link in footer
@@ -98,17 +80,8 @@ test.describe("Static Pages Navigation", () => {
   test.describe("Privacy Policy Page", () => {
     test("should have back button that links to Latvian home from /privatuma-politika", async ({
       page,
-      context,
     }) => {
       // Set Latvian locale cookie to ensure proper routing
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
       await page.goto("/privatuma-politika");
 
       // Find the back button (circular button with arrow SVG at top of page)
@@ -140,17 +113,8 @@ test.describe("Static Pages Navigation", () => {
 
     test("should navigate to correct locale home when clicked (Latvian)", async ({
       page,
-      context,
     }) => {
       // Set Latvian locale cookie
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
       await page.goto("/privatuma-politika");
 
       // Click the back button
@@ -186,17 +150,8 @@ test.describe("Static Pages Navigation", () => {
   test.describe("Terms Page", () => {
     test("should have back button that links to Latvian home from /noteikumi", async ({
       page,
-      context,
     }) => {
       // Set Latvian locale cookie
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
       await page.goto("/noteikumi");
 
       // Find the back button
@@ -228,17 +183,8 @@ test.describe("Static Pages Navigation", () => {
 
     test("should navigate to correct locale home when clicked (Latvian)", async ({
       page,
-      context,
     }) => {
       // Set Latvian locale cookie
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
       await page.goto("/noteikumi");
 
       // Click the back button
@@ -274,16 +220,7 @@ test.describe("Static Pages Navigation", () => {
   test.describe("AI Translation Notes", () => {
     test("privacy policy should show AI translation note in English", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/privatuma-politika");
 
@@ -298,16 +235,7 @@ test.describe("Static Pages Navigation", () => {
 
     test("privacy policy should not show AI translation note in Latvian", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/privatuma-politika");
 
@@ -318,16 +246,7 @@ test.describe("Static Pages Navigation", () => {
 
     test("terms should show AI translation note in English", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -342,16 +261,7 @@ test.describe("Static Pages Navigation", () => {
 
     test("terms should not show AI translation note in Latvian", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -364,16 +274,7 @@ test.describe("Static Pages Navigation", () => {
   test.describe("Contact Information Validation", () => {
     test("privacy policy LV should contain correct contact information", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/privatuma-politika");
 
@@ -386,21 +287,12 @@ test.describe("Static Pages Navigation", () => {
       expect(pageText).toContain("LV50HABA0551060828205");
 
       // Check email
-      expect(pageText).toContain("pasaulesture@gmail.com");
+      expect(pageText).toContain("toms@pasaulesture.lv");
     });
 
     test("privacy policy EN should contain correct contact information", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/privatuma-politika");
 
@@ -413,21 +305,12 @@ test.describe("Static Pages Navigation", () => {
       expect(pageText).toContain("LV50HABA0551060828205");
 
       // Check email
-      expect(pageText).toContain("pasaulesture@gmail.com");
+      expect(pageText).toContain("toms@pasaulesture.lv");
     });
 
     test("terms LV should contain correct contact information", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "lv",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/noteikumi");
 
@@ -440,21 +323,12 @@ test.describe("Static Pages Navigation", () => {
       expect(pageText).toContain("LV50HABA0551060828205");
 
       // Check email
-      expect(pageText).toContain("pasaulesture@gmail.com");
+      expect(pageText).toContain("toms@pasaulesture.lv");
     });
 
     test("terms EN should contain correct contact information", async ({
       page,
-      context,
     }) => {
-      await context.addCookies([
-        {
-          name: "NEXT_LOCALE",
-          value: "en",
-          domain: "localhost",
-          path: "/",
-        },
-      ]);
 
       await page.goto("/en/noteikumi");
 
@@ -467,7 +341,7 @@ test.describe("Static Pages Navigation", () => {
       expect(pageText).toContain("LV50HABA0551060828205");
 
       // Check email
-      expect(pageText).toContain("pasaulesture@gmail.com");
+      expect(pageText).toContain("toms@pasaulesture.lv");
     });
   });
 });

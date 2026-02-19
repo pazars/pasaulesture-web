@@ -2,13 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('SEO and Metadata', () => {
   test.describe('HTML lang attribute', () => {
-    test('should have lang="lv" for Latvian pages', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have lang="lv" for Latvian pages', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
@@ -16,13 +10,7 @@ test.describe('SEO and Metadata', () => {
       expect(langAttr).toBe('lv');
     });
 
-    test('should have lang="en" for English pages', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have lang="en" for English pages', async ({ page }) => {
 
       await page.goto('/en/egipte-malta');
 
@@ -32,41 +20,23 @@ test.describe('SEO and Metadata', () => {
   });
 
   test.describe('Page titles', () => {
-    test('should have consistent title for LV pages', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have event-specific title for LV event pages', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
       const title = await page.title();
-      expect(title).toBe('Pasaules Tūre');
+      expect(title).toBe('Ēģipte-Malta');
     });
 
-    test('should have title without macron for EN pages', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have event-specific title for EN event pages', async ({ page }) => {
 
       await page.goto('/en/egipte-malta');
 
       const title = await page.title();
-      expect(title).toBe('Pasaules Ture');
+      expect(title).toBe('Egypt-Malta');
     });
 
-    test('should have title for static pages in LV', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have title for static pages in LV', async ({ page }) => {
 
       await page.goto('/privatuma-politika');
 
@@ -74,13 +44,7 @@ test.describe('SEO and Metadata', () => {
       expect(title).toBe('Pasaules Tūre');
     });
 
-    test('should have title for static pages in EN', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have title for static pages in EN', async ({ page }) => {
 
       await page.goto('/en/privatuma-politika');
 
@@ -90,45 +54,27 @@ test.describe('SEO and Metadata', () => {
   });
 
   test.describe('Meta descriptions', () => {
-    test('should have Latvian meta description for LV pages', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have event-specific meta description for LV pages', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
       const metaDescription = await page.locator('meta[name="description"]').getAttribute('content');
-      // Event pages include event name in description
-      expect(metaDescription).toContain('Ultra riteņbraukšanas pasākumi Latvijā');
+      // Event pages have event-specific descriptions
+      expect(metaDescription).toContain('Gravel riteņbraukšanas pasākumi');
     });
 
-    test('should have English meta description for EN pages', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have event-specific meta description for EN pages', async ({ page }) => {
 
       await page.goto('/en/egipte-malta');
 
       const metaDescription = await page.locator('meta[name="description"]').getAttribute('content');
-      // Event pages include event name in description
-      expect(metaDescription).toContain('Ultra cycling events in Latvia');
+      // Event pages have event-specific descriptions
+      expect(metaDescription).toContain('Gravel cycling events in Latvia');
     });
   });
 
   test.describe('Viewport and charset', () => {
-    test('should have viewport meta tag', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have viewport meta tag', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
@@ -137,13 +83,7 @@ test.describe('SEO and Metadata', () => {
       expect(viewport).toContain('initial-scale=1');
     });
 
-    test('should have UTF-8 charset', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have UTF-8 charset', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
@@ -153,30 +93,22 @@ test.describe('SEO and Metadata', () => {
   });
 
   test.describe('Favicon', () => {
-    test('should have favicon link', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have favicon link', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
-      const favicon = await page.locator('link[rel="icon"]').getAttribute('href');
+      // Multiple favicon links may exist (Next.js generated + custom), check that at least one exists
+      const faviconCount = await page.locator('link[rel="icon"]').count();
+      expect(faviconCount).toBeGreaterThan(0);
+
+      const favicon = await page.locator('link[rel="icon"]').first().getAttribute('href');
       expect(favicon).toBeTruthy();
       expect(favicon).toContain('favicon.ico');
     });
   });
 
   test.describe('Accessibility', () => {
-    test('should have proper heading hierarchy in LV', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have proper heading hierarchy in LV', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 
@@ -188,13 +120,7 @@ test.describe('SEO and Metadata', () => {
       await expect(page.locator('h1').first()).toBeVisible();
     });
 
-    test('should have proper heading hierarchy in EN', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'en',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have proper heading hierarchy in EN', async ({ page }) => {
 
       await page.goto('/en/egipte-malta');
 
@@ -206,13 +132,7 @@ test.describe('SEO and Metadata', () => {
       await expect(page.locator('h1').first()).toBeVisible();
     });
 
-    test('should have ARIA labels for navigation elements', async ({ page, context }) => {
-      await context.addCookies([{
-        name: 'NEXT_LOCALE',
-        value: 'lv',
-        domain: 'localhost',
-        path: '/',
-      }]);
+    test('should have ARIA labels for navigation elements', async ({ page }) => {
 
       await page.goto('/egipte-malta');
 

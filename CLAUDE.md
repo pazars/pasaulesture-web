@@ -19,9 +19,11 @@ Pasaules Tūre website - a Next.js 16 application for ultra cycling events in La
 
 ### Testing
 - `npm test` - Run unit tests (Vitest)
-- `npm run test:e2e` - Run E2E tests (Playwright, all browsers)
+- `npm run test:e2e -- --project=chromium` - Run E2E tests in Chromium only (⚡ **recommended for development**, ~6 min)
+- `npm run test:e2e` - Run E2E tests in all browsers (Chromium, Firefox, WebKit, ~18 min)
 - `npm run test:e2e:ui` - Run E2E tests with Playwright UI
-- `npm run test:e2e -- --project=chromium` - Run E2E tests in Chromium only
+
+**Note:** During development, use `--project=chromium` for faster testing. Run all browsers only before deployment or in CI.
 
 ## Architecture
 

@@ -3,14 +3,8 @@ import { CONTACT_INFO } from "@/app/data/contact";
 
 test.describe("Contact Page", () => {
   test.describe("Latvian", () => {
-    test("should display all contact information", async ({ page, context }) => {
+    test("should display all contact information", async ({ page }) => {
       // Set Latvian locale preference
-      await context.addCookies([{
-        name: "NEXT_LOCALE",
-        value: "lv",
-        domain: "localhost",
-        path: "/"
-      }]);
 
       await page.goto("/kontakti");
 
@@ -37,14 +31,8 @@ test.describe("Contact Page", () => {
       ).toBeVisible();
     });
 
-    test("should have back to home button", async ({ page, context }) => {
+    test("should have back to home button", async ({ page }) => {
       // Set Latvian locale preference
-      await context.addCookies([{
-        name: "NEXT_LOCALE",
-        value: "lv",
-        domain: "localhost",
-        path: "/"
-      }]);
 
       await page.goto("/kontakti");
 
@@ -53,14 +41,8 @@ test.describe("Contact Page", () => {
       await expect(backButton).toHaveAttribute("href", "/");
     });
 
-    test("email link should be clickable", async ({ page, context }) => {
+    test("email link should be clickable", async ({ page }) => {
       // Set Latvian locale preference
-      await context.addCookies([{
-        name: "NEXT_LOCALE",
-        value: "lv",
-        domain: "localhost",
-        path: "/"
-      }]);
 
       await page.goto("/kontakti");
 
@@ -121,14 +103,8 @@ test.describe("Contact Page", () => {
   });
 
   test.describe("Navigation", () => {
-    test("should be accessible from footer (Latvian)", async ({ page, context }) => {
+    test("should be accessible from footer (Latvian)", async ({ page }) => {
       // Set Latvian locale preference
-      await context.addCookies([{
-        name: "NEXT_LOCALE",
-        value: "lv",
-        domain: "localhost",
-        path: "/"
-      }]);
 
       await page.goto("/egipte-malta");
 
