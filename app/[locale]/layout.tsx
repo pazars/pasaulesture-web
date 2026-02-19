@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import { notFound } from "next/navigation";
 import "../globals.css";
 import type { Metadata, Viewport } from "next";
@@ -127,6 +128,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
