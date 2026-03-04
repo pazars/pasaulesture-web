@@ -21,6 +21,7 @@
   "section_gallery": "Moments from the track",
   "route_coming_soon": "Route coming soon...",
   "route_best_on_pc": "Best explored on a computer",
+  "route_reveal_soon": "just a moment...",
   "route_reveal_countdown": "Route reveal in",
   "countdown_days": "{count, plural, one {day} other {days}}",
   "countdown_hours": "{count, plural, one {hour} other {hours}}",
