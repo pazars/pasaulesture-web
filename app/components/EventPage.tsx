@@ -45,7 +45,7 @@ export default function EventPage({ event }: EventPageProps) {
   const t = useTranslations();
   const locale = useLocale();
   const [selectedDistanceIndex, setSelectedDistanceIndex] = useState(event.distances.length - 1);
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  // const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [showToast, setShowToast] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -94,34 +94,34 @@ export default function EventPage({ event }: EventPageProps) {
     };
   }, [event.slug, event.distances.length, isDakar]);
 
-  // Countdown timer for route reveal (Dakar: March 1st, 2026)
-  useEffect(() => {
-    if (!isDakar) return;
-
-    const routeRevealDate = new Date('2026-03-01T00:00:00');
-
-    const updateCountdown = () => {
-      const now = new Date();
-      const diff = routeRevealDate.getTime() - now.getTime();
-
-      if (diff <= 0) {
-        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      setCountdown({ days, hours, minutes, seconds });
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-
-    return () => clearInterval(interval);
-  }, [isDakar]);
+  // Countdown timer for route reveal (Dakar: March 1st, 2026) - commented out, replaced with "route_reveal_soon"
+  // useEffect(() => {
+  //   if (!isDakar) return;
+  //
+  //   const routeRevealDate = new Date('2026-03-01T00:00:00');
+  //
+  //   const updateCountdown = () => {
+  //     const now = new Date();
+  //     const diff = routeRevealDate.getTime() - now.getTime();
+  //
+  //     if (diff <= 0) {
+  //       setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  //       return;
+  //     }
+  //
+  //     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  //     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  //     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  //     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  //
+  //     setCountdown({ days, hours, minutes, seconds });
+  //   };
+  //
+  //   updateCountdown();
+  //   const interval = setInterval(updateCountdown, 1000);
+  //
+  //   return () => clearInterval(interval);
+  // }, [isDakar]);
 
   const handleDistanceSelect = (index: number) => {
     setSelectedDistanceIndex(index);
@@ -440,6 +440,11 @@ export default function EventPage({ event }: EventPageProps) {
                   <span className="block text-5xl mb-4" role="img" aria-hidden="true">👀</span>
                   {isDakar ? (
                     <>
+                      <p className="text-beige/70 text-lg font-medium mb-2">{t("route_reveal_countdown")}</p>
+                      <p className="text-beige/70 text-lg font-medium">{t("route_reveal_soon")}</p>
+                    </>
+                    /* Countdown timer - commented out, replaced with "route_reveal_soon" message
+                    <>
                       <p className="text-beige/70 text-lg font-medium mb-6">{t("route_reveal_countdown")}</p>
                       <div className="grid grid-cols-4 gap-3 sm:gap-5 w-full max-w-xs sm:max-w-md mx-auto">
                         {[
@@ -457,6 +462,7 @@ export default function EventPage({ event }: EventPageProps) {
                         ))}
                       </div>
                     </>
+                    */
                   ) : (
                     <p className="text-beige/70 text-lg font-medium">{t("route_coming_soon")}</p>
                   )}

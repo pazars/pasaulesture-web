@@ -21,6 +21,7 @@
   "section_gallery": "Mirkļi no trases",
   "route_coming_soon": "Maršruts drīzumā...",
   "route_best_on_pc": "Ērtāk apskatāms datorā",
+  "route_reveal_soon": "pavisam īsa brīža...",
   "route_reveal_countdown": "Maršruts tiks atklāts pēc",
   "countdown_days": "{count, plural, one {dienas} other {dienām}}",
   "countdown_hours": "{count, plural, one {stundas} other {stundām}}",
