@@ -118,8 +118,10 @@ export default function CheckoutForm({
         fetchPrices();
     }, []);
 
-    // Fetch accommodation availability on mount
+    // Fetch accommodation availability on mount (only for events with accommodation)
     useEffect(() => {
+        if (!event.hasAccommodation) return;
+
         async function fetchAccommodation() {
             try {
                 const response = await fetch(`/api/accommodations/availability?eventSlug=${event.slug}`);
@@ -134,7 +136,7 @@ export default function CheckoutForm({
         }
 
         fetchAccommodation();
-    }, [event.slug]);
+    }, [event.slug, event.hasAccommodation]);
 
     // Save selection and check for redirected persistence
     useEffect(() => {
@@ -375,7 +377,7 @@ export default function CheckoutForm({
             )}
 
             {/* Dorm Full Error Banner */}
-            {dormFullError && (
+            {event.hasAccommodation && dormFullError && (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                     <div className="flex items-start gap-3">
                         <svg
@@ -550,7 +552,8 @@ export default function CheckoutForm({
                     )}
                 </div>
 
-                {/* Accommodation Checkbox */}
+                {/* Accommodation Checkbox (only for events with accommodation) */}
+                {event.hasAccommodation && (
                 <div className="-mt-2 !mb-4">
                     <div className="flex items-start gap-3 py-2">
                         <input
@@ -617,6 +620,7 @@ export default function CheckoutForm({
                         </div>
                     )}
                 </div>
+                )}
 
                 {/* Preparation Tips Checkbox */}
                 <div className="space-y-4">
