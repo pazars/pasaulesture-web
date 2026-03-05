@@ -26,6 +26,8 @@ export interface EventData {
   registrationUrl: string;
   heroQuoteKey: string;
   heroQuote2Key: string;
+  routeDescriptionKey?: string;
+  routeHighlightsKey?: string;
   gallery?: string[];
 }
 
@@ -66,6 +68,8 @@ export const events: Record<string, EventData> = {
     registrationUrl: "",
     heroQuoteKey: "hero_quote_egipte_malta",
     heroQuote2Key: "hero_quote_2_egipte_malta",
+    routeDescriptionKey: "route_description_egipte_malta",
+    routeHighlightsKey: "route_highlights_egipte_malta",
     gallery: [
       "/events/egipte-malta/gallery/0.jpeg",
       "/events/egipte-malta/gallery/1.jpeg",
@@ -101,6 +105,8 @@ export const events: Record<string, EventData> = {
     registrationUrl: "",
     heroQuoteKey: "hero_quote_parize_dakara",
     heroQuote2Key: "hero_quote_2_parize_dakara",
+    routeDescriptionKey: "route_description_parize_dakara",
+    routeHighlightsKey: "route_highlights_parize_dakara",
   },
 };
 

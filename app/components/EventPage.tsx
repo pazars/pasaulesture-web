@@ -10,6 +10,7 @@ import Header from "./Header";
 import Toast from "./Toast";
 import Gallery from "./Gallery";
 import { useTranslations, useLocale } from "next-intl";
+import { formatText } from "@/app/lib/formatText";
 
 interface EventPageProps {
   event: EventData;
@@ -413,8 +414,10 @@ export default function EventPage({ event }: EventPageProps) {
             <div className="text-center mb-10">
               <h2 className="font-accent text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
               <div className="section-divider w-24 mx-auto" />
-              {/* TODO: Remove isDakar check once Parīze-Dakāra route is revealed */}
-              {!isDakar && <p className="sm:hidden text-beige/40 text-sm mt-3">{t("route_best_on_pc")}</p>}
+              <p className="sm:hidden text-beige/40 text-sm mt-3">{t("route_best_on_pc")}</p>
+              {event.routeDescriptionKey && t(event.routeDescriptionKey as any) && (
+                <p className="text-beige text-base sm:text-lg mt-4">{t(event.routeDescriptionKey as any)}</p>
+              )}
             </div>
 
             {selectedDistance.distanceEmbedUrl ? (
@@ -468,6 +471,15 @@ export default function EventPage({ event }: EventPageProps) {
             )}
           </div>
         </section>
+
+        {/* Route Highlights */}
+        {event.routeHighlightsKey && (
+          <section className="relative py-4 sm:py-6 mx-2 rounded-3xl overflow-hidden">
+            <div className="max-w-3xl mx-auto px-6 text-beige text-base sm:text-lg leading-relaxed text-center">
+              {formatText(t(event.routeHighlightsKey as any))}
+            </div>
+          </section>
+        )}
 
         {/* Photo Gallery Section */}
         {event.gallery && event.gallery.length > 0 && (

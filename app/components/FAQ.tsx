@@ -2,64 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-
-// Format text with basic markdown-like features: newlines and bullet points
-function formatText(text: string) {
-  const lines = text.split('\n');
-  const elements: React.ReactNode[] = [];
-  let listItems: string[] = [];
-  let paragraphLines: string[] = [];
-
-  const flushParagraph = () => {
-    if (paragraphLines.length > 0) {
-      elements.push(
-        <p key={`p-${elements.length}`} className="mb-3 last:mb-0">
-          {paragraphLines.join(' ')}
-        </p>
-      );
-      paragraphLines = [];
-    }
-  };
-
-  const flushList = () => {
-    if (listItems.length > 0) {
-      elements.push(
-        <ul key={`ul-${elements.length}`} className="list-disc pl-5 mb-3 space-y-1">
-          {listItems.map((item, i) => (
-            <li key={i}>{item}</li>
-          ))}
-        </ul>
-      );
-      listItems = [];
-    }
-  };
-
-  lines.forEach((line) => {
-    const trimmedLine = line.trim();
-
-    // Check if line is a bullet point
-    if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
-      flushParagraph();
-      listItems.push(trimmedLine.substring(2));
-    }
-    // Empty line - paragraph break
-    else if (trimmedLine === '') {
-      flushList();
-      flushParagraph();
-    }
-    // Regular text line
-    else {
-      flushList();
-      paragraphLines.push(trimmedLine);
-    }
-  });
-
-  // Flush any remaining content
-  flushList();
-  flushParagraph();
-
-  return <>{elements}</>;
-}
+import { formatText } from "@/app/lib/formatText";
 
 interface FAQItem {
   questionKey: string;
