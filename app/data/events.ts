@@ -26,6 +26,8 @@ export interface EventData {
   registrationUrl: string;
   heroQuoteKey: string;
   heroQuote2Key: string;
+  routeDescriptionKey?: string;
+  routeHighlightsKey?: string;
   gallery?: string[];
 }
 
@@ -66,6 +68,8 @@ export const events: Record<string, EventData> = {
     registrationUrl: "",
     heroQuoteKey: "hero_quote_egipte_malta",
     heroQuote2Key: "hero_quote_2_egipte_malta",
+    routeDescriptionKey: "route_description_egipte_malta",
+    routeHighlightsKey: "route_highlights_egipte_malta",
     gallery: [
       "/events/egipte-malta/gallery/0.jpeg",
       "/events/egipte-malta/gallery/1.jpeg",
@@ -83,8 +87,8 @@ export const events: Record<string, EventData> = {
     nameKey: "event_parize_dakara",
     date: new Date("2026-08-29"),
     location: {
-      name: "Kurzeme",
-      googleMapsUrl: "",
+      name: "Vaivari, Jūrmala",
+      googleMapsUrl: "https://maps.app.goo.gl/vM83xP3aXHAbgh1y8",
     },
     surfaceType: "Gravel",
     distances: [
@@ -94,14 +98,15 @@ export const events: Record<string, EventData> = {
           { icon: "calendar", labelKey: "label_date", value: "29/08" },
           { icon: "route", labelKey: "label_distance", value: "380 km" },
           { icon: "mountain", labelKey: "label_elevation", value: "<2000 m" },
-          { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
-        distanceEmbedUrl: "",
+        distanceEmbedUrl: "https://ridewithgps.com/embeds?type=route&id=54143669&title=Par%C4%ABze%20-%20Dak%C4%81ra&metricUnits=true&sampleGraph=true",
       },
     ],
     registrationUrl: "",
     heroQuoteKey: "hero_quote_parize_dakara",
     heroQuote2Key: "hero_quote_2_parize_dakara",
+    routeDescriptionKey: "route_description_parize_dakara",
+    routeHighlightsKey: "route_highlights_parize_dakara",
   },
 };
 
