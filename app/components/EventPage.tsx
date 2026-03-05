@@ -324,12 +324,10 @@ export default function EventPage({ event }: EventPageProps) {
         </section>
 
         {/* Route Selection with Start Location */}
-        {/* Only show route selection if there are multiple routes */}
-        {event.distances.length > 1 && (
-          <section className="relative mt-4 mx-2 rounded-3xl overflow-hidden py-4">
-            <div className="max-w-5xl mx-auto px-6">
-              {/* Vertical layout: Start on top, Routes below */}
-              <div className="flex flex-col items-center gap-4">
+        <section className="relative mt-4 mx-2 rounded-3xl overflow-hidden py-4">
+          <div className="max-w-5xl mx-auto px-6">
+            {/* Vertical layout: Start on top, Routes below */}
+            <div className={event.distances.length === 1 ? "grid gap-4 w-fit mx-auto" : "flex flex-col items-center gap-4"}>
 
               {/* Start Location - Top, centered */}
               {event.location.googleMapsUrl ? (
@@ -380,10 +378,10 @@ export default function EventPage({ event }: EventPageProps) {
                     <button
                       key={distance.nameKey}
                       onClick={() => handleDistanceSelect(index)}
-                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden w-full sm:w-auto sm:min-w-40 cursor-pointer ${isSelected
+                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden w-full ${event.distances.length > 1 ? "sm:w-auto sm:min-w-40" : ""} cursor-pointer ${isSelected
                         ? isDakar
-                          ? "bg-dakar-cream text-dakar-brown shadow-lg shadow-dakar-cream/40 scale-105"
-                          : "bg-pink text-blue shadow-lg shadow-pink/40 scale-105"
+                          ? `bg-dakar-cream text-dakar-brown${event.distances.length > 1 ? " shadow-lg shadow-dakar-cream/40 scale-105" : ""}`
+                          : `bg-pink text-blue${event.distances.length > 1 ? " shadow-lg shadow-pink/40 scale-105" : ""}`
                         : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
                         }`}
                     >
@@ -408,7 +406,6 @@ export default function EventPage({ event }: EventPageProps) {
             </div>
           </div>
         </section>
-        )}
 
         {/* Route Section */}
         <section id="route" className="py-10 sm:py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">

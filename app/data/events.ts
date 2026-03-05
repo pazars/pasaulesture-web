@@ -83,8 +83,8 @@ export const events: Record<string, EventData> = {
     nameKey: "event_parize_dakara",
     date: new Date("2026-08-29"),
     location: {
-      name: "Kurzeme",
-      googleMapsUrl: "",
+      name: "Vaivari, Jūrmala",
+      googleMapsUrl: "https://maps.app.goo.gl/vM83xP3aXHAbgh1y8",
     },
     surfaceType: "Gravel",
     distances: [
@@ -94,9 +94,8 @@ export const events: Record<string, EventData> = {
           { icon: "calendar", labelKey: "label_date", value: "29/08" },
           { icon: "route", labelKey: "label_distance", value: "380 km" },
           { icon: "mountain", labelKey: "label_elevation", value: "<2000 m" },
-          { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
-        distanceEmbedUrl: "",
+        distanceEmbedUrl: "https://ridewithgps.com/embeds?type=route&id=54143669&title=Par%C4%ABze%20-%20Dak%C4%81ra&metricUnits=true&sampleGraph=true",
       },
     ],
     registrationUrl: "",
