@@ -24,6 +24,7 @@ export interface EventData {
   surfaceType: string;
   distances: EventDistance[];
   registrationUrl: string;
+  hasAccommodation: boolean;
   heroQuoteKey: string;
   heroQuote2Key: string;
   routeDescriptionKey?: string;
@@ -66,6 +67,7 @@ export const events: Record<string, EventData> = {
       }
     ],
     registrationUrl: "",
+    hasAccommodation: true,
     heroQuoteKey: "hero_quote_egipte_malta",
     heroQuote2Key: "hero_quote_2_egipte_malta",
     routeDescriptionKey: "route_description_egipte_malta",
@@ -103,6 +105,7 @@ export const events: Record<string, EventData> = {
       },
     ],
     registrationUrl: "",
+    hasAccommodation: false,
     heroQuoteKey: "hero_quote_parize_dakara",
     heroQuote2Key: "hero_quote_2_parize_dakara",
     routeDescriptionKey: "route_description_parize_dakara",
