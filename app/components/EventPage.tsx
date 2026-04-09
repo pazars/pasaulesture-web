@@ -60,9 +60,20 @@ export default function EventPage({ event }: EventPageProps) {
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
 
+  // Compute distance options for hero fact line (e.g. "200 km vai 370 km")
+  const allDistanceValues = event.distances.map(d => {
+    const fact = d.facts.find(f => f.icon === "route");
+    return fact?.value || "";
+  });
+  const distanceDisplay = allDistanceValues.length === 1
+    ? allDistanceValues[0]
+    : allDistanceValues.map((v, i) =>
+        i < allDistanceValues.length - 1 ? v.replace(/\s*km/, '') : v
+      ).join(` ${t("distance_or")} `);
+
   // Event-specific theme configuration
   const isDakar = event.slug === "parize-dakara";
-  const postcardSrc = isDakar ? "/post/dakar/dakar-card.png" : "/post/card.png";
+  const heroImageSrc = isDakar ? "/post/dakar/dakar-card.png" : (event.gallery?.[0] || "/post/card.png");
   // Dakar uses only the golden stamp, Malta uses blue + pink
   const stamps = isDakar
     ? [
@@ -134,44 +145,52 @@ export default function EventPage({ event }: EventPageProps) {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <Header currentSlug={event.slug} />
-        <p className="hidden sm:block text-center text-beige text-base font-accent tracking-[0.15em] pt-2 pb-1">
+        <p className="hidden sm:block text-center text-beige text-xl font-accent tracking-[0.15em] pt-2 pb-1">
           {t("header_subtitle")}
         </p>
 
         {/* Hero Section - Postcard Collage */}
         <section className="relative w-full sm:min-h-[70vh] overflow-visible sm:overflow-hidden rounded-3xl mx-auto pt-2 pb-2 sm:pb-12" style={{ maxWidth: 'calc(100% - 1rem)', marginLeft: '0.5rem', marginRight: '0.5rem' }}>
 
-          {/* Mobile: Event name above date */}
-          <div className="sm:hidden relative z-20 text-center px-6 mb-5">
-            <h2 className={`font-accent text-3xl tracking-wide ${
+          {/* Mobile: Event identity block — label contextualizes the event name */}
+          <div className="sm:hidden relative z-20 text-center px-6 mb-8 animate-on-load animate-fade-in-up">
+            <p className="text-beige/80 text-sm font-accent mb-2">
+              {t("header_subtitle")}
+            </p>
+            <h2 className={`font-accent text-4xl tracking-wide ${
               isDakar ? "text-dakar-yellow" : "text-pink"
             }`}>
               {t(event.nameKey as any)}
             </h2>
+            <p className="text-beige/70 text-sm mt-3">
+              {distanceDisplay}
+            </p>
           </div>
 
           {/* Elegant Spelled-Out Date - Top */}
-          <div className="relative z-20 flex justify-center px-6 mb-6 sm:mb-12">
+          <div className="relative z-20 flex justify-center px-6 mb-8 sm:mb-12">
             <div className="text-center">
-              <h1 className="font-accent text-[clamp(1.5rem,7.5vw,2.25rem)] sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_4px_16px_rgba(0,0,0,0.3)] leading-tight whitespace-nowrap">
+              <h1 className="font-accent text-[clamp(1.25rem,5.5vw,1.75rem)] sm:text-5xl md:text-6xl lg:text-7xl text-beige tracking-wide drop-shadow-[0_2px_8px_rgba(0,0,0,0.2)] leading-tight whitespace-nowrap">
                 {formattedDate}
               </h1>
             </div>
           </div>
 
           {/* Mobile: Compact postcard collage — stamps tucked into postcard corners */}
-          <div className="sm:hidden relative w-full max-w-xs mx-auto px-4 mb-4">
+          <div className="sm:hidden relative w-full max-w-sm mx-auto px-4 mb-6 animate-on-load animate-fade-in-up delay-200">
             <div className="relative">
-              {/* Main Postcard */}
+              {/* Main hero image */}
               <div className="rotate-[-2deg]">
-                <Image
-                  src={postcardSrc}
-                  alt="Pasaules Tūre Postcard"
-                  width={520}
-                  height={360}
-                  className="rounded-lg shadow-2xl w-full h-auto"
-                  priority
-                />
+                <div className="relative aspect-[13/9] overflow-hidden rounded-lg shadow-2xl">
+                  <Image
+                    src={heroImageSrc}
+                    alt="Pasaules Tūre"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 384px"
+                    priority
+                  />
+                </div>
               </div>
 
               {/* Stamp 1 — top-left, overlapping the postcard corner */}
@@ -205,15 +224,15 @@ export default function EventPage({ event }: EventPageProps) {
           {/* Desktop: Scattered Collage Container */}
           <div className="relative w-full max-w-4xl mx-auto px-4 hidden sm:block" style={{ minHeight: '400px' }}>
 
-            {/* Main Postcard - Center, slightly tilted */}
+            {/* Main hero image - Center, slightly tilted */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rotate-[-2deg]">
-              <div className="relative group">
+              <div className="relative group w-[520px] aspect-[13/9] overflow-hidden rounded-lg shadow-2xl transition-transform duration-500 group-hover:scale-105 group-hover:rotate-0">
                 <Image
-                  src={postcardSrc}
-                  alt="Pasaules Tūre Postcard"
-                  width={520}
-                  height={360}
-                  className="rounded-lg shadow-2xl transition-transform duration-500 group-hover:scale-105 group-hover:rotate-0"
+                  src={heroImageSrc}
+                  alt="Pasaules Tūre"
+                  fill
+                  className="object-cover"
+                  sizes="520px"
                   priority
                 />
               </div>
@@ -297,122 +316,107 @@ export default function EventPage({ event }: EventPageProps) {
 
           </div>
 
-          {/* Route description (desktop only — fills space below collage) */}
+          {/* Desktop: quote, distance options, and CTA */}
           <div className="hidden sm:block relative z-20 max-w-2xl mx-auto px-6 text-center mt-8">
-            <p className="text-lg md:text-xl lg:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-4">
-              &ldquo;{t(event.heroQuoteKey as any)}&rdquo;
+            <p className="text-lg md:text-xl lg:text-2xl text-beige font-medium italic leading-relaxed font-accent">
+              {t(event.heroQuoteKey as any)}
             </p>
-            <p className="text-base md:text-lg text-beige/70 leading-relaxed">
-              {t(event.heroQuote2Key as any)}
-            </p>
+            <Link
+              href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
+              className={`inline-block text-base font-bold px-10 py-4 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all mt-6 ${
+                isDakar
+                  ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30"
+                  : "bg-pink text-blue shadow-pink/30"
+              }`}
+            >
+              {t("register_button")}
+            </Link>
           </div>
         </section>
 
-        {/* Quote Section - two paragraphs */}
-        <section className="relative py-6 overflow-hidden rounded-3xl mt-2 mx-2 sm:hidden">
+        {/* Mobile: Tagline + CTA — the commercial hook */}
+        <section className="relative pt-4 pb-8 overflow-hidden rounded-3xl mx-2 sm:hidden animate-on-load animate-fade-in-up delay-400">
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-            <p className="text-xl sm:text-2xl text-beige font-medium italic leading-relaxed font-accent mb-6">
-              &ldquo;{t(event.heroQuoteKey as any)}&rdquo;
+            <p className="text-2xl text-beige font-display leading-relaxed mb-6">
+              {t(event.heroQuoteKey as any)}
             </p>
-            <p className="text-lg text-beige/70 leading-relaxed">
-              {t(event.heroQuote2Key as any)}
-            </p>
-          </div>
-        </section>
-
-        {/* Route Selection with Start Location */}
-        <section className="relative mt-4 mx-2 rounded-3xl overflow-hidden py-4">
-          <div className="max-w-5xl mx-auto px-6">
-            {/* Vertical layout: Start on top, Routes below */}
-            <div className={event.distances.length === 1 ? "grid gap-4 w-fit mx-auto" : "flex flex-col items-center gap-4"}>
-
-              {/* Start Location - Top, centered */}
-              {event.location.googleMapsUrl ? (
-                <a
-                  href={event.location.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8 hover:bg-white/12 transition-all cursor-pointer"
-                >
-                  <div className={`p-2 rounded-lg ${isDakar ? "bg-dakar-cream/25" : "bg-pink/25"
-                    }`}>
-                    <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
-                      }`} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
-                    <p className={`font-bold text-beige transition-colors inline-flex items-center gap-1 ${isDakar ? "group-hover:text-dakar-yellow" : "group-hover:text-pink"
-                      }`}>
-                      {event.location.name}
-                      <ExternalLinkIcon className="w-3 h-3" />
-                    </p>
-                  </div>
-                </a>
-              ) : (
-                <div className="group flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/8">
-                  <div className={`p-2 rounded-lg ${isDakar ? "bg-dakar-cream/25" : "bg-pink/25"
-                    }`}>
-                    <LocationIcon className={`w-5 h-5 ${isDakar ? "text-beige" : "text-pink"
-                      }`} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-beige/60 uppercase tracking-wider font-semibold">{t("label_start")}</p>
-                    <p className="font-bold text-beige">{event.location.name}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Route Selection - Centered, larger buttons with clear hover states */}
-              <div className="flex flex-wrap justify-center gap-4">
-                {event.distances.map((distance, index) => {
-                  const distanceFact = distance.facts.find(f => f.icon === "route");
-                  const elevationFact = distance.facts.find(f => f.icon === "mountain");
-                  const distanceValue = distanceFact?.value || "";
-                  const elevationValue = elevationFact?.value || "";
-                  const isSelected = index === selectedDistanceIndex;
-                  const distanceName = t(distance.nameKey as any);
-                  return (
-                    <button
-                      key={distance.nameKey}
-                      onClick={() => handleDistanceSelect(index)}
-                      className={`relative px-8 py-5 font-bold transition-all rounded-2xl overflow-hidden w-full ${event.distances.length > 1 ? "sm:w-auto sm:min-w-40" : ""} cursor-pointer ${isSelected
-                        ? isDakar
-                          ? `bg-dakar-cream text-dakar-brown${event.distances.length > 1 ? " shadow-lg shadow-dakar-cream/40 scale-105" : ""}`
-                          : `bg-pink text-blue${event.distances.length > 1 ? " shadow-lg shadow-pink/40 scale-105" : ""}`
-                        : "bg-white/8 text-beige hover:bg-white/15 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
-                        }`}
-                    >
-                      {isSelected && (
-                        <div className={`absolute top-0 right-0 w-6 h-6 transform rotate-45 translate-x-3 -translate-y-3 ${isDakar ? "bg-dakar-yellow" : "bg-lime"
-                          }`} />
-                      )}
-                      <span className="block text-lg relative z-10 font-accent">{distanceName}</span>
-                      <div className={`flex items-center justify-center gap-2 mt-1.5 relative z-10 text-sm ${isSelected
-                        ? isDakar
-                          ? "text-dakar-brown/70"
-                          : "text-blue/70"
-                        : "text-beige/60"
-                        }`}>
-                        <span className="font-semibold">{distanceValue}</span>
-                        {elevationValue && <span>· {elevationValue}</span>}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <Link
+              href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
+              className={`inline-block text-base font-bold px-8 py-3.5 rounded-full shadow-lg transition-all hover:-translate-y-0.5 ${
+                isDakar
+                  ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30"
+                  : "bg-pink text-blue shadow-pink/30"
+              }`}
+            >
+              {t("register_button")}
+            </Link>
           </div>
         </section>
 
         {/* Route Section */}
         <section id="route" className="py-10 sm:py-16 relative overflow-hidden rounded-3xl mt-4 mx-2">
           <div className="max-w-5xl mx-auto px-6 relative z-10">
-            <div className="text-center mb-10">
+            <div className="text-center mb-8">
               <h2 className="font-accent text-4xl sm:text-5xl text-beige mb-3">{t("section_route")}</h2>
               <div className="section-divider w-24 mx-auto" />
+
               <p className="sm:hidden text-beige/40 text-sm mt-3">{t("route_best_on_pc")}</p>
+
               {event.routeDescriptionKey && t(event.routeDescriptionKey as any) && (
-                <p className="text-beige text-base sm:text-lg mt-4">{t(event.routeDescriptionKey as any)}</p>
+                <p className="text-beige/50 text-sm mt-3">{t(event.routeDescriptionKey as any)}</p>
+              )}
+
+              {/* Start & finish locations */}
+              <div className="flex flex-col items-center gap-1 mt-3">
+                <a
+                  href={event.location.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-1.5 text-sm transition-colors ${isDakar ? "text-beige hover:text-dakar-yellow" : "text-beige hover:text-pink"}`}
+                >
+                  <LocationIcon className="w-4 h-4" />
+                  <span className="font-semibold">{t("label_start")}: {event.location.name}</span>
+                  <ExternalLinkIcon className="w-3 h-3" />
+                </a>
+                {selectedDistance.endLocation && (
+                  <a
+                    href={selectedDistance.endLocation.googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center gap-1.5 text-sm transition-colors ${isDakar ? "text-beige hover:text-dakar-yellow" : "text-beige hover:text-pink"}`}
+                  >
+                    <LocationIcon className="w-4 h-4" />
+                    <span className="font-semibold">{t("label_finish")}: {selectedDistance.endLocation.name}</span>
+                    <ExternalLinkIcon className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
+
+              {/* Distance toggle — pill style, matches event tabs */}
+              {event.distances.length > 1 && (
+                <div className={`flex rounded-full p-1 border max-w-xs mx-auto mt-6 ${isDakar ? "bg-dakar-brown/30 border-dakar-cream/12" : "bg-blue/30 border-white/10"} backdrop-blur-md`}>
+                  {event.distances.map((distance, index) => {
+                    const isSelected = index === selectedDistanceIndex;
+                    const distanceFact = distance.facts.find(f => f.icon === "route");
+                    const label = distanceFact?.value || t(distance.nameKey as any);
+                    return isSelected ? (
+                      <span
+                        key={distance.nameKey}
+                        className={`flex-1 text-center py-2 rounded-full font-accent font-bold text-sm cursor-default transition-all ${isDakar ? "bg-dakar-cream text-dakar-brown shadow-md shadow-dakar-cream/25" : "bg-pink text-blue shadow-md shadow-pink/25"}`}
+                      >
+                        {label}
+                      </span>
+                    ) : (
+                      <button
+                        key={distance.nameKey}
+                        onClick={() => handleDistanceSelect(index)}
+                        className="flex-1 text-center py-2 rounded-full font-accent font-semibold text-sm text-beige/50 transition-all active:scale-95 cursor-pointer"
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
             </div>
 
@@ -468,6 +472,13 @@ export default function EventPage({ event }: EventPageProps) {
           </div>
         </section>
 
+        {/* Second hero quote — between map and highlights */}
+        <section className="relative py-4 sm:py-6 mx-2 rounded-3xl overflow-hidden">
+          <div className="max-w-3xl mx-auto px-6 text-beige text-base sm:text-lg leading-relaxed text-center">
+            {t(event.heroQuote2Key as any)}
+          </div>
+        </section>
+
         {/* Route Highlights */}
         {event.routeHighlightsKey && (
           <section className="relative py-4 sm:py-6 mx-2 rounded-3xl overflow-hidden">
@@ -484,8 +495,8 @@ export default function EventPage({ event }: EventPageProps) {
           />
         )}
 
-        {/* Registration Section - collage style */}
-        <section id="register" className="relative py-6 sm:py-16 mt-2 sm:mt-6 mx-2">
+        {/* Registration Section - collage style (desktop only — mobile has inline CTA + sticky bar) */}
+        <section id="register" className="hidden sm:block relative py-6 sm:py-16 mt-2 sm:mt-6 mx-2">
 
           {/* Left stamp - sits above text, slightly askew */}
           <div className="absolute z-10 hidden sm:block" style={{ left: '8%', top: '50%', transform: 'translateY(-50%)' }}>
@@ -517,12 +528,9 @@ export default function EventPage({ event }: EventPageProps) {
           <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
             <Link
               href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
-              className={`inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all ${isDakar ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30 hover:shadow-dakar-yellow/40" : "bg-pink text-blue shadow-pink/30 hover:shadow-pink/40"}`}
+              className={`inline-block text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all ${isDakar ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30 hover:shadow-dakar-yellow/40" : "bg-pink text-blue shadow-pink/30 hover:shadow-pink/40"}`}
             >
-              <span>{t("register_button")}</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              {t("register_button")}
             </Link>
           </div>
         </section>

@@ -829,3 +829,21 @@ body::after {
   cursor: pointer;
 }
 
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-load {
+    opacity: 1;
+  }
+
+  .animate-fade-in-up,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-float,
+  .animate-pulse-glow {
+    animation: none;
+    opacity: 1;
+  }
+}
+

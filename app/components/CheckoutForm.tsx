@@ -457,7 +457,7 @@ export default function CheckoutForm({
                                     const distKm = d.facts.find(f => f.icon === "route")?.value || "";
                                     return (
                                         <option key={idx} value={idx.toString()}>
-                                            {t(d.nameKey as any)} ({distKm})
+                                            {distKm || t(d.nameKey as any)}
                                         </option>
                                     );
                                 })}
