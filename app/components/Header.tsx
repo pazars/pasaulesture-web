@@ -38,14 +38,11 @@ export default function Header({ currentSlug }: HeaderProps) {
             <MenuIcon className="w-7 h-7" />
           </button>
 
-          {/* Brand + subtitle */}
+          {/* Brand */}
           <div className="text-center">
             <span className="font-display text-xl text-beige">
               {t("footer_brand")}
             </span>
-            <p className="text-beige/60 text-xs font-accent tracking-[0.15em] -mt-0.5">
-              {t("header_subtitle")}
-            </p>
           </div>
 
           {/* Spacer for symmetry */}

@@ -228,7 +228,7 @@ export default async function CheckoutSuccessPage({
                   {t("checkout_distance_label")}
                 </label>
                 <div className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium">
-                  {t(distance.nameKey as any)}
+                  {distanceFact?.value || t(distance.nameKey as any)}
                 </div>
               </div>
 

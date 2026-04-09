@@ -13,6 +13,7 @@ export interface EventDistance {
   nameKey: string; // Translation key for distance name
   facts: EventFact[];
   distanceEmbedUrl: string;
+  endLocation?: EventLocation;
   // price field removed - managed in Stripe Dashboard
 }
 
@@ -53,6 +54,10 @@ export const events: Record<string, EventData> = {
         ],
         distanceEmbedUrl:
           "https://ridewithgps.com/embeds?type=route&id=53804940&title=%C4%92%C4%A3ipte&metricUnits=true&sampleGraph=true",
+        endLocation: {
+          name: "Daugavpils cietoksnis",
+          googleMapsUrl: "https://maps.app.goo.gl/HSs57YqjPhS5PFmM9",
+        },
       },
       {
         nameKey: "distance_challenge",
@@ -64,6 +69,10 @@ export const events: Record<string, EventData> = {
         ],
         distanceEmbedUrl:
           "https://ridewithgps.com/embeds?type=route&id=53804909&title=%C4%92%C4%A3ipte%20-%20Malta&metricUnits=true&sampleGraph=true",
+        endLocation: {
+          name: "Sarkaņkalns",
+          googleMapsUrl: "https://maps.app.goo.gl/ZT7SXvmoPGzpR8DM8",
+        },
       }
     ],
     registrationUrl: "",
@@ -102,6 +111,10 @@ export const events: Record<string, EventData> = {
           { icon: "mountain", labelKey: "label_elevation", value: "<2000 m" },
         ],
         distanceEmbedUrl: "https://ridewithgps.com/embeds?type=route&id=54143669&title=Par%C4%ABze%20-%20Dak%C4%81ra&metricUnits=true&sampleGraph=true",
+        endLocation: {
+          name: "Bernāti",
+          googleMapsUrl: "https://maps.app.goo.gl/VLpKcFBoc9pGkbGZA",
+        },
       },
     ],
     registrationUrl: "",

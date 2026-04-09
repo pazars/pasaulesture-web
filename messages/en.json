@@ -1,14 +1,15 @@
 {
   "site_title": "Pasaules Ture",
   "site_description": "Ultra cycling events in Latvia",
-  "header_subtitle": "gravel cycling events",
-  "hero_quote_egipte_malta": "The route is centered around local landmarks by the name of Egypt and Malta and explores Latvia's region Latgale. With snacks, of course.",
-  "hero_quote_2_egipte_malta": "We're not sure what's the story behind these settlements, but we're sure that these are some of the best gravel roads Northern Europe has to offer.",
-  "hero_quote_parize_dakara": "Route inspired by Paris - Dakar rally fused with Courland region's gems. With snacks, of course.",
-  "hero_quote_2_parize_dakara": "Just like the rally ended at the Westernmost tip of Africa, this route will end at Latvia's Westernmost point along the Baltic coast. Along the way you'll visit Paris as well. Some say you might even spot the Eiffel tower.",
+  "header_subtitle": "gravel cycling event in Latvia",
+  "hero_quote_egipte_malta": "With snacks, of course",
+  "hero_quote_2_egipte_malta": "Yes, there are towns called Egypt and Malta in Latvia. We're not sure what's the story there, but we're sure that these are some of the best gravel roads Northern Europe has to offer.",
+  "hero_quote_parize_dakara": "With snacks, of course",
+  "hero_quote_2_parize_dakara": "Route inspired by Paris - Dakar rally. Just like the rally ended at the Westernmost tip of Africa, this route will end at Latvia's Westernmost point along the Baltic coast. Along the way you'll visit Paris as well. Some say you might even spot the Eiffel tower.",
   "coming_soon": "Coming Soon",
   "label_surface": "Surface",
   "label_start": "Start",
+  "label_finish": "Finish",
   "label_date": "Date",
   "label_elevation": "Elevation",
   "label_time_limit": "Time Limit",
@@ -144,5 +145,6 @@
   "label_discount_saved": "Saved",
   "checkout_emergency_section_label": "Emergency Contact",
   "menu_open": "Menu",
-  "menu_close": "Close"
+  "menu_close": "Close",
+  "distance_or": "or"
 }
