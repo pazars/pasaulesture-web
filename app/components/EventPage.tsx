@@ -145,7 +145,7 @@ export default function EventPage({ event }: EventPageProps) {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <Header currentSlug={event.slug} />
-        <p className="hidden sm:block text-center text-beige text-base font-accent tracking-[0.15em] pt-2 pb-1">
+        <p className="hidden sm:block text-center text-beige text-xl font-accent tracking-[0.15em] pt-2 pb-1">
           {t("header_subtitle")}
         </p>
 
@@ -316,11 +316,21 @@ export default function EventPage({ event }: EventPageProps) {
 
           </div>
 
-          {/* Route description (desktop only — fills space below collage) */}
+          {/* Desktop: quote, distance options, and CTA */}
           <div className="hidden sm:block relative z-20 max-w-2xl mx-auto px-6 text-center mt-8">
             <p className="text-lg md:text-xl lg:text-2xl text-beige font-medium italic leading-relaxed font-accent">
               {t(event.heroQuoteKey as any)}
             </p>
+            <Link
+              href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
+              className={`inline-block text-base font-bold px-10 py-4 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all mt-6 ${
+                isDakar
+                  ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30"
+                  : "bg-pink text-blue shadow-pink/30"
+              }`}
+            >
+              {t("register_button")}
+            </Link>
           </div>
         </section>
 
@@ -357,7 +367,7 @@ export default function EventPage({ event }: EventPageProps) {
               )}
 
               {/* Start & finish locations */}
-              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-3">
+              <div className="flex flex-col items-center gap-1 mt-3">
                 <a
                   href={event.location.googleMapsUrl}
                   target="_blank"
@@ -464,10 +474,8 @@ export default function EventPage({ event }: EventPageProps) {
 
         {/* Second hero quote — between map and highlights */}
         <section className="relative py-4 sm:py-6 mx-2 rounded-3xl overflow-hidden">
-          <div className="max-w-2xl mx-auto px-6 text-center">
-            <p className="text-base sm:text-lg text-beige/70 leading-relaxed">
-              {t(event.heroQuote2Key as any)}
-            </p>
+          <div className="max-w-3xl mx-auto px-6 text-beige text-base sm:text-lg leading-relaxed text-center">
+            {t(event.heroQuote2Key as any)}
           </div>
         </section>
 
@@ -520,12 +528,9 @@ export default function EventPage({ event }: EventPageProps) {
           <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
             <Link
               href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
-              className={`inline-flex items-center gap-3 text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all ${isDakar ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30 hover:shadow-dakar-yellow/40" : "bg-pink text-blue shadow-pink/30 hover:shadow-pink/40"}`}
+              className={`inline-block text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all ${isDakar ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30 hover:shadow-dakar-yellow/40" : "bg-pink text-blue shadow-pink/30 hover:shadow-pink/40"}`}
             >
-              <span>{t("register_button")}</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              {t("register_button")}
             </Link>
           </div>
         </section>
