@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
-export const dynamic = "force-dynamic";
 import { getEventBySlug } from "@/app/data/events";
+import { getStripePrices } from "@/app/data/stripe-prices.server";
 import CheckoutForm from "@/app/components/CheckoutForm";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+
+export const revalidate = 300;
 
 interface CheckoutPageProps {
     params: Promise<{
@@ -24,6 +26,8 @@ export default async function CheckoutPage({
     if (!event) {
         notFound();
     }
+
+    const initialPrices = await getStripePrices();
 
     const eventUrl = locale === "en" ? `/en/${slug}` : `/${slug}`;
 
@@ -65,7 +69,7 @@ export default async function CheckoutPage({
                         <div className="w-8 h-8 border-2 border-slate-200 border-t-slate-600 rounded-full animate-spin" />
                     </div>
                 }>
-                    <CheckoutForm event={event} />
+                    <CheckoutForm event={event} initialPrices={initialPrices} />
                 </Suspense>
             </div>
         </div>

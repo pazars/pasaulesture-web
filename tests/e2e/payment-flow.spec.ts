@@ -214,47 +214,6 @@ test.describe("Payment Flow E2E", () => {
     });
   });
 
-  test.describe("Price Loading States", () => {
-    test("should disable submit button while prices are loading", async ({
-      page,
-    }) => {
-      // Navigate to checkout
-      await page.goto("/egipte-malta/checkout?distance=0");
-
-      // Initially, button may be disabled until prices load
-      const submitButton = page.locator('button[type="submit"]');
-
-      // Wait for prices to load (any price starting with €)
-      await expect(page.locator("text=/€\\d+/")).toBeVisible({ timeout: 10000 });
-
-      // After load, fill form and button should be enabled
-      await page.fill('input[id="name"]', "Test");
-      await page.fill('input[id="email"]', "test@test.com");
-      await page.check('input[id="terms"]');
-
-      await expect(submitButton).toBeEnabled();
-    });
-
-    test("should show error message if prices fail to load", async ({
-      page,
-    }) => {
-      // Block the prices API
-      await page.route("**/api/stripe/prices", (route) => {
-        route.fulfill({
-          status: 500,
-          body: JSON.stringify({ error: "Internal error" }),
-        });
-      });
-
-      await page.goto("/egipte-malta/checkout?distance=0");
-
-      // Should show error state
-      await expect(
-        page.getByText(/Registration is temporarily unavailable/i)
-      ).toBeVisible({ timeout: 10000 });
-    });
-  });
-
   test.describe("Event and Distance Selection", () => {
     test("should update price when changing distance", async ({ page }) => {
       await page.goto("/egipte-malta/checkout?distance=0");

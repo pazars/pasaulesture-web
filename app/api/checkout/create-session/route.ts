@@ -107,10 +107,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Resolve the Stripe price. Prefer client-supplied priceId (already loaded by the form's
-    // /api/stripe/prices fetch on mount) — single targeted GET vs. listing the whole catalog.
-    // Always re-validate the price's product metadata so a tampered priceId can't pay a
-    // mismatched event/distance.
+    // Resolve the Stripe price. Prefer client-supplied priceId (SSR'd into the page) —
+    // single targeted GET vs. listing the whole catalog. Always re-validate the price's
+    // product metadata so a tampered priceId can't pay a mismatched event/distance.
     let resolvedPrice: Stripe.Price | null = null;
     if (submittedPriceId) {
       try {

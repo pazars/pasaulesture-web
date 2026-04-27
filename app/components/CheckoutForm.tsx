@@ -9,15 +9,16 @@ import { useTranslations, useLocale } from "next-intl";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
-interface CheckoutFormProps {
-    event: EventData;
-}
-
 interface StripePrice {
     priceId: string;
     eventSlug: string;
     distanceIndex: number;
     amount: number;
+}
+
+interface CheckoutFormProps {
+    event: EventData;
+    initialPrices: StripePrice[] | null;
 }
 
 interface AccommodationAvailability {
@@ -30,6 +31,7 @@ interface AccommodationAvailability {
 
 export default function CheckoutForm({
     event,
+    initialPrices,
 }: CheckoutFormProps) {
     const t = useTranslations();
     const locale = useLocale();
@@ -61,9 +63,7 @@ export default function CheckoutForm({
 
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [stripePrices, setStripePrices] = useState<StripePrice[]>([]);
-    const [priceLoading, setPriceLoading] = useState(true);
-    const [priceError, setPriceError] = useState<string | null>(null);
+    const stripePrices = initialPrices ?? [];
     const [dormAvailability, setDormAvailability] = useState<AccommodationAvailability | null>(null);
     const [dormFullError, setDormFullError] = useState(false);
     const [submitError, setSubmitError] = useState(false);
@@ -95,27 +95,6 @@ export default function CheckoutForm({
             }
         }
     }, []); // Run only on mount
-
-    // Fetch Stripe prices on mount
-    useEffect(() => {
-        async function fetchPrices() {
-            try {
-                const response = await fetch('/api/stripe/prices');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch prices');
-                }
-                const data = await response.json();
-                setStripePrices(data.prices || []);
-            } catch (error) {
-                console.error('Error fetching prices:', error);
-                setPriceError('Failed to load pricing information');
-            } finally {
-                setPriceLoading(false);
-            }
-        }
-
-        fetchPrices();
-    }, []);
 
     // Fetch accommodation availability on mount (only for events with accommodation)
     useEffect(() => {
@@ -315,7 +294,7 @@ export default function CheckoutForm({
     const termsUrl = locale === "en" ? "/en/noteikumi" : "/noteikumi";
 
     // Show error if price not found
-    const showPriceError = !priceLoading && !matchingPrice;
+    const showPriceError = !matchingPrice;
 
     return (
         <div className="space-y-6">
@@ -395,9 +374,7 @@ export default function CheckoutForm({
                         </span>
                         <div className="text-right">
                             <span className="text-xs text-slate-400 uppercase tracking-wide block mb-0.5">{t("checkout_price_label")}</span>
-                            {priceLoading ? (
-                                <span className="text-xl font-semibold text-slate-400">...</span>
-                            ) : matchingPrice ? (
+                            {matchingPrice ? (
                                 <div className="flex items-baseline justify-end gap-2">
                                     <span className="text-2xl font-bold text-emerald-400">
                                         €{(finalPrice / 100).toFixed(2)}
@@ -778,7 +755,7 @@ export default function CheckoutForm({
                 <div className="sticky bottom-0 sm:static bg-white/95 backdrop-blur-sm sm:backdrop-blur-none -mx-6 px-6 py-4 sm:py-0 sm:mx-0 sm:px-0 border-t border-slate-100 sm:border-t-0 pb-safe">
                     <button
                         type="submit"
-                        disabled={isSubmitting || priceLoading || showPriceError}
+                        disabled={isSubmitting || showPriceError}
                         className="w-full py-4 px-6 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 text-white font-semibold text-lg rounded-xl transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? (
