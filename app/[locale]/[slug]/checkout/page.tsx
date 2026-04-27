@@ -6,7 +6,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 interface CheckoutPageProps {
     params: Promise<{
