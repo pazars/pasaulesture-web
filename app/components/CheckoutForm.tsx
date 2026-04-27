@@ -68,6 +68,7 @@ export default function CheckoutForm({
     const [priceError, setPriceError] = useState<string | null>(null);
     const [dormAvailability, setDormAvailability] = useState<AccommodationAvailability | null>(null);
     const [dormFullError, setDormFullError] = useState(false);
+    const [submitError, setSubmitError] = useState(false);
     const [discountCode, setDiscountCode] = useState("");
     const [discountStatus, setDiscountStatus] = useState<"idle" | "checking" | "applied" | "error">("idle");
     const [discountData, setDiscountData] = useState<{ couponId: string; percentOff: number; code: string } | null>(null);
@@ -144,6 +145,33 @@ export default function CheckoutForm({
         localStorage.setItem("last_event_slug", event.slug);
     }, [event.slug, selectedDistanceIndex]);
 
+    // Handle ?error=… returns from server-side checkout redirect (303-back on failure).
+    useEffect(() => {
+        const errorParam = searchParams.get("error");
+        if (!errorParam) return;
+
+        if (errorParam === "dorm_full") {
+            setDormFullError(true);
+            if (event.hasAccommodation) {
+                fetch(`/api/accommodations/availability?eventSlug=${event.slug}`)
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => { if (data) setDormAvailability(data); })
+                    .catch(() => { /* swallow; banner still shown */ });
+            }
+        } else if (errorParam === "server" || errorParam === "missing_fields") {
+            setSubmitError(true);
+        }
+        // price_unavailable falls through — the existing showPriceError banner handles it
+        // once prices load (or fail to load).
+
+        // Strip the error param so a manual reload doesn't re-trigger the banner.
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete("error");
+        const qs = newParams.toString();
+        const path = locale === "en" ? `/en/${event.slug}/checkout` : `/${event.slug}/checkout`;
+        router.replace(qs ? `${path}?${qs}` : path, { scroll: false });
+    }, []); // mount-only
+
     const selectedDistance = event.distances[selectedDistanceIndex];
     const eventName = t(event.nameKey as any);
     const distanceFact = selectedDistance.facts.find((f) => f.icon === "route");
@@ -204,82 +232,29 @@ export default function CheckoutForm({
         return newErrors;
     };
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (e: FormEvent) => {
+        // Native form POST + 303 redirect: the browser owns the navigation, not JS.
+        // Only call e.preventDefault() to block submission on validation failure.
         setDormFullError(false);
+        setSubmitError(false);
 
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
-            // Scroll to first error field
+            e.preventDefault();
             const firstErrorKey = Object.keys(validationErrors)[0];
-            const el = document.getElementById(firstErrorKey);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            document.getElementById(firstErrorKey)?.scrollIntoView({ behavior: "smooth", block: "center" });
             return;
         }
 
         if (!matchingPrice) {
+            e.preventDefault();
             alert('Price information is not available. Please contact us.');
             return;
         }
 
+        // Allow native submission. Browser navigates on the server's 303 response.
+        // isSubmitting stays true until the page is torn down.
         setIsSubmitting(true);
-
-        try {
-            const response = await fetch('/api/checkout/create-session', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    eventSlug: event.slug,
-                    distanceIndex: selectedDistanceIndex,
-                    name: formData.name,
-                    email: formData.email,
-                    phone: formData.phone,
-                    emergencyContactName: formData.emergencyName,
-                    emergencyContactPhone: formData.emergencyPhone,
-                    needsAccommodation: formData.needsAccommodation,
-                    accommodationType: formData.accommodationType || null,
-                    accommodationWaitlist: formData.accommodationType === 'dorm' && isDormWaitlist,
-                    wantsPreparationTips: formData.wantsPreparationTips,
-                    preparationTipsChannel: formData.preparationTipsChannels.length > 0 ? formData.preparationTipsChannels.join(',') : null,
-                    locale,
-                    couponId: discountData?.code || null,
-                    originalPrice,
-                }),
-            });
-
-            if (!response.ok) {
-                const data = await response.json();
-                if (data.error === 'DORM_FULL') {
-                    setDormFullError(true);
-                    // Refresh availability
-                    const availResponse = await fetch(`/api/accommodations/availability?eventSlug=${event.slug}`);
-                    if (availResponse.ok) {
-                        const availData = await availResponse.json();
-                        setDormAvailability(availData);
-                    }
-                    setIsSubmitting(false);
-                    return;
-                }
-                throw new Error('Failed to create checkout session');
-            }
-
-            const data = await response.json();
-
-            // Redirect to Stripe Checkout
-            if (data.url) {
-                window.location.href = data.url;
-            } else {
-                throw new Error('No checkout URL returned');
-            }
-        } catch (error) {
-            console.error('Error creating checkout session:', error);
-            alert('Unable to start checkout. Please try again.');
-            setIsSubmitting(false);
-        }
     };
 
     const handleInputChange = (field: string, value: string | boolean) => {
@@ -398,6 +373,28 @@ export default function CheckoutForm({
                 </div>
             )}
 
+            {/* Generic Server Error Banner */}
+            {submitError && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                        <svg
+                            className="w-5 h-5 text-red-500 shrink-0 mt-0.5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                        <p className="text-sm text-red-700">
+                            {t("checkout_error_server")}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* Selection Card */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 {/* Header */}
@@ -495,7 +492,26 @@ export default function CheckoutForm({
             </div>
 
             {/* Participant Details Form */}
-            <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-300 shadow-2xl p-6 space-y-6 relative z-10">
+            <form
+                method="POST"
+                action="/api/checkout/create-session"
+                onSubmit={handleSubmit}
+                className="bg-white rounded-2xl border border-slate-300 shadow-2xl p-6 space-y-6 relative z-10"
+            >
+                {/* Hidden inputs project JS-controlled state into native FormData. */}
+                <input type="hidden" name="eventSlug" value={event.slug} />
+                <input type="hidden" name="distanceIndex" value={selectedDistanceIndex} />
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="priceId" value={matchingPrice?.priceId || ""} />
+                <input type="hidden" name="phone" value={formData.phone} />
+                <input type="hidden" name="emergencyContactPhone" value={formData.emergencyPhone} />
+                <input type="hidden" name="needsAccommodation" value={formData.needsAccommodation ? "1" : "0"} />
+                <input type="hidden" name="accommodationType" value={formData.accommodationType || ""} />
+                <input type="hidden" name="accommodationWaitlist" value={formData.accommodationType === "dorm" && isDormWaitlist ? "1" : "0"} />
+                <input type="hidden" name="wantsPreparationTips" value={formData.wantsPreparationTips ? "1" : "0"} />
+                <input type="hidden" name="preparationTipsChannel" value={formData.preparationTipsChannels.join(",")} />
+                <input type="hidden" name="couponId" value={discountData?.code || ""} />
+                <input type="hidden" name="originalPrice" value={originalPrice} />
                 {/* Name */}
                 <div>
                     <label htmlFor="name" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
@@ -504,6 +520,7 @@ export default function CheckoutForm({
                     <input
                         type="text"
                         id="name"
+                        name="name"
                         autoComplete="name"
                         value={formData.name}
                         onChange={(e) => handleInputChange("name", e.target.value)}
@@ -523,6 +540,7 @@ export default function CheckoutForm({
                     <input
                         type="email"
                         id="email"
+                        name="email"
                         autoComplete="email"
                         inputMode="email"
                         value={formData.email}
@@ -701,6 +719,7 @@ export default function CheckoutForm({
                         <input
                             type="text"
                             id="emergencyName"
+                            name="emergencyContactName"
                             autoComplete="off"
                             value={formData.emergencyName}
                             onChange={(e) => handleInputChange("emergencyName", e.target.value)}

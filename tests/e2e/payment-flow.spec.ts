@@ -124,6 +124,33 @@ test.describe("Payment Flow E2E", () => {
       // Button should show loading spinner (SVG with animate-spin class)
       await expect(page.locator("button svg.animate-spin")).toBeVisible();
     });
+
+    test("form posts natively to /api/checkout/create-session (browser-driven 303 redirect)", async ({
+      page,
+    }) => {
+      // Regression guard: the redirect must be browser-native, not JS-driven.
+      // If this attribute drifts, we lose mobile-tab-suspension robustness.
+      await page.goto("/egipte-malta/checkout?distance=0");
+
+      const form = page.locator("form").filter({ has: page.locator('button[type="submit"]') });
+      await expect(form).toHaveAttribute("method", /post/i);
+      await expect(form).toHaveAttribute("action", "/api/checkout/create-session");
+    });
+
+    test("renders dorm-full banner when server redirects back with ?error=dorm_full", async ({
+      page,
+    }) => {
+      // Simulate the server-side dorm-full redirect by landing on the URL directly.
+      // The component reads ?error=dorm_full on mount, shows the banner, then strips the param.
+      await page.goto("/egipte-malta/checkout?distance=0&error=dorm_full");
+
+      await expect(
+        page.getByText(/Kopmītnes vietas aizpildījās/i)
+      ).toBeVisible();
+
+      // The error param is stripped via router.replace so reload doesn't re-trigger.
+      await expect(page).toHaveURL(/\/egipte-malta\/checkout\?distance=0$/);
+    });
   });
 
   test.describe("Checkout Success Page", () => {

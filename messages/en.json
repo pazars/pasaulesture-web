@@ -119,6 +119,7 @@
   "checkout_error_emergency_phone": "Invalid emergency contact phone number",
   "checkout_error_accommodation_type": "Please select accommodation type",
   "checkout_error_dorm_full": "Dorm spots filled while you were registering. Please refresh to update availability.",
+  "checkout_error_server": "We couldn't start your registration. Please try again or contact us.",
   "checkout_success_title": "Registration Complete!",
   "checkout_success_message": "Thank you for registering. Your payment has been successfully processed.",
   "checkout_registration_confirmed": "Registration Confirmed",

@@ -119,6 +119,7 @@
   "checkout_error_emergency_phone": "Nederīgs ārkārtas kontaktpersonas telefona numurs",
   "checkout_error_accommodation_type": "Lūdzu izvēlieties naktsmītnes veidu",
   "checkout_error_dorm_full": "Kopmītnes vietas aizpildījās, kamēr reģistrējāties. Lūdzu atsvaidziniet lapu.",
+  "checkout_error_server": "Reģistrāciju neizdevās uzsākt. Lūdzu mēģiniet vēlreiz vai sazinieties ar mums.",
   "checkout_success_title": "Reģistrācija pabeigta!",
   "checkout_success_message": "Paldies par reģistrāciju. Jūsu maksājums ir veiksmīgi apstrādāts.",
   "checkout_registration_confirmed": "Reģistrācija apstiprināta",
