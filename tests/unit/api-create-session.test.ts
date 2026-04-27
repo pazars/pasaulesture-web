@@ -33,8 +33,6 @@ const createValidBody = (overrides: Record<string, string | number | boolean | n
     name: 'Jānis Bērziņš',
     email: 'janis@example.com',
     phone: '+37120000000',
-    emergencyContactName: 'Anna Bērziņa',
-    emergencyContactPhone: '+37120000001',
     locale: 'lv',
   };
   const merged = { ...defaults, ...overrides };
@@ -293,8 +291,8 @@ describe('POST /api/checkout/create-session', () => {
       expect.objectContaining({
         metadata: expect.objectContaining({
           participant_phone: '+37120000000',
-          emergency_contact_name: 'Anna Bērziņa',
-          emergency_contact_phone: '+37120000001',
+          emergency_contact_name: 'N/A',
+          emergency_contact_phone: 'N/A',
           needs_accommodation: 'true',
           accommodation_type: 'dorm',
           accommodation_waitlist: 'false',

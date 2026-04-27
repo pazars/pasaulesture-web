@@ -52,8 +52,6 @@ export default function CheckoutForm({
         name: "",
         email: "",
         phone: "",
-        emergencyName: "",
-        emergencyPhone: "",
         needsAccommodation: false,
         accommodationType: "" as "" | "dorm" | "tent",
         wantsPreparationTips: false,
@@ -210,14 +208,6 @@ export default function CheckoutForm({
 
         if (!formData.phone || !isValidPhoneNumber(formData.phone)) {
             newErrors.phone = t("checkout_error_phone");
-        }
-
-        if (!formData.emergencyName.trim()) {
-            newErrors.emergencyName = t("checkout_error_emergency_name");
-        }
-
-        if (!formData.emergencyPhone || !isValidPhoneNumber(formData.emergencyPhone)) {
-            newErrors.emergencyPhone = t("checkout_error_emergency_phone");
         }
 
         if (formData.needsAccommodation && !formData.accommodationType) {
@@ -504,7 +494,6 @@ export default function CheckoutForm({
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="priceId" value={matchingPrice?.priceId || ""} />
                 <input type="hidden" name="phone" value={formData.phone} />
-                <input type="hidden" name="emergencyContactPhone" value={formData.emergencyPhone} />
                 <input type="hidden" name="needsAccommodation" value={formData.needsAccommodation ? "1" : "0"} />
                 <input type="hidden" name="accommodationType" value={formData.accommodationType || ""} />
                 <input type="hidden" name="accommodationWaitlist" value={formData.accommodationType === "dorm" && isDormWaitlist ? "1" : "0"} />
@@ -699,54 +688,6 @@ export default function CheckoutForm({
                             </div>
                         </div>
                     )}
-                </div>
-
-                {/* Emergency Contact Section */}
-                <div className="space-y-6 !mt-8">
-                    <div className="flex items-center gap-3">
-                        <div className="h-px flex-1 bg-slate-200" />
-                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                            {t("checkout_emergency_section_label")}
-                        </span>
-                        <div className="h-px flex-1 bg-slate-200" />
-                    </div>
-
-                    {/* Emergency Name */}
-                    <div>
-                        <label htmlFor="emergencyName" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-                            {t("checkout_emergency_name_label")} <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="emergencyName"
-                            name="emergencyContactName"
-                            autoComplete="off"
-                            value={formData.emergencyName}
-                            onChange={(e) => handleInputChange("emergencyName", e.target.value)}
-                            className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.emergencyName ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
-                            placeholder="Anna Bērziņa"
-                        />
-                        {errors.emergencyName && (
-                            <p className="mt-1.5 text-sm text-red-600">{errors.emergencyName}</p>
-                        )}
-                    </div>
-
-                    {/* Emergency Phone */}
-                    <div>
-                        <label htmlFor="emergencyPhone" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-                            {t("checkout_emergency_phone_label")} <span className="text-red-500">*</span>
-                        </label>
-                        <PhoneInput
-                            international
-                            defaultCountry="LV"
-                            value={formData.emergencyPhone}
-                            onChange={(phone) => handleInputChange("emergencyPhone", phone || "")}
-                            className={`checkout-phone-input ${errors.emergencyPhone ? 'error' : ''}`}
-                        />
-                        {errors.emergencyPhone && (
-                            <p className="mt-1.5 text-sm text-red-600">{errors.emergencyPhone}</p>
-                        )}
-                    </div>
                 </div>
 
                 {/* Discount Code Section */}

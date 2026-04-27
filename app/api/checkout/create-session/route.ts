@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
     const name = getString(form, 'name');
     const email = getString(form, 'email');
     const phone = getString(form, 'phone');
-    const emergencyContactName = getString(form, 'emergencyContactName');
-    const emergencyContactPhone = getString(form, 'emergencyContactPhone');
+    const emergencyContactName = 'N/A';
+    const emergencyContactPhone = 'N/A';
     const needsAccommodation = getBool(form, 'needsAccommodation');
     const accommodationTypeRaw = getString(form, 'accommodationType');
     const accommodationType = accommodationTypeRaw || null;
@@ -79,8 +79,6 @@ export async function POST(request: NextRequest) {
       !name ||
       !email ||
       !phone ||
-      !emergencyContactName ||
-      !emergencyContactPhone ||
       !locale
     ) {
       return back('missing_fields');

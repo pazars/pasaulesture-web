@@ -201,8 +201,6 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       await page.locator('input[id="name"]').fill("Jānis Bērziņš");
       await page.locator('input[id="email"]').fill("janis@example.com");
       await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
-      await page.locator('input[id="emergencyName"]').fill("Anna Bērziņa");
-      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.locator('input[id="terms"]').check();
 
       // Submit form
@@ -220,8 +218,6 @@ test.describe("Checkout Form - Interaction & Validation", () => {
       await page.locator('input[id="name"]').fill("Jānis Bērziņš");
       await page.locator('input[id="email"]').fill("janis@example.com");
       await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
-      await page.locator('input[id="emergencyName"]').fill("Anna Bērziņa");
-      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.locator('input[id="terms"]').check();
 
       // Click submit

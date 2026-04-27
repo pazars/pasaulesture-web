@@ -123,10 +123,7 @@ describe("CheckoutForm Stripe Integration", () => {
     // Fill participant fields so visible inputs serialize.
     await userEvent.type(screen.getByLabelText(/checkout_name_label/i), "John Doe");
     await userEvent.type(screen.getByLabelText(/checkout_email_label/i), "john@example.com");
-    const phoneInputs = screen.getAllByTestId("phone-input");
-    await userEvent.type(phoneInputs[0], "+37120000000");
-    await userEvent.type(screen.getByLabelText(/checkout_emergency_name_label/i), "Jane Doe");
-    await userEvent.type(phoneInputs[1], "+37120000001");
+    await userEvent.type(screen.getByTestId("phone-input"), "+37120000000");
 
     const fd = new FormData(form!);
 
@@ -135,14 +132,12 @@ describe("CheckoutForm Stripe Integration", () => {
     expect(fd.get("locale")).toBe("lv");
     expect(fd.get("priceId")).toBe("price_123");
     expect(fd.get("phone")).toBe("+37120000000");
-    expect(fd.get("emergencyContactPhone")).toBe("+37120000001");
     expect(fd.get("needsAccommodation")).toBe("0");
     expect(fd.get("originalPrice")).toBe("6900");
 
     // Visible inputs serialize via their name= attributes.
     expect(fd.get("name")).toBe("John Doe");
     expect(fd.get("email")).toBe("john@example.com");
-    expect(fd.get("emergencyContactName")).toBe("Jane Doe");
   });
 
   it("shows error if price not found", async () => {

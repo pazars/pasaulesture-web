@@ -63,8 +63,6 @@ test.describe("Payment Flow E2E", () => {
       await page.fill('input[id="name"]', "Test User");
       await page.fill('input[id="email"]', "test@example.com");
       await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
-      await page.fill('input[id="emergencyName"]', "Emergency Contact");
-      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
 
       // Submit without checking terms
       const submitButton = page.locator('button[type="submit"]');
@@ -88,8 +86,6 @@ test.describe("Payment Flow E2E", () => {
       await page.fill('input[id="name"]', "E2E Test User");
       await page.fill('input[id="email"]', "e2e-test@example.com");
       await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
-      await page.fill('input[id="emergencyName"]', "Emergency Contact");
-      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.check('input[id="terms"]');
 
       // Submit form
@@ -113,8 +109,6 @@ test.describe("Payment Flow E2E", () => {
       await page.fill('input[id="name"]', "E2E Test User");
       await page.fill('input[id="email"]', "e2e-test@example.com");
       await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
-      await page.fill('input[id="emergencyName"]', "Emergency Contact");
-      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.check('input[id="terms"]');
 
       // Click submit and check for loading state
