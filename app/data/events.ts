@@ -79,7 +79,6 @@ export const events: Record<string, EventData> = {
     hasAccommodation: true,
     heroQuoteKey: "hero_quote_egipte_malta",
     heroQuote2Key: "hero_quote_2_egipte_malta",
-    routeDescriptionKey: "route_description_egipte_malta",
     routeHighlightsKey: "route_highlights_egipte_malta",
     gallery: [
       "/events/egipte-malta/gallery/0.jpeg",
