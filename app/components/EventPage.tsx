@@ -425,6 +425,7 @@ export default function EventPage({ event }: EventPageProps) {
                 <iframe
                   src={selectedDistance.distanceEmbedUrl.replace(/sampleGraph=(true|false)/, `sampleGraph=${!isMobile}`)}
                   title="Route Map"
+                  loading="lazy"
                   className="h-[400px] sm:h-[700px]"
                   style={{
                     width: '1px',

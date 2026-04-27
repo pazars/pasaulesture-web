@@ -106,6 +106,8 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={`${displayFont.variable} ${bioRhyme.variable} ${josefinSans.variable}`}>
       <head>
+        <link rel="preconnect" href="https://cdn.ridewithgps.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://vector.ridewithgps.com" crossOrigin="anonymous" />
         {/* Google Tag Manager */}
         <Script id="gtm-script" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
