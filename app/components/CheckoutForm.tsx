@@ -16,11 +16,6 @@ interface StripePrice {
     amount: number;
 }
 
-interface CheckoutFormProps {
-    event: EventData;
-    initialPrices: StripePrice[] | null;
-}
-
 interface AccommodationAvailability {
     dorm: {
         total: number;
@@ -29,9 +24,16 @@ interface AccommodationAvailability {
     };
 }
 
+interface CheckoutFormProps {
+    event: EventData;
+    initialPrices: StripePrice[] | null;
+    initialAccommodation: AccommodationAvailability | null;
+}
+
 export default function CheckoutForm({
     event,
     initialPrices,
+    initialAccommodation,
 }: CheckoutFormProps) {
     const t = useTranslations();
     const locale = useLocale();
@@ -64,7 +66,7 @@ export default function CheckoutForm({
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const stripePrices = initialPrices ?? [];
-    const [dormAvailability, setDormAvailability] = useState<AccommodationAvailability | null>(null);
+    const [dormAvailability, setDormAvailability] = useState<AccommodationAvailability | null>(initialAccommodation);
     const [dormFullError, setDormFullError] = useState(false);
     const [submitError, setSubmitError] = useState(false);
     const [discountCode, setDiscountCode] = useState("");
@@ -95,26 +97,6 @@ export default function CheckoutForm({
             }
         }
     }, []); // Run only on mount
-
-    // Fetch accommodation availability on mount (only for events with accommodation)
-    useEffect(() => {
-        if (!event.hasAccommodation) return;
-
-        async function fetchAccommodation() {
-            try {
-                const response = await fetch(`/api/accommodations/availability?eventSlug=${event.slug}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch accommodation');
-                }
-                const data = await response.json();
-                setDormAvailability(data);
-            } catch (error) {
-                console.error('Error fetching accommodation:', error);
-            }
-        }
-
-        fetchAccommodation();
-    }, [event.slug, event.hasAccommodation]);
 
     // Save selection and check for redirected persistence
     useEffect(() => {

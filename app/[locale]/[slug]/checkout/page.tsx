@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getEventBySlug } from "@/app/data/events";
 import { getStripePrices } from "@/app/data/stripe-prices.server";
+import { getAccommodationAvailability } from "@/app/data/accommodation.server";
 import CheckoutForm from "@/app/components/CheckoutForm";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
@@ -27,7 +28,10 @@ export default async function CheckoutPage({
         notFound();
     }
 
-    const initialPrices = await getStripePrices();
+    const [initialPrices, initialAccommodation] = await Promise.all([
+        getStripePrices(),
+        event.hasAccommodation ? getAccommodationAvailability(slug) : Promise.resolve(null),
+    ]);
 
     const eventUrl = locale === "en" ? `/en/${slug}` : `/${slug}`;
 
@@ -69,7 +73,11 @@ export default async function CheckoutPage({
                         <div className="w-8 h-8 border-2 border-slate-200 border-t-slate-600 rounded-full animate-spin" />
                     </div>
                 }>
-                    <CheckoutForm event={event} initialPrices={initialPrices} />
+                    <CheckoutForm
+                        event={event}
+                        initialPrices={initialPrices}
+                        initialAccommodation={initialAccommodation}
+                    />
                 </Suspense>
             </div>
         </div>

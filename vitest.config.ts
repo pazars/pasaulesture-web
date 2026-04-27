@@ -11,6 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './'),
+      'server-only': path.resolve(__dirname, './tests/__mocks__/server-only.ts'),
     },
     conditions: ['import', 'module', 'browser', 'default'],
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],

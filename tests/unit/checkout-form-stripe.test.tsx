@@ -80,6 +80,7 @@ describe("CheckoutForm Stripe Integration", () => {
         initialPrices={[
           { priceId: "price_123", eventSlug: "egipte-malta", distanceIndex: 1, amount: 6900 },
         ]}
+        initialAccommodation={null}
       />,
     );
 
@@ -102,6 +103,7 @@ describe("CheckoutForm Stripe Integration", () => {
         initialPrices={[
           { priceId: "price_123", eventSlug: "egipte-malta", distanceIndex: 1, amount: 6900 },
         ]}
+        initialAccommodation={null}
       />,
     );
 
@@ -137,7 +139,7 @@ describe("CheckoutForm Stripe Integration", () => {
   it("shows error banner when no matching price is in initialPrices", async () => {
     global.fetch = accommodationFetch();
 
-    render(<CheckoutForm event={mockEvent} initialPrices={[]} />);
+    render(<CheckoutForm event={mockEvent} initialPrices={[]} initialAccommodation={null} />);
 
     await waitFor(() => {
       expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument();
@@ -147,7 +149,7 @@ describe("CheckoutForm Stripe Integration", () => {
   it("shows error banner when initialPrices is null (server-side fetch failed)", async () => {
     global.fetch = accommodationFetch();
 
-    render(<CheckoutForm event={mockEvent} initialPrices={null} />);
+    render(<CheckoutForm event={mockEvent} initialPrices={null} initialAccommodation={null} />);
 
     await waitFor(() => {
       expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument();
