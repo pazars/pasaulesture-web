@@ -8,6 +8,7 @@ import { ExternalLinkIcon, LocationIcon } from "./Icons";
 import FAQ from "./FAQ";
 import Header from "./Header";
 import Gallery from "./Gallery";
+import EventPlan from "./EventPlan";
 import { useTranslations, useLocale } from "next-intl";
 import { formatText } from "@/app/lib/formatText";
 
@@ -487,6 +488,11 @@ export default function EventPage({ event }: EventPageProps) {
               {formatText(t(event.routeHighlightsKey as any))}
             </div>
           </section>
+        )}
+
+        {/* Event Plan — chronological narrative of what happens when */}
+        {event.plan && event.plan.length > 0 && (
+          <EventPlan items={event.plan} isDakar={isDakar} />
         )}
 
         {/* Photo Gallery Section */}

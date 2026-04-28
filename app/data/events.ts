@@ -17,6 +17,12 @@ export interface EventDistance {
   // price field removed - managed in Stripe Dashboard
 }
 
+export type PlanItem =
+  | { kind: "prose"; bodyKey: string; leadKey?: string }
+  | { kind: "chapter"; titleKey: string }
+  | { kind: "image"; src: string; captionKey?: string; variant?: "full" | "postcard" | "paper"; width?: number; height?: number }
+  | { kind: "break" };
+
 export interface EventData {
   slug: string;
   nameKey: string; // Translation key for event name
@@ -31,6 +37,7 @@ export interface EventData {
   routeDescriptionKey?: string;
   routeHighlightsKey?: string;
   gallery?: string[];
+  plan?: PlanItem[];
 }
 
 export const events: Record<string, EventData> = {
@@ -91,6 +98,25 @@ export const events: Record<string, EventData> = {
       "/events/egipte-malta/gallery/7.jpeg",
       "/events/egipte-malta/gallery/8.jpeg",
     ],
+    plan: [
+      { kind: "chapter", titleKey: "plan_em_1_title" },
+      { kind: "prose", leadKey: "plan_em_2_lead", bodyKey: "plan_em_2_body" },
+      { kind: "image", src: "/events/egipte-malta/maps/route_to_sarkankalns.png", captionKey: "plan_em_3_caption", variant: "paper", width: 1261, height: 872 },
+      { kind: "prose", bodyKey: "plan_em_4_body" },
+      { kind: "image", src: "/events/egipte-malta/gallery/5.jpeg", captionKey: "plan_em_5_caption", variant: "paper", width: 5760, height: 3840 },
+      { kind: "chapter", titleKey: "plan_em_6_title" },
+      { kind: "prose", leadKey: "plan_em_7_lead", bodyKey: "plan_em_7_body" },
+      { kind: "image", src: "/events/egipte-malta/plan/pt_124.jpg", captionKey: "plan_em_8_caption", variant: "paper", width: 1600, height: 1013 },
+      { kind: "prose", bodyKey: "plan_em_9_body" },
+      { kind: "chapter", titleKey: "plan_em_10_title" },
+      { kind: "prose", leadKey: "plan_em_11_lead", bodyKey: "plan_em_11_body" },
+      { kind: "image", src: "/events/egipte-malta/plan/PT_82.jpg", variant: "paper", width: 1600, height: 1067 },
+      { kind: "prose", bodyKey: "plan_em_13_body" },
+      { kind: "image", src: "/events/egipte-malta/plan/PT_126.jpg", captionKey: "plan_em_14_caption", variant: "paper", width: 1600, height: 1067 },
+      { kind: "prose", bodyKey: "plan_em_15_body" },
+      { kind: "prose", bodyKey: "plan_em_16_body" },
+      { kind: "image", src: "/events/egipte-malta/plan/PT_141.jpg", variant: "paper", width: 1600, height: 1067 },
+    ],
   },
   "parize-dakara": {
     slug: "parize-dakara",
@@ -122,6 +148,10 @@ export const events: Record<string, EventData> = {
     heroQuote2Key: "hero_quote_2_parize_dakara",
     routeDescriptionKey: "route_description_parize_dakara",
     routeHighlightsKey: "route_highlights_parize_dakara",
+    plan: [
+      { kind: "chapter", titleKey: "plan_pd_1_title" },
+      { kind: "prose", leadKey: "plan_pd_2_lead", bodyKey: "plan_pd_2_body" },
+    ],
   },
 };
 

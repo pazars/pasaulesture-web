@@ -306,6 +306,29 @@ body::after {
 /* ===== TYPOGRAPHY ===== */
 /* Font families are now defined in @theme block above */
 
+/* Editorial drop cap — first letter of the opening paragraph of a plan chapter.
+   Applies to formatText output: the first <p> child of the wrapper. */
+.plan-drop-cap > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-size: 5.5rem;
+  line-height: 0.85;
+  float: left;
+  margin: 0.45rem 0.55rem -0.05rem 0;
+  font-weight: 400;
+  color: var(--pink);
+}
+
+.theme-dakar .plan-drop-cap > p:first-of-type::first-letter {
+  color: var(--dakar-yellow);
+}
+
+@media (max-width: 640px) {
+  .plan-drop-cap > p:first-of-type::first-letter {
+    font-size: 4.25rem;
+    margin: 0.35rem 0.4rem -0.05rem 0;
+  }
+}
+
 /* ===== ANIMATIONS ===== */
 @keyframes fadeInUp {
   from {
