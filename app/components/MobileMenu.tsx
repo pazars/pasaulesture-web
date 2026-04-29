@@ -135,7 +135,7 @@ export default function MobileMenu({ currentSlug, isOpen, onClose }: MobileMenuP
           <button onClick={() => scrollTo("route")} className={linkClass}>
             {t("section_route")}
           </button>
-          <button onClick={() => scrollTo("faq")} className={linkClass}>
+          <button onClick={() => scrollTo("event-plan")} className={linkClass}>
             {t("faq_badge")}
           </button>
         </nav>
