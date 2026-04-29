@@ -8,46 +8,87 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 const DORM_TOTAL_SPOTS = 15;
 
+function getString(form: FormData, key: string): string {
+  const v = form.get(key);
+  return typeof v === 'string' ? v : '';
+}
+
+function getBool(form: FormData, key: string): boolean {
+  return getString(form, key) === '1';
+}
+
+function buildBackUrl(
+  baseUrl: string,
+  locale: string,
+  eventSlug: string,
+  distanceIndex: string,
+  error: string,
+): string {
+  const localePrefix = locale === 'lv' || !locale ? '' : `/${locale}`;
+  const params = new URLSearchParams();
+  if (distanceIndex) params.set('distance', distanceIndex);
+  params.set('error', error);
+  return `${baseUrl}${localePrefix}/${eventSlug}/checkout?${params.toString()}`;
+}
+
 export async function POST(request: NextRequest) {
   const sql = neon(process.env.DATABASE_URL!);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+  // Parse early so we can build redirect-back URLs even on error paths.
+  let form: FormData;
   try {
-    const body = await request.json();
-    const {
-      eventSlug,
-      distanceIndex,
-      name,
-      email,
-      phone,
-      emergencyContactName,
-      emergencyContactPhone,
-      needsAccommodation,
-      accommodationType,
-      accommodationWaitlist,
-      wantsPreparationTips,
-      preparationTipsChannel,
-      locale,
-      couponId,
-      originalPrice,
-    } = body;
+    form = await request.formData();
+  } catch {
+    return NextResponse.redirect(`${baseUrl}/?error=server`, { status: 303 });
+  }
+
+  const eventSlug = getString(form, 'eventSlug');
+  const distanceIndexStr = getString(form, 'distanceIndex');
+  const distanceIndex = parseInt(distanceIndexStr, 10);
+  const locale = getString(form, 'locale') || 'lv';
+
+  const back = (error: string) =>
+    NextResponse.redirect(
+      buildBackUrl(baseUrl, locale, eventSlug || '', distanceIndexStr, error),
+      { status: 303 },
+    );
+
+  try {
+    const name = getString(form, 'name');
+    const email = getString(form, 'email');
+    const phone = getString(form, 'phone');
+    const emergencyContactName = 'N/A';
+    const emergencyContactPhone = 'N/A';
+    const needsAccommodation = getBool(form, 'needsAccommodation');
+    const accommodationTypeRaw = getString(form, 'accommodationType');
+    const accommodationType = accommodationTypeRaw || null;
+    const accommodationWaitlist = getBool(form, 'accommodationWaitlist');
+    const wantsPreparationTips = getBool(form, 'wantsPreparationTips');
+    const preparationTipsChannel = getString(form, 'preparationTipsChannel') || null;
+    const couponId = getString(form, 'couponId') || null;
+    const originalPriceStr = getString(form, 'originalPrice');
+    const originalPrice = originalPriceStr ? parseInt(originalPriceStr, 10) : null;
+    const submittedPriceId = getString(form, 'priceId');
 
     // Validate ALL required fields
-    if (!eventSlug || distanceIndex === undefined || !name || !email || !phone || !emergencyContactName || !emergencyContactPhone || !locale) {
-      return NextResponse.json(
-        { error: 'Missing required fields: eventSlug, distanceIndex, name, email, phone, emergencyContactName, emergencyContactPhone, locale' },
-        { status: 400 }
-      );
+    if (
+      !eventSlug ||
+      !distanceIndexStr ||
+      Number.isNaN(distanceIndex) ||
+      !name ||
+      !email ||
+      !phone ||
+      !locale
+    ) {
+      return back('missing_fields');
     }
 
-    // Validate accommodation type if accommodation is needed
     if (needsAccommodation && !accommodationType) {
-      return NextResponse.json(
-        { error: 'Accommodation type is required when accommodation is needed' },
-        { status: 400 }
-      );
+      return back('missing_fields');
     }
 
-    // Check for dorm race condition: user selected dorm when spots were available,
-    // but spots are now full
+    // Dorm race-check: user selected dorm when spots were available, but spots are now full.
     if (needsAccommodation && accommodationType === 'dorm' && !accommodationWaitlist) {
       const result = await sql`
         SELECT COUNT(*) as dorm_count
@@ -62,43 +103,58 @@ export async function POST(request: NextRequest) {
       const remaining = DORM_TOTAL_SPOTS - dormCount;
 
       if (remaining <= 0) {
-        return NextResponse.json(
-          { error: 'DORM_FULL', message: 'Dorm spots filled while you were registering. Please refresh to update availability.' },
-          { status: 409 }
-        );
+        return back('dorm_full');
       }
     }
 
-    // Fetch prices using Stripe API with expanded product data
-    const prices = await stripe.prices.list({
-      active: true,
-      expand: ['data.product'],
-    });
+    // Resolve the Stripe price. Prefer client-supplied priceId (SSR'd into the page) —
+    // single targeted GET vs. listing the whole catalog. Always re-validate the price's
+    // product metadata so a tampered priceId can't pay a mismatched event/distance.
+    let resolvedPrice: Stripe.Price | null = null;
+    if (submittedPriceId) {
+      try {
+        const price = await stripe.prices.retrieve(submittedPriceId, {
+          expand: ['product'],
+        });
+        const product = price.product as Stripe.Product;
+        if (
+          price.active &&
+          product?.metadata?.event_slug === eventSlug &&
+          product?.metadata?.distance_index === String(distanceIndex)
+        ) {
+          resolvedPrice = price;
+        }
+      } catch {
+        // Fall through to list-search.
+      }
+    }
 
-    // Find matching price by product metadata
-    const matchingPrice = prices.data.find((price) => {
-      const product = price.product as Stripe.Product;
-      return (
-        product.metadata?.event_slug === eventSlug &&
-        product.metadata?.distance_index === String(distanceIndex)
-      );
-    });
+    if (!resolvedPrice) {
+      const prices = await stripe.prices.list({
+        active: true,
+        expand: ['data.product'],
+      });
+      resolvedPrice =
+        prices.data.find((price) => {
+          const product = price.product as Stripe.Product;
+          return (
+            product.metadata?.event_slug === eventSlug &&
+            product.metadata?.distance_index === String(distanceIndex)
+          );
+        }) || null;
+    }
 
-    if (!matchingPrice) {
-      return NextResponse.json(
-        { error: 'Price not found for this event and distance' },
-        { status: 404 }
-      );
+    if (!resolvedPrice) {
+      return back('price_unavailable');
     }
 
     // Create Stripe Checkout Session
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const localePrefix = locale === 'lv' ? '' : `/${locale}`;
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       line_items: [
         {
-          price: matchingPrice.id,
+          price: resolvedPrice.id,
           quantity: 1,
         },
       ],
@@ -114,25 +170,25 @@ export async function POST(request: NextRequest) {
         participant_phone: phone,
         emergency_contact_name: emergencyContactName,
         emergency_contact_phone: emergencyContactPhone,
-        needs_accommodation: String(needsAccommodation || false),
+        needs_accommodation: String(needsAccommodation),
         accommodation_type: accommodationType || '',
-        accommodation_waitlist: String(accommodationWaitlist || false),
-        wants_preparation_tips: String(wantsPreparationTips || false),
+        accommodation_waitlist: String(accommodationWaitlist),
+        wants_preparation_tips: String(wantsPreparationTips),
         preparation_tips_channel: preparationTipsChannel || '',
-        locale: locale,
+        locale,
         coupon_id: couponId || '',
         original_price: originalPrice ? String(originalPrice) : '',
       },
     };
 
-    // Add discounts array if coupon is valid
+    // TODO: re-validate coupon server-side here — currently couponId is client-trusted.
     if (couponId) {
       sessionParams.discounts = [{ coupon: couponId }];
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 
-    // Create pending registration in database
+    // Create pending registration in database (best-effort; webhook will reconcile if it fails).
     try {
       await sql`
         INSERT INTO registrations (
@@ -162,11 +218,11 @@ export async function POST(request: NextRequest) {
           ${phone},
           ${emergencyContactName},
           ${emergencyContactPhone},
-          ${needsAccommodation || false},
-          ${accommodationType || null},
-          ${accommodationWaitlist || false},
-          ${wantsPreparationTips || false},
-          ${preparationTipsChannel || null},
+          ${needsAccommodation},
+          ${accommodationType},
+          ${accommodationWaitlist},
+          ${wantsPreparationTips},
+          ${preparationTipsChannel},
           ${locale},
           'pending',
           ${couponId},
@@ -175,18 +231,11 @@ export async function POST(request: NextRequest) {
       `;
     } catch (dbError) {
       console.error('Error creating pending registration:', dbError);
-      // Continue anyway - webhook will create if this fails
     }
 
-    return NextResponse.json({
-      sessionId: session.id,
-      url: session.url,
-    });
+    return NextResponse.redirect(session.url!, { status: 303 });
   } catch (error) {
     console.error('Error creating checkout session:', error);
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return back('server');
   }
 }

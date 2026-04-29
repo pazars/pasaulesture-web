@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 
 // Mock Stripe
 const mockPricesList = vi.fn();
+const mockPricesRetrieve = vi.fn();
 const mockCheckoutSessionsCreate = vi.fn();
 const mockSql = vi.fn();
 
@@ -10,6 +11,7 @@ vi.mock('stripe', () => ({
   default: vi.fn().mockImplementation(() => ({
     prices: {
       list: mockPricesList,
+      retrieve: mockPricesRetrieve,
     },
     checkout: {
       sessions: {
@@ -23,18 +25,35 @@ vi.mock('@neondatabase/serverless', () => ({
   neon: vi.fn(() => mockSql),
 }));
 
-// Helper to create a valid request body with all required fields
-const createValidBody = (overrides = {}) => ({
-  eventSlug: 'egipte-malta',
-  distanceIndex: 0,
-  name: 'Jānis Bērziņš',
-  email: 'janis@example.com',
-  phone: '+37120000000',
-  emergencyContactName: 'Anna Bērziņa',
-  emergencyContactPhone: '+37120000001',
-  locale: 'lv',
-  ...overrides,
-});
+// Helper: build a form-encoded body with the required fields. Booleans serialize as "1"/"0".
+const createValidBody = (overrides: Record<string, string | number | boolean | null> = {}) => {
+  const defaults: Record<string, string | number | boolean | null> = {
+    eventSlug: 'egipte-malta',
+    distanceIndex: 0,
+    name: 'Jānis Bērziņš',
+    email: 'janis@example.com',
+    phone: '+37120000000',
+    locale: 'lv',
+  };
+  const merged = { ...defaults, ...overrides };
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(merged)) {
+    if (v === null || v === undefined) continue;
+    if (typeof v === 'boolean') {
+      params.set(k, v ? '1' : '0');
+    } else {
+      params.set(k, String(v));
+    }
+  }
+  return params.toString();
+};
+
+const createRequest = (body: string) =>
+  new NextRequest('http://localhost:3000/api/checkout/create-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
 
 describe('POST /api/checkout/create-session', () => {
   beforeEach(() => {
@@ -42,11 +61,11 @@ describe('POST /api/checkout/create-session', () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_mock';
     process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
     process.env.DATABASE_URL = 'postgres://mock';
-    // Mock successful DB operations by default
-    mockSql.mockResolvedValue([{ dorm_count: '0' }] as any);
+    // Default DB mock — empty rows; specific tests override.
+    mockSql.mockResolvedValue([]);
   });
 
-  it('should create a checkout session successfully with all fields', async () => {
+  it('redirects 303 to Stripe on success with all fields', async () => {
     mockPricesList.mockResolvedValue({
       data: [
         {
@@ -54,10 +73,7 @@ describe('POST /api/checkout/create-session', () => {
           active: true,
           product: {
             id: 'prod_123',
-            metadata: {
-              event_slug: 'egipte-malta',
-              distance_index: '0',
-            },
+            metadata: { event_slug: 'egipte-malta', distance_index: '0' },
           },
           unit_amount: 6900,
           currency: 'eur',
@@ -71,33 +87,19 @@ describe('POST /api/checkout/create-session', () => {
     });
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody()));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody()),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data.sessionId).toBe('cs_test_123');
-    expect(data.url).toBe('https://checkout.stripe.com/pay/cs_test_123');
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toBe('https://checkout.stripe.com/pay/cs_test_123');
   });
 
-  it('should handle English locale with /en/ prefix in URLs', async () => {
+  it('uses /en/ prefix in success/cancel URLs for English locale', async () => {
     mockPricesList.mockResolvedValue({
       data: [
         {
           id: 'price_123',
           active: true,
-          product: {
-            id: 'prod_123',
-            metadata: {
-              event_slug: 'egipte-malta',
-              distance_index: '1',
-            },
-          },
+          product: { metadata: { event_slug: 'egipte-malta', distance_index: '1' } },
         },
       ],
     });
@@ -108,107 +110,74 @@ describe('POST /api/checkout/create-session', () => {
     });
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody({ distanceIndex: 1, locale: 'en' })));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody({ distanceIndex: 1, locale: 'en' })),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data.sessionId).toBe('cs_test_456');
-
+    expect(response.status).toBe(303);
     expect(mockCheckoutSessionsCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         success_url: 'http://localhost:3000/en/egipte-malta/checkout/success?session_id={CHECKOUT_SESSION_ID}',
         cancel_url: 'http://localhost:3000/en/egipte-malta/checkout',
-      })
+      }),
     );
   });
 
-  it('should return 404 if price not found for event and distance', async () => {
+  it('redirects back to checkout with ?error=price_unavailable when no price matches', async () => {
     mockPricesList.mockResolvedValue({ data: [] });
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody()));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody()),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(404);
-    expect(data.error).toBe('Price not found for this event and distance');
+    expect(response.status).toBe(303);
+    const loc = response.headers.get('location') || '';
+    expect(loc).toContain('/egipte-malta/checkout');
+    expect(loc).toContain('error=price_unavailable');
   });
 
-  it('should return 400 for missing required fields', async () => {
+  it('redirects back with ?error=missing_fields when required fields are missing', async () => {
+    const params = new URLSearchParams({
+      eventSlug: 'egipte-malta',
+      distanceIndex: '0',
+      name: 'Jānis',
+      email: 'janis@example.com',
+      // phone missing
+      locale: 'lv',
+    });
+
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(params.toString()));
 
-    // Missing phone
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify({
-        eventSlug: 'egipte-malta',
-        distanceIndex: 0,
-        name: 'Jānis Bērziņš',
-        email: 'janis@example.com',
-        locale: 'lv',
-      }),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(data.error).toContain('Missing required fields');
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toContain('error=missing_fields');
   });
 
-  it('should return 400 when accommodation needed but type not specified', async () => {
+  it('redirects back with ?error=missing_fields when accommodation type is required but absent', async () => {
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody({
+      needsAccommodation: true,
+      accommodationType: '',
+    })));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody({
-        needsAccommodation: true,
-        accommodationType: null,
-      })),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('Accommodation type is required when accommodation is needed');
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toContain('error=missing_fields');
   });
 
-  it('should return 409 DORM_FULL when dorm is full and user did not select waitlist', async () => {
-    // First call: dorm availability check returns full (15 registrations)
+  it('redirects back with ?error=dorm_full when dorm is full and waitlist not selected', async () => {
     mockSql.mockResolvedValueOnce([{ dorm_count: '15' }]);
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody({
+      needsAccommodation: true,
+      accommodationType: 'dorm',
+      accommodationWaitlist: false,
+    })));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody({
-        needsAccommodation: true,
-        accommodationType: 'dorm',
-        accommodationWaitlist: false,
-      })),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(409);
-    expect(data.error).toBe('DORM_FULL');
+    expect(response.status).toBe(303);
+    const loc = response.headers.get('location') || '';
+    expect(loc).toContain('error=dorm_full');
+    expect(loc).toContain('distance=0');
   });
 
-  it('should allow dorm selection when spots are available', async () => {
-    // Dorm availability check returns 5 registrations (10 spots remaining)
+  it('allows dorm selection when spots are available', async () => {
     mockSql.mockResolvedValueOnce([{ dorm_count: '5' }]);
     mockSql.mockResolvedValueOnce([]); // DB insert
 
@@ -217,12 +186,7 @@ describe('POST /api/checkout/create-session', () => {
         {
           id: 'price_123',
           active: true,
-          product: {
-            metadata: {
-              event_slug: 'egipte-malta',
-              distance_index: '0',
-            },
-          },
+          product: { metadata: { event_slug: 'egipte-malta', distance_index: '0' } },
         },
       ],
     });
@@ -233,38 +197,23 @@ describe('POST /api/checkout/create-session', () => {
     });
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody({
+      needsAccommodation: true,
+      accommodationType: 'dorm',
+      accommodationWaitlist: false,
+    })));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody({
-        needsAccommodation: true,
-        accommodationType: 'dorm',
-        accommodationWaitlist: false,
-      })),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data.sessionId).toBe('cs_test_dorm');
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toBe('https://checkout.stripe.com/pay/cs_test_dorm');
   });
 
-  it('should allow dorm waitlist registration when user explicitly selects waitlist', async () => {
-    // Dorm is full, but user selected waitlist
-    mockSql.mockResolvedValue([]); // No dorm check needed when waitlist is true
-
+  it('allows dorm waitlist registration without capacity check', async () => {
     mockPricesList.mockResolvedValue({
       data: [
         {
           id: 'price_123',
           active: true,
-          product: {
-            metadata: {
-              event_slug: 'egipte-malta',
-              distance_index: '0',
-            },
-          },
+          product: { metadata: { event_slug: 'egipte-malta', distance_index: '0' } },
         },
       ],
     });
@@ -275,35 +224,23 @@ describe('POST /api/checkout/create-session', () => {
     });
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody({
+      needsAccommodation: true,
+      accommodationType: 'dorm',
+      accommodationWaitlist: true,
+    })));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody({
-        needsAccommodation: true,
-        accommodationType: 'dorm',
-        accommodationWaitlist: true,
-      })),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data.sessionId).toBe('cs_test_waitlist');
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toBe('https://checkout.stripe.com/pay/cs_test_waitlist');
   });
 
-  it('should allow tent accommodation without capacity check', async () => {
+  it('allows tent accommodation without capacity check', async () => {
     mockPricesList.mockResolvedValue({
       data: [
         {
           id: 'price_123',
           active: true,
-          product: {
-            metadata: {
-              event_slug: 'egipte-malta',
-              distance_index: '0',
-            },
-          },
+          product: { metadata: { event_slug: 'egipte-malta', distance_index: '0' } },
         },
       ],
     });
@@ -314,34 +251,25 @@ describe('POST /api/checkout/create-session', () => {
     });
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody({
+      needsAccommodation: true,
+      accommodationType: 'tent',
+    })));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody({
-        needsAccommodation: true,
-        accommodationType: 'tent',
-      })),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data.sessionId).toBe('cs_test_tent');
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toBe('https://checkout.stripe.com/pay/cs_test_tent');
   });
 
-  it('should include all metadata in Stripe session', async () => {
+  it('passes participant + accommodation metadata to Stripe', async () => {
+    mockSql.mockResolvedValueOnce([{ dorm_count: '5' }]);
+    mockSql.mockResolvedValueOnce([]);
+
     mockPricesList.mockResolvedValue({
       data: [
         {
           id: 'price_123',
           active: true,
-          product: {
-            metadata: {
-              event_slug: 'egipte-malta',
-              distance_index: '0',
-            },
-          },
+          product: { metadata: { event_slug: 'egipte-malta', distance_index: '0' } },
         },
       ],
     });
@@ -352,51 +280,35 @@ describe('POST /api/checkout/create-session', () => {
     });
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    await POST(createRequest(createValidBody({
+      needsAccommodation: true,
+      accommodationType: 'dorm',
+      accommodationWaitlist: false,
+      wantsPreparationTips: true,
+    })));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody({
-        needsAccommodation: true,
-        accommodationType: 'dorm',
-        accommodationWaitlist: false,
-        wantsPreparationTips: true,
-      })),
-    });
-
-    // Mock dorm availability check
-    mockSql.mockResolvedValueOnce([{ dorm_count: '5' }]);
-    mockSql.mockResolvedValueOnce([]); // DB insert
-
-    const response = await POST(request);
-
-    expect(response.status).toBe(200);
     expect(mockCheckoutSessionsCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         metadata: expect.objectContaining({
           participant_phone: '+37120000000',
-          emergency_contact_name: 'Anna Bērziņa',
-          emergency_contact_phone: '+37120000001',
+          emergency_contact_name: 'N/A',
+          emergency_contact_phone: 'N/A',
           needs_accommodation: 'true',
           accommodation_type: 'dorm',
           accommodation_waitlist: 'false',
           wants_preparation_tips: 'true',
         }),
-      })
+      }),
     );
   });
 
-  it('should still return success even if database insert fails', async () => {
+  it('still redirects to Stripe even if database insert fails', async () => {
     mockPricesList.mockResolvedValue({
       data: [
         {
           id: 'price_123',
           active: true,
-          product: {
-            metadata: {
-              event_slug: 'egipte-malta',
-              distance_index: '0',
-            },
-          },
+          product: { metadata: { event_slug: 'egipte-malta', distance_index: '0' } },
         },
       ],
     });
@@ -406,36 +318,22 @@ describe('POST /api/checkout/create-session', () => {
       url: 'https://checkout.stripe.com/pay/cs_test_db_fail',
     });
 
-    // Simulate database error on insert
     mockSql.mockRejectedValue(new Error('Database connection failed'));
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody()));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody()),
-    });
-
-    const response = await POST(request);
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data.sessionId).toBe('cs_test_db_fail');
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toBe('https://checkout.stripe.com/pay/cs_test_db_fail');
   });
 
-  it('should accept distanceIndex of 0', async () => {
+  it('accepts distanceIndex of 0', async () => {
     mockPricesList.mockResolvedValue({
       data: [
         {
           id: 'price_zero',
           active: true,
-          product: {
-            id: 'prod_zero',
-            metadata: {
-              event_slug: 'egipte-malta',
-              distance_index: '0',
-            },
-          },
+          product: { metadata: { event_slug: 'egipte-malta', distance_index: '0' } },
         },
       ],
     });
@@ -446,16 +344,90 @@ describe('POST /api/checkout/create-session', () => {
     });
 
     const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody({ distanceIndex: 0 })));
 
-    const request = new NextRequest('http://localhost:3000/api/checkout/create-session', {
-      method: 'POST',
-      body: JSON.stringify(createValidBody({ distanceIndex: 0 })),
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toBe('https://checkout.stripe.com/pay/cs_test_zero');
+  });
+
+  it('uses prices.retrieve (not list) when client supplies a valid priceId', async () => {
+    mockPricesRetrieve.mockResolvedValue({
+      id: 'price_supplied',
+      active: true,
+      product: { metadata: { event_slug: 'egipte-malta', distance_index: '0' } },
     });
 
-    const response = await POST(request);
-    const data = await response.json();
+    mockCheckoutSessionsCreate.mockResolvedValue({
+      id: 'cs_test_retrieve',
+      url: 'https://checkout.stripe.com/pay/cs_test_retrieve',
+    });
 
-    expect(response.status).toBe(200);
-    expect(data.sessionId).toBe('cs_test_zero');
+    const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody({ priceId: 'price_supplied' })));
+
+    expect(response.status).toBe(303);
+    expect(mockPricesRetrieve).toHaveBeenCalledWith('price_supplied', { expand: ['product'] });
+    expect(mockPricesList).not.toHaveBeenCalled();
+    expect(mockCheckoutSessionsCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        line_items: [expect.objectContaining({ price: 'price_supplied' })],
+      }),
+    );
+  });
+
+  it('falls back to prices.list when supplied priceId has mismatched product metadata', async () => {
+    // priceId points at a different event — must NOT be trusted.
+    mockPricesRetrieve.mockResolvedValue({
+      id: 'price_other_event',
+      active: true,
+      product: { metadata: { event_slug: 'parize-dakara', distance_index: '0' } },
+    });
+
+    mockPricesList.mockResolvedValue({
+      data: [
+        {
+          id: 'price_real',
+          active: true,
+          product: { metadata: { event_slug: 'egipte-malta', distance_index: '0' } },
+        },
+      ],
+    });
+
+    mockCheckoutSessionsCreate.mockResolvedValue({
+      id: 'cs_test_fallback',
+      url: 'https://checkout.stripe.com/pay/cs_test_fallback',
+    });
+
+    const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody({ priceId: 'price_other_event' })));
+
+    expect(response.status).toBe(303);
+    expect(mockPricesRetrieve).toHaveBeenCalled();
+    expect(mockPricesList).toHaveBeenCalled();
+    expect(mockCheckoutSessionsCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        line_items: [expect.objectContaining({ price: 'price_real' })],
+      }),
+    );
+  });
+
+  it('redirects back with ?error=server when Stripe session creation throws', async () => {
+    mockPricesList.mockResolvedValue({
+      data: [
+        {
+          id: 'price_123',
+          active: true,
+          product: { metadata: { event_slug: 'egipte-malta', distance_index: '0' } },
+        },
+      ],
+    });
+
+    mockCheckoutSessionsCreate.mockRejectedValue(new Error('Stripe down'));
+
+    const { POST } = await import('@/app/api/checkout/create-session/route');
+    const response = await POST(createRequest(createValidBody()));
+
+    expect(response.status).toBe(303);
+    expect(response.headers.get('location')).toContain('error=server');
   });
 });

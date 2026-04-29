@@ -9,10 +9,6 @@ import { useTranslations, useLocale } from "next-intl";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
-interface CheckoutFormProps {
-    event: EventData;
-}
-
 interface StripePrice {
     priceId: string;
     eventSlug: string;
@@ -28,8 +24,16 @@ interface AccommodationAvailability {
     };
 }
 
+interface CheckoutFormProps {
+    event: EventData;
+    initialPrices: StripePrice[] | null;
+    initialAccommodation: AccommodationAvailability | null;
+}
+
 export default function CheckoutForm({
     event,
+    initialPrices,
+    initialAccommodation,
 }: CheckoutFormProps) {
     const t = useTranslations();
     const locale = useLocale();
@@ -52,8 +56,6 @@ export default function CheckoutForm({
         name: "",
         email: "",
         phone: "",
-        emergencyName: "",
-        emergencyPhone: "",
         needsAccommodation: false,
         accommodationType: "" as "" | "dorm" | "tent",
         wantsPreparationTips: false,
@@ -63,11 +65,10 @@ export default function CheckoutForm({
 
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [stripePrices, setStripePrices] = useState<StripePrice[]>([]);
-    const [priceLoading, setPriceLoading] = useState(true);
-    const [priceError, setPriceError] = useState<string | null>(null);
-    const [dormAvailability, setDormAvailability] = useState<AccommodationAvailability | null>(null);
+    const stripePrices = initialPrices ?? [];
+    const [dormAvailability, setDormAvailability] = useState<AccommodationAvailability | null>(initialAccommodation);
     const [dormFullError, setDormFullError] = useState(false);
+    const [submitError, setSubmitError] = useState(false);
     const [discountCode, setDiscountCode] = useState("");
     const [discountStatus, setDiscountStatus] = useState<"idle" | "checking" | "applied" | "error">("idle");
     const [discountData, setDiscountData] = useState<{ couponId: string; percentOff: number; code: string } | null>(null);
@@ -97,52 +98,38 @@ export default function CheckoutForm({
         }
     }, []); // Run only on mount
 
-    // Fetch Stripe prices on mount
-    useEffect(() => {
-        async function fetchPrices() {
-            try {
-                const response = await fetch('/api/stripe/prices');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch prices');
-                }
-                const data = await response.json();
-                setStripePrices(data.prices || []);
-            } catch (error) {
-                console.error('Error fetching prices:', error);
-                setPriceError('Failed to load pricing information');
-            } finally {
-                setPriceLoading(false);
-            }
-        }
-
-        fetchPrices();
-    }, []);
-
-    // Fetch accommodation availability on mount (only for events with accommodation)
-    useEffect(() => {
-        if (!event.hasAccommodation) return;
-
-        async function fetchAccommodation() {
-            try {
-                const response = await fetch(`/api/accommodations/availability?eventSlug=${event.slug}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch accommodation');
-                }
-                const data = await response.json();
-                setDormAvailability(data);
-            } catch (error) {
-                console.error('Error fetching accommodation:', error);
-            }
-        }
-
-        fetchAccommodation();
-    }, [event.slug, event.hasAccommodation]);
-
     // Save selection and check for redirected persistence
     useEffect(() => {
         localStorage.setItem(`last_distance_${event.slug}`, selectedDistanceIndex.toString());
         localStorage.setItem("last_event_slug", event.slug);
     }, [event.slug, selectedDistanceIndex]);
+
+    // Handle ?error=… returns from server-side checkout redirect (303-back on failure).
+    useEffect(() => {
+        const errorParam = searchParams.get("error");
+        if (!errorParam) return;
+
+        if (errorParam === "dorm_full") {
+            setDormFullError(true);
+            if (event.hasAccommodation) {
+                fetch(`/api/accommodations/availability?eventSlug=${event.slug}`)
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => { if (data) setDormAvailability(data); })
+                    .catch(() => { /* swallow; banner still shown */ });
+            }
+        } else if (errorParam === "server" || errorParam === "missing_fields") {
+            setSubmitError(true);
+        }
+        // price_unavailable falls through — the existing showPriceError banner handles it
+        // once prices load (or fail to load).
+
+        // Strip the error param so a manual reload doesn't re-trigger the banner.
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete("error");
+        const qs = newParams.toString();
+        const path = locale === "en" ? `/en/${event.slug}/checkout` : `/${event.slug}/checkout`;
+        router.replace(qs ? `${path}?${qs}` : path, { scroll: false });
+    }, []); // mount-only
 
     const selectedDistance = event.distances[selectedDistanceIndex];
     const eventName = t(event.nameKey as any);
@@ -184,14 +171,6 @@ export default function CheckoutForm({
             newErrors.phone = t("checkout_error_phone");
         }
 
-        if (!formData.emergencyName.trim()) {
-            newErrors.emergencyName = t("checkout_error_emergency_name");
-        }
-
-        if (!formData.emergencyPhone || !isValidPhoneNumber(formData.emergencyPhone)) {
-            newErrors.emergencyPhone = t("checkout_error_emergency_phone");
-        }
-
         if (formData.needsAccommodation && !formData.accommodationType) {
             newErrors.accommodationType = t("checkout_error_accommodation_type");
         }
@@ -204,82 +183,29 @@ export default function CheckoutForm({
         return newErrors;
     };
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (e: FormEvent) => {
+        // Native form POST + 303 redirect: the browser owns the navigation, not JS.
+        // Only call e.preventDefault() to block submission on validation failure.
         setDormFullError(false);
+        setSubmitError(false);
 
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
-            // Scroll to first error field
+            e.preventDefault();
             const firstErrorKey = Object.keys(validationErrors)[0];
-            const el = document.getElementById(firstErrorKey);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            document.getElementById(firstErrorKey)?.scrollIntoView({ behavior: "smooth", block: "center" });
             return;
         }
 
         if (!matchingPrice) {
+            e.preventDefault();
             alert('Price information is not available. Please contact us.');
             return;
         }
 
+        // Allow native submission. Browser navigates on the server's 303 response.
+        // isSubmitting stays true until the page is torn down.
         setIsSubmitting(true);
-
-        try {
-            const response = await fetch('/api/checkout/create-session', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    eventSlug: event.slug,
-                    distanceIndex: selectedDistanceIndex,
-                    name: formData.name,
-                    email: formData.email,
-                    phone: formData.phone,
-                    emergencyContactName: formData.emergencyName,
-                    emergencyContactPhone: formData.emergencyPhone,
-                    needsAccommodation: formData.needsAccommodation,
-                    accommodationType: formData.accommodationType || null,
-                    accommodationWaitlist: formData.accommodationType === 'dorm' && isDormWaitlist,
-                    wantsPreparationTips: formData.wantsPreparationTips,
-                    preparationTipsChannel: formData.preparationTipsChannels.length > 0 ? formData.preparationTipsChannels.join(',') : null,
-                    locale,
-                    couponId: discountData?.code || null,
-                    originalPrice,
-                }),
-            });
-
-            if (!response.ok) {
-                const data = await response.json();
-                if (data.error === 'DORM_FULL') {
-                    setDormFullError(true);
-                    // Refresh availability
-                    const availResponse = await fetch(`/api/accommodations/availability?eventSlug=${event.slug}`);
-                    if (availResponse.ok) {
-                        const availData = await availResponse.json();
-                        setDormAvailability(availData);
-                    }
-                    setIsSubmitting(false);
-                    return;
-                }
-                throw new Error('Failed to create checkout session');
-            }
-
-            const data = await response.json();
-
-            // Redirect to Stripe Checkout
-            if (data.url) {
-                window.location.href = data.url;
-            } else {
-                throw new Error('No checkout URL returned');
-            }
-        } catch (error) {
-            console.error('Error creating checkout session:', error);
-            alert('Unable to start checkout. Please try again.');
-            setIsSubmitting(false);
-        }
     };
 
     const handleInputChange = (field: string, value: string | boolean) => {
@@ -350,7 +276,7 @@ export default function CheckoutForm({
     const termsUrl = locale === "en" ? "/en/noteikumi" : "/noteikumi";
 
     // Show error if price not found
-    const showPriceError = !priceLoading && !matchingPrice;
+    const showPriceError = !matchingPrice;
 
     return (
         <div className="space-y-6">
@@ -398,6 +324,28 @@ export default function CheckoutForm({
                 </div>
             )}
 
+            {/* Generic Server Error Banner */}
+            {submitError && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                        <svg
+                            className="w-5 h-5 text-red-500 shrink-0 mt-0.5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                        <p className="text-sm text-red-700">
+                            {t("checkout_error_server")}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* Selection Card */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 {/* Header */}
@@ -408,9 +356,7 @@ export default function CheckoutForm({
                         </span>
                         <div className="text-right">
                             <span className="text-xs text-slate-400 uppercase tracking-wide block mb-0.5">{t("checkout_price_label")}</span>
-                            {priceLoading ? (
-                                <span className="text-xl font-semibold text-slate-400">...</span>
-                            ) : matchingPrice ? (
+                            {matchingPrice ? (
                                 <div className="flex items-baseline justify-end gap-2">
                                     <span className="text-2xl font-bold text-emerald-400">
                                         €{(finalPrice / 100).toFixed(2)}
@@ -495,7 +441,25 @@ export default function CheckoutForm({
             </div>
 
             {/* Participant Details Form */}
-            <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-300 shadow-2xl p-6 space-y-6 relative z-10">
+            <form
+                method="POST"
+                action="/api/checkout/create-session"
+                onSubmit={handleSubmit}
+                className="bg-white rounded-2xl border border-slate-300 shadow-2xl p-6 space-y-6 relative z-10"
+            >
+                {/* Hidden inputs project JS-controlled state into native FormData. */}
+                <input type="hidden" name="eventSlug" value={event.slug} />
+                <input type="hidden" name="distanceIndex" value={selectedDistanceIndex} />
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="priceId" value={matchingPrice?.priceId || ""} />
+                <input type="hidden" name="phone" value={formData.phone} />
+                <input type="hidden" name="needsAccommodation" value={formData.needsAccommodation ? "1" : "0"} />
+                <input type="hidden" name="accommodationType" value={formData.accommodationType || ""} />
+                <input type="hidden" name="accommodationWaitlist" value={formData.accommodationType === "dorm" && isDormWaitlist ? "1" : "0"} />
+                <input type="hidden" name="wantsPreparationTips" value={formData.wantsPreparationTips ? "1" : "0"} />
+                <input type="hidden" name="preparationTipsChannel" value={formData.preparationTipsChannels.join(",")} />
+                <input type="hidden" name="couponId" value={discountData?.code || ""} />
+                <input type="hidden" name="originalPrice" value={originalPrice} />
                 {/* Name */}
                 <div>
                     <label htmlFor="name" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
@@ -504,6 +468,7 @@ export default function CheckoutForm({
                     <input
                         type="text"
                         id="name"
+                        name="name"
                         autoComplete="name"
                         value={formData.name}
                         onChange={(e) => handleInputChange("name", e.target.value)}
@@ -523,6 +488,7 @@ export default function CheckoutForm({
                     <input
                         type="email"
                         id="email"
+                        name="email"
                         autoComplete="email"
                         inputMode="email"
                         value={formData.email}
@@ -683,53 +649,6 @@ export default function CheckoutForm({
                     )}
                 </div>
 
-                {/* Emergency Contact Section */}
-                <div className="space-y-6 !mt-8">
-                    <div className="flex items-center gap-3">
-                        <div className="h-px flex-1 bg-slate-200" />
-                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                            {t("checkout_emergency_section_label")}
-                        </span>
-                        <div className="h-px flex-1 bg-slate-200" />
-                    </div>
-
-                    {/* Emergency Name */}
-                    <div>
-                        <label htmlFor="emergencyName" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-                            {t("checkout_emergency_name_label")} <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="emergencyName"
-                            autoComplete="off"
-                            value={formData.emergencyName}
-                            onChange={(e) => handleInputChange("emergencyName", e.target.value)}
-                            className={`w-full px-4 py-3 bg-white border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent transition-all ${errors.emergencyName ? 'border-red-300 focus:ring-red-500' : 'border-slate-300 hover:border-slate-400'}`}
-                            placeholder="Anna Bērziņa"
-                        />
-                        {errors.emergencyName && (
-                            <p className="mt-1.5 text-sm text-red-600">{errors.emergencyName}</p>
-                        )}
-                    </div>
-
-                    {/* Emergency Phone */}
-                    <div>
-                        <label htmlFor="emergencyPhone" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-                            {t("checkout_emergency_phone_label")} <span className="text-red-500">*</span>
-                        </label>
-                        <PhoneInput
-                            international
-                            defaultCountry="LV"
-                            value={formData.emergencyPhone}
-                            onChange={(phone) => handleInputChange("emergencyPhone", phone || "")}
-                            className={`checkout-phone-input ${errors.emergencyPhone ? 'error' : ''}`}
-                        />
-                        {errors.emergencyPhone && (
-                            <p className="mt-1.5 text-sm text-red-600">{errors.emergencyPhone}</p>
-                        )}
-                    </div>
-                </div>
-
                 {/* Discount Code Section */}
                 <div className="space-y-3">
                     <label htmlFor="discountCode" className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
@@ -818,7 +737,7 @@ export default function CheckoutForm({
                 <div className="sticky bottom-0 sm:static bg-white/95 backdrop-blur-sm sm:backdrop-blur-none -mx-6 px-6 py-4 sm:py-0 sm:mx-0 sm:px-0 border-t border-slate-100 sm:border-t-0 pb-safe">
                     <button
                         type="submit"
-                        disabled={isSubmitting || priceLoading || showPriceError}
+                        disabled={isSubmitting || showPriceError}
                         className="w-full py-4 px-6 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 text-white font-semibold text-lg rounded-xl transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? (

@@ -8,6 +8,7 @@ import { ExternalLinkIcon, LocationIcon } from "./Icons";
 import FAQ from "./FAQ";
 import Header from "./Header";
 import Gallery from "./Gallery";
+import EventPlan from "./EventPlan";
 import { useTranslations, useLocale } from "next-intl";
 import { formatText } from "@/app/lib/formatText";
 
@@ -60,7 +61,7 @@ export default function EventPage({ event }: EventPageProps) {
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
 
-  // Compute distance options for hero fact line (e.g. "200 km vai 370 km")
+  // Compute distance options for hero fact line (e.g. "225 km vai 370 km")
   const allDistanceValues = event.distances.map(d => {
     const fact = d.facts.find(f => f.icon === "route");
     return fact?.value || "";
@@ -425,6 +426,7 @@ export default function EventPage({ event }: EventPageProps) {
                 <iframe
                   src={selectedDistance.distanceEmbedUrl.replace(/sampleGraph=(true|false)/, `sampleGraph=${!isMobile}`)}
                   title="Route Map"
+                  loading="lazy"
                   className="h-[400px] sm:h-[700px]"
                   style={{
                     width: '1px',
@@ -486,6 +488,11 @@ export default function EventPage({ event }: EventPageProps) {
               {formatText(t(event.routeHighlightsKey as any))}
             </div>
           </section>
+        )}
+
+        {/* Event Plan — chronological narrative of what happens when */}
+        {event.plan && event.plan.length > 0 && (
+          <EventPlan items={event.plan} isDakar={isDakar} />
         )}
 
         {/* Photo Gallery Section */}

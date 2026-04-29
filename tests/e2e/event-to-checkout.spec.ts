@@ -138,7 +138,7 @@ test.describe("Event to Checkout Flow", () => {
     test("should show correct distance facts on checkout", async ({ page }) => {
       await page.goto("/egipte-malta");
 
-      // Select first distance (200 km)
+      // Select first distance (225 km)
       const firstDistanceButton = page
         .getByRole("button")
         .filter({ hasText: "Piedzīvojums" })
@@ -151,8 +151,8 @@ test.describe("Event to Checkout Flow", () => {
       const registerButton = page.getByRole("link", { name: /Reģistrēties/ });
       await registerButton.click();
 
-      // Should show 200 km distance (use span.font-medium to avoid matching option text)
-      await expect(page.locator('span.font-medium', { hasText: '200 km' })).toBeVisible();
+      // Should show 225 km distance (use span.font-medium to avoid matching option text)
+      await expect(page.locator('span.font-medium', { hasText: '225 km' })).toBeVisible();
 
       // Should show 1200 m elevation
       await expect(page.locator('span.font-medium', { hasText: '1200 m' })).toBeVisible();

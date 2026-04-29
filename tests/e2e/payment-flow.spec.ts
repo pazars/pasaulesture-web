@@ -63,8 +63,6 @@ test.describe("Payment Flow E2E", () => {
       await page.fill('input[id="name"]', "Test User");
       await page.fill('input[id="email"]', "test@example.com");
       await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
-      await page.fill('input[id="emergencyName"]', "Emergency Contact");
-      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
 
       // Submit without checking terms
       const submitButton = page.locator('button[type="submit"]');
@@ -88,8 +86,6 @@ test.describe("Payment Flow E2E", () => {
       await page.fill('input[id="name"]', "E2E Test User");
       await page.fill('input[id="email"]', "e2e-test@example.com");
       await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
-      await page.fill('input[id="emergencyName"]', "Emergency Contact");
-      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.check('input[id="terms"]');
 
       // Submit form
@@ -113,8 +109,6 @@ test.describe("Payment Flow E2E", () => {
       await page.fill('input[id="name"]', "E2E Test User");
       await page.fill('input[id="email"]', "e2e-test@example.com");
       await page.locator('.checkout-phone-input input[type="tel"]').first().fill("+37120000000");
-      await page.fill('input[id="emergencyName"]', "Emergency Contact");
-      await page.locator('.checkout-phone-input input[type="tel"]').nth(1).fill("+37120000001");
       await page.check('input[id="terms"]');
 
       // Click submit and check for loading state
@@ -123,6 +117,33 @@ test.describe("Payment Flow E2E", () => {
 
       // Button should show loading spinner (SVG with animate-spin class)
       await expect(page.locator("button svg.animate-spin")).toBeVisible();
+    });
+
+    test("form posts natively to /api/checkout/create-session (browser-driven 303 redirect)", async ({
+      page,
+    }) => {
+      // Regression guard: the redirect must be browser-native, not JS-driven.
+      // If this attribute drifts, we lose mobile-tab-suspension robustness.
+      await page.goto("/egipte-malta/checkout?distance=0");
+
+      const form = page.locator("form").filter({ has: page.locator('button[type="submit"]') });
+      await expect(form).toHaveAttribute("method", /post/i);
+      await expect(form).toHaveAttribute("action", "/api/checkout/create-session");
+    });
+
+    test("renders dorm-full banner when server redirects back with ?error=dorm_full", async ({
+      page,
+    }) => {
+      // Simulate the server-side dorm-full redirect by landing on the URL directly.
+      // The component reads ?error=dorm_full on mount, shows the banner, then strips the param.
+      await page.goto("/egipte-malta/checkout?distance=0&error=dorm_full");
+
+      await expect(
+        page.getByText(/Kopmītnes vietas aizpildījās/i)
+      ).toBeVisible();
+
+      // The error param is stripped via router.replace so reload doesn't re-trigger.
+      await expect(page).toHaveURL(/\/egipte-malta\/checkout\?distance=0$/);
     });
   });
 
@@ -190,47 +211,6 @@ test.describe("Payment Flow E2E", () => {
 
       // Should show English error message
       await expect(page.getByText(/No session found/i)).toBeVisible();
-    });
-  });
-
-  test.describe("Price Loading States", () => {
-    test("should disable submit button while prices are loading", async ({
-      page,
-    }) => {
-      // Navigate to checkout
-      await page.goto("/egipte-malta/checkout?distance=0");
-
-      // Initially, button may be disabled until prices load
-      const submitButton = page.locator('button[type="submit"]');
-
-      // Wait for prices to load (any price starting with €)
-      await expect(page.locator("text=/€\\d+/")).toBeVisible({ timeout: 10000 });
-
-      // After load, fill form and button should be enabled
-      await page.fill('input[id="name"]', "Test");
-      await page.fill('input[id="email"]', "test@test.com");
-      await page.check('input[id="terms"]');
-
-      await expect(submitButton).toBeEnabled();
-    });
-
-    test("should show error message if prices fail to load", async ({
-      page,
-    }) => {
-      // Block the prices API
-      await page.route("**/api/stripe/prices", (route) => {
-        route.fulfill({
-          status: 500,
-          body: JSON.stringify({ error: "Internal error" }),
-        });
-      });
-
-      await page.goto("/egipte-malta/checkout?distance=0");
-
-      // Should show error state
-      await expect(
-        page.getByText(/Registration is temporarily unavailable/i)
-      ).toBeVisible({ timeout: 10000 });
     });
   });
 

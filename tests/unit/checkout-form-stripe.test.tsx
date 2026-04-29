@@ -2,10 +2,9 @@
  * CheckoutForm Stripe Integration Tests
  *
  * Tests the CheckoutForm component's integration with Stripe APIs:
- * - Fetching prices from /api/stripe/prices
- * - Creating checkout sessions via /api/checkout/create-session
- * - Redirecting to Stripe Checkout
- * - Error handling for missing prices
+ * - Receives prices via `initialPrices` prop (SSR'd from the checkout page)
+ * - Native form POST to /api/checkout/create-session (browser-driven 303 redirect)
+ * - Error handling when no matching price is available
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -15,7 +14,7 @@ import "@testing-library/jest-dom";
 import CheckoutForm from "@/app/components/CheckoutForm";
 import { events } from "@/app/data/events";
 
-// Mock fetch
+// Mock fetch (still needed for accommodation availability + discount lookups)
 global.fetch = vi.fn();
 
 // Mock next/navigation
@@ -50,15 +49,17 @@ vi.mock("react-phone-number-input", () => ({
   isValidPhoneNumber: () => true,
 }));
 
+const accommodationFetch = () =>
+  vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ dorm: { total: 15, remaining: 10, available: true } }),
+  });
+
 describe("CheckoutForm Stripe Integration", () => {
   const mockEvent = events["egipte-malta"];
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock window.location.href
-    delete (window as any).location;
-    window.location = { href: "" } as any;
-    // Mock localStorage
     global.localStorage = {
       getItem: vi.fn(),
       setItem: vi.fn(),
@@ -69,113 +70,86 @@ describe("CheckoutForm Stripe Integration", () => {
     };
   });
 
-  it("fetches prices on mount", async () => {
-    const mockFetch = vi.fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          prices: [
-            { priceId: "price_123", eventSlug: "egipte-malta", distanceIndex: 0, amount: 6900 },
-          ],
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          dorm: { total: 15, remaining: 10, available: true },
-        }),
-      });
+  it("renders the matching price from initialPrices without any fetch to /api/stripe/prices", async () => {
+    const mockFetch = accommodationFetch();
     global.fetch = mockFetch;
 
-    render(<CheckoutForm event={mockEvent} />);
+    render(
+      <CheckoutForm
+        event={mockEvent}
+        initialPrices={[
+          { priceId: "price_123", eventSlug: "egipte-malta", distanceIndex: 1, amount: 6900 },
+        ]}
+        initialAccommodation={null}
+      />,
+    );
 
+    // Price renders synchronously from props, no waiting on a fetch.
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith("/api/stripe/prices");
+      expect(screen.getByText("€69.00")).toBeInTheDocument();
     });
+
+    // Confirm we never poked /api/stripe/prices.
+    const calls = mockFetch.mock.calls.map((c) => c[0]);
+    expect(calls).not.toContain("/api/stripe/prices");
   });
 
-  it("creates checkout session and redirects on submit", async () => {
-    const mockFetch = vi.fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          prices: [
-            { priceId: "price_123", eventSlug: "egipte-malta", distanceIndex: 1, amount: 6900 },
-          ],
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          dorm: { total: 15, remaining: 10, available: true },
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          url: "https://checkout.stripe.com/pay/cs_test_123",
-        }),
-      });
-    global.fetch = mockFetch;
+  it("renders a native POST form pointing at the create-session endpoint with hidden state inputs", async () => {
+    global.fetch = accommodationFetch();
 
-    render(<CheckoutForm event={mockEvent} />);
+    const { container } = render(
+      <CheckoutForm
+        event={mockEvent}
+        initialPrices={[
+          { priceId: "price_123", eventSlug: "egipte-malta", distanceIndex: 1, amount: 6900 },
+        ]}
+        initialAccommodation={null}
+      />,
+    );
 
-    // Wait for prices to load and button to become enabled
-    await waitFor(() => {
-      const button = screen.getByRole("button", { name: /checkout_submit/i });
-      expect(button).not.toBeDisabled();
-    });
+    const button = screen.getByRole("button", { name: /checkout_submit/i });
+    expect(button).not.toBeDisabled();
 
-    // Fill form - name, email, phone, emergency contact fields
+    // The form drives a native POST so the browser owns the redirect (suspension-safe).
+    const form = container.querySelector("form");
+    expect(form).not.toBeNull();
+    expect(form!.method.toLowerCase()).toBe("post");
+    expect(form!.getAttribute("action")).toBe("/api/checkout/create-session");
+
+    // Fill participant fields so visible inputs serialize.
     await userEvent.type(screen.getByLabelText(/checkout_name_label/i), "John Doe");
     await userEvent.type(screen.getByLabelText(/checkout_email_label/i), "john@example.com");
-    // Fill phone inputs (there are multiple phone-input testids)
-    const phoneInputs = screen.getAllByTestId("phone-input");
-    await userEvent.type(phoneInputs[0], "+37120000000"); // participant phone
-    // Fill emergency contact fields
-    await userEvent.type(screen.getByLabelText(/checkout_emergency_name_label/i), "Jane Doe");
-    await userEvent.type(phoneInputs[1], "+37120000001"); // emergency phone
-    // Accept terms (first checkbox that isn't accommodation/tips)
-    const checkboxes = screen.getAllByRole("checkbox");
-    const termsCheckbox = checkboxes.find(cb => cb.id === "terms");
-    if (termsCheckbox) await userEvent.click(termsCheckbox);
+    await userEvent.type(screen.getByTestId("phone-input"), "+37120000000");
 
-    // Submit
-    await userEvent.click(screen.getByRole("button", { name: /checkout_submit/i }));
+    const fd = new FormData(form!);
 
-    // Check session creation request
-    await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        "/api/checkout/create-session",
-        expect.objectContaining({
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: expect.stringContaining("egipte-malta"),
-        })
-      );
-    });
+    // Hidden inputs project JS-controlled state into FormData.
+    expect(fd.get("eventSlug")).toBe("egipte-malta");
+    expect(fd.get("locale")).toBe("lv");
+    expect(fd.get("priceId")).toBe("price_123");
+    expect(fd.get("phone")).toBe("+37120000000");
+    expect(fd.get("needsAccommodation")).toBe("0");
+    expect(fd.get("originalPrice")).toBe("6900");
 
-    // Check redirect
-    expect(window.location.href).toBe("https://checkout.stripe.com/pay/cs_test_123");
+    // Visible inputs serialize via their name= attributes.
+    expect(fd.get("name")).toBe("John Doe");
+    expect(fd.get("email")).toBe("john@example.com");
   });
 
-  it("shows error if price not found", async () => {
-    const mockFetch = vi.fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          prices: [], // No prices
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          dorm: { total: 15, remaining: 10, available: true },
-        }),
-      });
-    global.fetch = mockFetch;
+  it("shows error banner when no matching price is in initialPrices", async () => {
+    global.fetch = accommodationFetch();
 
-    render(<CheckoutForm event={mockEvent} />);
+    render(<CheckoutForm event={mockEvent} initialPrices={[]} initialAccommodation={null} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows error banner when initialPrices is null (server-side fetch failed)", async () => {
+    global.fetch = accommodationFetch();
+
+    render(<CheckoutForm event={mockEvent} initialPrices={null} initialAccommodation={null} />);
 
     await waitFor(() => {
       expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument();
