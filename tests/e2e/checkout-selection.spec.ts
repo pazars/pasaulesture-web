@@ -104,8 +104,8 @@ test.describe("Checkout - Event & Distance Selection", () => {
     }) => {
       await page.goto("/egipte-malta/checkout?distance=0");
 
-      // Verify initial distance facts (200 km) - use span.font-medium to avoid matching option text
-      await expect(page.locator('span.font-medium', { hasText: '200 km' })).toBeVisible();
+      // Verify initial distance facts (225 km) - use span.font-medium to avoid matching option text
+      await expect(page.locator('span.font-medium', { hasText: '225 km' })).toBeVisible();
 
       // Change to distance 1
       const distanceSelect = page.getByTestId("distance-select");
@@ -113,7 +113,7 @@ test.describe("Checkout - Event & Distance Selection", () => {
 
       // Verify updated distance facts (370 km)
       await expect(page.locator('span.font-medium', { hasText: '370 km' })).toBeVisible();
-      await expect(page.locator('span.font-medium', { hasText: '200 km' })).not.toBeVisible();
+      await expect(page.locator('span.font-medium', { hasText: '225 km' })).not.toBeVisible();
     });
 
     test("should update elevation when distance changes", async ({ page }) => {
