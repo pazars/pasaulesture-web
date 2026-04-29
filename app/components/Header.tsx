@@ -66,8 +66,8 @@ export default function Header({ currentSlug }: HeaderProps) {
                   key={e.slug}
                   className={`flex-1 text-center py-2 rounded-full font-accent font-bold text-sm cursor-default transition-all ${
                     isTabDakar
-                      ? "bg-dakar-cream text-dakar-brown shadow-md shadow-dakar-cream/25"
-                      : "bg-pink text-blue shadow-md shadow-pink/25"
+                      ? "bg-dakar-cream text-dakar-brown"
+                      : "bg-pink text-blue"
                   }`}
                 >
                   {eventName}
@@ -107,8 +107,8 @@ export default function Header({ currentSlug }: HeaderProps) {
                     key={e.slug}
                     className={`relative px-8 py-3.5 rounded-full font-accent font-bold text-lg cursor-default whitespace-nowrap scale-105 ${
                       isDakar
-                        ? "bg-dakar-cream text-dakar-brown shadow-xl shadow-dakar-cream/40"
-                        : "bg-pink text-blue shadow-xl shadow-pink/40"
+                        ? "bg-dakar-cream text-dakar-brown"
+                        : "bg-pink text-blue"
                     }`}
                   >
                     {eventName}
