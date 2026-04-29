@@ -27,7 +27,7 @@ export default function EventPlan({ items, isDakar = false }: EventPlanProps) {
   const t = useTranslations();
 
   return (
-    <section className="relative py-16 sm:py-24 mx-2 rounded-3xl overflow-hidden">
+    <section id="event-plan" className="relative py-16 sm:py-24 mx-2 rounded-3xl overflow-hidden">
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         <div className="text-center mb-14 sm:mb-20">
           <h2 className="font-accent text-4xl sm:text-5xl text-beige mb-4">
