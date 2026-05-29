@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
 });
 
-const DORM_TOTAL_SPOTS = 15;
+const DORM_TOTAL_SPOTS = 10;
 
 function getString(form: FormData, key: string): string {
   const v = form.get(key);
