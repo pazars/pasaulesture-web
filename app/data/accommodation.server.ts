@@ -1,7 +1,7 @@
 import "server-only";
 import { neon } from "@neondatabase/serverless";
 
-const DORM_TOTAL_SPOTS = 15;
+const DORM_TOTAL_SPOTS = 10;
 
 export interface AccommodationAvailability {
   dorm: {
