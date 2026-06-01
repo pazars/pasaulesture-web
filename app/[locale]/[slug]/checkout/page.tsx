@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getEventBySlug } from "@/app/data/events";
 import { getStripePrices } from "@/app/data/stripe-prices.server";
 import { getAccommodationAvailability } from "@/app/data/accommodation.server";
@@ -26,6 +26,12 @@ export default async function CheckoutPage({
 
     if (!event) {
         notFound();
+    }
+
+    // Registration disabled for this event — send visitors back to the event page,
+    // which shows the "registration closed" notice.
+    if (event.registrationClosed) {
+        redirect(locale === "en" ? `/en/${slug}` : `/${slug}`);
     }
 
     const [initialPrices, initialAccommodation] = await Promise.all([

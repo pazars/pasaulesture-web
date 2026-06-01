@@ -31,6 +31,7 @@ export interface EventData {
   surfaceType: string;
   distances: EventDistance[];
   registrationUrl: string;
+  registrationClosed?: boolean; // When true, registration CTAs show "closed" text instead of linking to checkout
   hasAccommodation: boolean;
   heroQuoteKey: string;
   heroQuote2Key: string;
@@ -55,7 +56,7 @@ export const events: Record<string, EventData> = {
         nameKey: "distance_adventure",
         facts: [
           { icon: "calendar", labelKey: "label_date", value: "06/06 9AM" },
-          { icon: "route", labelKey: "label_distance", value: "225 km" },
+          { icon: "route", labelKey: "label_distance", value: "234 km" },
           { icon: "mountain", labelKey: "label_elevation", value: "1200 m" },
           { icon: "clock", labelKey: "label_time_limit", value: "35h" },
         ],
@@ -83,6 +84,7 @@ export const events: Record<string, EventData> = {
       }
     ],
     registrationUrl: "",
+    registrationClosed: true,
     hasAccommodation: true,
     heroQuoteKey: "hero_quote_egipte_malta",
     heroQuote2Key: "hero_quote_2_egipte_malta",

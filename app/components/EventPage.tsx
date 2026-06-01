@@ -61,7 +61,7 @@ export default function EventPage({ event }: EventPageProps) {
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
 
-  // Compute distance options for hero fact line (e.g. "225 km vai 370 km")
+  // Compute distance options for hero fact line (e.g. "234 km vai 370 km")
   const allDistanceValues = event.distances.map(d => {
     const fact = d.facts.find(f => f.icon === "route");
     return fact?.value || "";
@@ -74,6 +74,7 @@ export default function EventPage({ event }: EventPageProps) {
 
   // Event-specific theme configuration
   const isDakar = event.slug === "parize-dakara";
+  const registrationClosed = event.registrationClosed ?? false;
   const heroImageSrc = isDakar ? "/post/dakar/dakar-card.png" : (event.gallery?.[0] || "/post/card.png");
   // Dakar uses only the golden stamp, Malta uses blue + pink
   const stamps = isDakar
@@ -322,16 +323,22 @@ export default function EventPage({ event }: EventPageProps) {
             <p className="text-lg md:text-xl lg:text-2xl text-beige font-medium italic leading-relaxed font-accent">
               {t(event.heroQuoteKey as any)}
             </p>
-            <Link
-              href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
-              className={`inline-block text-base font-bold px-10 py-4 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all mt-6 ${
-                isDakar
-                  ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30"
-                  : "bg-pink text-blue shadow-pink/30"
-              }`}
-            >
-              {t("register_button")}
-            </Link>
+            {registrationClosed ? (
+              <p className="mt-6 font-accent font-bold text-xl text-beige/90">
+                {t("registration_closed")}
+              </p>
+            ) : (
+              <Link
+                href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
+                className={`inline-block text-base font-bold px-10 py-4 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all mt-6 ${
+                  isDakar
+                    ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30"
+                    : "bg-pink text-blue shadow-pink/30"
+                }`}
+              >
+                {t("register_button")}
+              </Link>
+            )}
           </div>
         </section>
 
@@ -341,16 +348,22 @@ export default function EventPage({ event }: EventPageProps) {
             <p className="text-2xl text-beige font-display leading-relaxed mb-6">
               {t(event.heroQuoteKey as any)}
             </p>
-            <Link
-              href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
-              className={`inline-block text-base font-bold px-8 py-3.5 rounded-full shadow-lg transition-all hover:-translate-y-0.5 ${
-                isDakar
-                  ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30"
-                  : "bg-pink text-blue shadow-pink/30"
-              }`}
-            >
-              {t("register_button")}
-            </Link>
+            {registrationClosed ? (
+              <p className="font-accent font-bold text-lg text-beige/90">
+                {t("registration_closed")}
+              </p>
+            ) : (
+              <Link
+                href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
+                className={`inline-block text-base font-bold px-8 py-3.5 rounded-full shadow-lg transition-all hover:-translate-y-0.5 ${
+                  isDakar
+                    ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30"
+                    : "bg-pink text-blue shadow-pink/30"
+                }`}
+              >
+                {t("register_button")}
+              </Link>
+            )}
           </div>
         </section>
 
@@ -533,12 +546,18 @@ export default function EventPage({ event }: EventPageProps) {
 
           {/* CTA content — sits on top */}
           <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
-            <Link
-              href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
-              className={`inline-block text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all ${isDakar ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30 hover:shadow-dakar-yellow/40" : "bg-pink text-blue shadow-pink/30 hover:shadow-pink/40"}`}
-            >
-              {t("register_button")}
-            </Link>
+            {registrationClosed ? (
+              <p className="font-accent font-bold text-xl text-beige/90">
+                {t("registration_closed")}
+              </p>
+            ) : (
+              <Link
+                href={`/${locale === "en" ? "en/" : ""}${event.slug}/checkout?distance=${selectedDistanceIndex}`}
+                className={`inline-block text-lg font-bold px-10 py-5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all ${isDakar ? "bg-dakar-yellow text-dakar-brown shadow-dakar-yellow/30 hover:shadow-dakar-yellow/40" : "bg-pink text-blue shadow-pink/30 hover:shadow-pink/40"}`}
+              >
+                {t("register_button")}
+              </Link>
+            )}
           </div>
         </section>
 

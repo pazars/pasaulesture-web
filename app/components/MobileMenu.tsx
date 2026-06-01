@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CloseIcon, InstagramIcon } from "./Icons";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { events } from "@/app/data/events";
 import { useTranslations, useLocale } from "next-intl";
 
 interface MobileMenuProps {
@@ -17,6 +18,7 @@ export default function MobileMenu({ currentSlug, isOpen, onClose }: MobileMenuP
   const t = useTranslations();
   const locale = useLocale();
   const isDakar = currentSlug === "parize-dakara";
+  const registrationClosed = events[currentSlug]?.registrationClosed ?? false;
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -121,17 +123,23 @@ export default function MobileMenu({ currentSlug, isOpen, onClose }: MobileMenuP
 
         {/* Page navigation */}
         <nav className="px-6 pb-2 flex flex-col gap-3">
-          <Link
-            href={checkoutPath}
-            onClick={onClose}
-            className={`block text-center px-6 py-4 rounded-2xl font-accent font-bold text-lg transition-all ${
-              isDakar
-                ? "bg-dakar-cream text-dakar-brown shadow-lg shadow-dakar-cream/30 active:shadow-dakar-cream/50"
-                : "bg-pink text-blue shadow-lg shadow-pink/30 active:shadow-pink/50"
-            }`}
-          >
-            {t("register_button")}
-          </Link>
+          {registrationClosed ? (
+            <p className="text-center py-4 font-accent font-semibold text-lg text-beige/80">
+              {t("registration_closed")}
+            </p>
+          ) : (
+            <Link
+              href={checkoutPath}
+              onClick={onClose}
+              className={`block text-center px-6 py-4 rounded-2xl font-accent font-bold text-lg transition-all ${
+                isDakar
+                  ? "bg-dakar-cream text-dakar-brown shadow-lg shadow-dakar-cream/30 active:shadow-dakar-cream/50"
+                  : "bg-pink text-blue shadow-lg shadow-pink/30 active:shadow-pink/50"
+              }`}
+            >
+              {t("register_button")}
+            </Link>
+          )}
           <button onClick={() => scrollTo("route")} className={linkClass}>
             {t("section_route")}
           </button>

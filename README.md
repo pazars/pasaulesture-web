@@ -123,7 +123,7 @@ All sections use `rounded-3xl` corners with `mt-6 mx-2` spacing for a friendly, 
 Create a file `stripe-products.txt` (gitignored) with this content:
 
 ```
-Ēģipte-Malta - Piedzīvojums (225km):
+Ēģipte-Malta - Piedzīvojums (234km):
   event_slug: egipte-malta
   distance_index: 0
 
