@@ -61,7 +61,7 @@ export default function EventPage({ event }: EventPageProps) {
   const selectedDistance: EventDistance = event.distances[selectedDistanceIndex];
   const formattedDate = formatEventDate(event.date, locale);
 
-  // Compute distance options for hero fact line (e.g. "225 km vai 370 km")
+  // Compute distance options for hero fact line (e.g. "234 km vai 370 km")
   const allDistanceValues = event.distances.map(d => {
     const fact = d.facts.find(f => f.icon === "route");
     return fact?.value || "";
