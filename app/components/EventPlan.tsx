@@ -92,9 +92,14 @@ export default function EventPlan({ items, isDakar = false }: EventPlanProps) {
                         sizes="(max-width: 768px) calc(100vw - 4rem), 640px"
                       />
                     </div>
-                    {item.captionKey && (
+                    {(item.captionKey || item.sourceKey) && (
                       <figcaption className="text-beige/55 text-center font-accent italic text-sm mt-3 tracking-wide">
-                        {t(item.captionKey as any)}
+                        {item.captionKey && t(item.captionKey as any)}
+                        {item.sourceKey && (
+                          <span className="block not-italic text-xs text-beige/40 mt-0.5">
+                            {t(item.sourceKey as any)}
+                          </span>
+                        )}
                       </figcaption>
                     )}
                   </figure>
@@ -114,9 +119,14 @@ export default function EventPlan({ items, isDakar = false }: EventPlanProps) {
                             sizes="(max-width: 768px) 100vw, 600px"
                           />
                         </div>
-                        {item.captionKey && (
+                        {(item.captionKey || item.sourceKey) && (
                           <figcaption className="absolute bottom-3 sm:bottom-4 left-0 right-0 text-center font-display text-blue/80 text-base sm:text-lg italic px-3">
-                            {t(item.captionKey as any)}
+                            {item.captionKey && t(item.captionKey as any)}
+                            {item.sourceKey && (
+                              <span className="block not-italic text-xs text-blue/55 mt-0.5">
+                                {t(item.sourceKey as any)}
+                              </span>
+                            )}
                           </figcaption>
                         )}
                       </div>
@@ -135,9 +145,14 @@ export default function EventPlan({ items, isDakar = false }: EventPlanProps) {
                       sizes="(max-width: 768px) 100vw, 672px"
                     />
                   </div>
-                  {item.captionKey && (
+                  {(item.captionKey || item.sourceKey) && (
                     <figcaption className="text-beige/55 text-center font-accent italic text-sm mt-3 tracking-wide">
-                      {t(item.captionKey as any)}
+                      {item.captionKey && t(item.captionKey as any)}
+                      {item.sourceKey && (
+                        <span className="block not-italic text-xs text-beige/40 mt-0.5">
+                          {t(item.sourceKey as any)}
+                        </span>
+                      )}
                     </figcaption>
                   )}
                 </figure>

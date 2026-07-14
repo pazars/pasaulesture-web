@@ -20,7 +20,7 @@ export interface EventDistance {
 export type PlanItem =
   | { kind: "prose"; bodyKey: string; leadKey?: string }
   | { kind: "chapter"; titleKey: string }
-  | { kind: "image"; src: string; captionKey?: string; variant?: "full" | "postcard" | "paper"; width?: number; height?: number }
+  | { kind: "image"; src: string; captionKey?: string; sourceKey?: string; variant?: "full" | "postcard" | "paper"; width?: number; height?: number }
   | { kind: "break" };
 
 export interface EventData {
@@ -153,6 +153,15 @@ export const events: Record<string, EventData> = {
     plan: [
       { kind: "chapter", titleKey: "plan_pd_1_title" },
       { kind: "prose", leadKey: "plan_pd_2_lead", bodyKey: "plan_pd_2_body" },
+      { kind: "image", src: "/events/parize-dakara/plan/vaivari.jpg", captionKey: "plan_pd_3_caption", sourceKey: "plan_pd_3_source", variant: "paper", width: 1200, height: 1200 },
+      { kind: "prose", bodyKey: "plan_pd_4_body" },
+      { kind: "prose", bodyKey: "plan_pd_5_body" },
+      { kind: "prose", bodyKey: "plan_pd_6_body" },
+      { kind: "image", src: "/events/parize-dakara/plan/eiffel.jpg", captionKey: "plan_pd_6_caption", variant: "paper", width: 1067, height: 1600 },
+      { kind: "prose", bodyKey: "plan_pd_7_body" },
+      { kind: "prose", bodyKey: "plan_pd_8_body" },
+      { kind: "image", src: "/events/parize-dakara/plan/bernati.jpg", captionKey: "plan_pd_9_caption", sourceKey: "plan_pd_9_source", variant: "paper", width: 1200, height: 799 },
+      { kind: "prose", bodyKey: "plan_pd_10_body" },
     ],
   },
 };
