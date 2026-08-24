@@ -145,6 +145,7 @@ export const events: Record<string, EventData> = {
       },
     ],
     registrationUrl: "",
+    registrationClosed: true,
     hasAccommodation: false,
     heroQuoteKey: "hero_quote_parize_dakara",
     heroQuote2Key: "hero_quote_2_parize_dakara",
